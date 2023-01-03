@@ -28,6 +28,7 @@
 #include "stm32l475e_iot01_hsensor.h"
 #include <math.h>
 #include <string.h>
+//prueba
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/

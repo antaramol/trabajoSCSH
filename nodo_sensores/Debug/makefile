@@ -40,34 +40,34 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
-BUILD_ARTIFACT_NAME := Practica_4
+BUILD_ARTIFACT_NAME := nodo_sensores
 BUILD_ARTIFACT_EXTENSION := elf
 BUILD_ARTIFACT_PREFIX :=
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-Practica_4.elf \
+nodo_sensores.elf \
 
 MAP_FILES += \
-Practica_4.map \
+nodo_sensores.map \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-Practica_4.list \
+nodo_sensores.list \
 
 
 # All Target
 all: main-build
 
 # Main-build Target
-main-build: Practica_4.elf secondary-outputs
+main-build: nodo_sensores.elf secondary-outputs
 
 # Tool invocations
-Practica_4.elf Practica_4.map: $(OBJS) $(USER_OBJS) C:\Users\Juanm\OneDrive\Escritorio\Universidad\Sistemas\ ciberfisicos\ y\ seguridad\ hardware\Trabajo_workspace\Practica_4\STM32L475VGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "Practica_4.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Juanm\OneDrive\Escritorio\Universidad\Sistemas ciberfisicos y seguridad hardware\Trabajo_workspace\Practica_4\STM32L475VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Practica_4.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+nodo_sensores.elf nodo_sensores.map: $(OBJS) $(USER_OBJS) C:\Users\anton\STM32CubeIDE\trabajoSCSH\nodo_sensores\STM32L475VGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "nodo_sensores.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\anton\STM32CubeIDE\trabajoSCSH\nodo_sensores\STM32L475VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="nodo_sensores.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -76,14 +76,14 @@ default.size.stdout: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-Practica_4.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "Practica_4.list"
+nodo_sensores.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "nodo_sensores.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) Practica_4.elf Practica_4.list Practica_4.map default.size.stdout
+	-$(RM) default.size.stdout nodo_sensores.elf nodo_sensores.list nodo_sensores.map
 	-@echo ' '
 
 secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
