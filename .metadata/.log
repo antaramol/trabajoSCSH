@@ -1,0 +1,57 @@
+!SESSION 2023-01-03 17:16:40.147 -----------------------------------------------
+eclipse.buildId=Version 1.11.0
+java.version=11.0.16
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=es_ES
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -data C:\Users\anton\STM32CubeIDE\workspace_1.11.0\trabajo
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2023-01-03 17:16:44.327
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2023-01-03 17:16:44.390
+!MESSAGE Log4j initialized with config file C:\Users\anton\STM32CubeIDE\workspace_1.11.0\trabajo\.metadata\.log4j.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2023-01-03 17:16:46.407
+!MESSAGE Started RMI Server, listening on port 41337
+!SESSION 2023-01-03 17:17:42.782 -----------------------------------------------
+eclipse.buildId=Version 1.11.0
+java.version=11.0.16
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=es_ES
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -data C:\Users\anton\STM32CubeIDE\workspace_1.11.0\trabajo
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2023-01-03 17:17:45.970
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2023-01-03 17:17:46.020
+!MESSAGE Log4j initialized with config file C:\Users\anton\STM32CubeIDE\workspace_1.11.0\trabajo\.metadata\.log4j.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2023-01-03 17:17:48.380
+!MESSAGE Started RMI Server, listening on port 41337
+
+!ENTRY org.eclipse.cdt.core 1 0 2023-01-03 17:19:06.442
+!MESSAGE Indexed 'Practica_aceleraciones' (47 sources, 176 headers) in 4.08 sec: 20,196 declarations; 116,212 references; 3 unresolved inclusions; 156 syntax errors; 172 unresolved names (0.13%)
+!SESSION 2023-01-03 17:20:10.117 -----------------------------------------------
+eclipse.buildId=Version 1.11.0
+java.version=11.0.16
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=es_ES
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -data C:\Users\anton\STM32CubeIDE\trabajo
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2023-01-03 17:20:13.360
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2023-01-03 17:20:13.400
+!MESSAGE Log4j initialized with config file C:\Users\anton\STM32CubeIDE\trabajo\.metadata\.log4j.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2023-01-03 17:20:17.299
+!MESSAGE Started RMI Server, listening on port 41337
+
+!ENTRY org.eclipse.cdt.core 1 0 2023-01-03 17:21:05.423
+!MESSAGE Indexed 'nodo_acelerometro' (0 sources, 0 headers) in 0,003 sec: 0 declarations; 0 references; 0 unresolved inclusions; 0 syntax errors; 0 unresolved names (0 %)
+
+!ENTRY org.eclipse.cdt.core 1 0 2023-01-03 17:22:56.471
+!MESSAGE Indexed 'Practica_4' (50 sources, 179 headers) in 3,99 sec: 21.575 declarations; 124.279 references; 3 unresolved inclusions; 156 syntax errors; 172 unresolved names (0,12 %)
+
+!ENTRY org.eclipse.cdt.core 1 0 2023-01-03 17:23:24.116
+!MESSAGE Indexed 'nodo_sensores' (0 sources, 0 headers) in 0 sec: 0 declarations; 0 references; 0 unresolved inclusions; 0 syntax errors; 0 unresolved names (0 %)
