@@ -55,3 +55,9 @@ Command-line arguments:  -os win32 -ws win32 -arch x86_64 -data C:\Users\anton\S
 
 !ENTRY org.eclipse.cdt.core 1 0 2023-01-03 17:23:24.116
 !MESSAGE Indexed 'nodo_sensores' (0 sources, 0 headers) in 0 sec: 0 declarations; 0 references; 0 unresolved inclusions; 0 syntax errors; 0 unresolved names (0 %)
+
+!ENTRY org.eclipse.cdt.core 1 0 2023-01-03 17:33:54.298
+!MESSAGE Indexed 'Practica_aceleraciones' (47 sources, 174 headers) in 2,82 sec: 20.105 declarations; 116.090 references; 3 unresolved inclusions; 156 syntax errors; 172 unresolved names (0,13 %)
+
+!ENTRY org.eclipse.cdt.core 1 0 2023-01-03 17:34:12.958
+!MESSAGE Indexed 'nodo_acelerometro' (0 sources, 0 headers) in 0 sec: 0 declarations; 0 references; 0 unresolved inclusions; 0 syntax errors; 0 unresolved names (0 %)
