@@ -22,7 +22,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "stdio.h"
+#include <stdio.h>
 #include "stm32l475e_iot01_accelero.h"
 /* USER CODE END Includes */
 

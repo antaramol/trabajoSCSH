@@ -40,34 +40,34 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
-BUILD_ARTIFACT_NAME := Practica_aceleraciones
+BUILD_ARTIFACT_NAME := nodo_acelerometro
 BUILD_ARTIFACT_EXTENSION := elf
 BUILD_ARTIFACT_PREFIX :=
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-Practica_aceleraciones.elf \
+nodo_acelerometro.elf \
 
 MAP_FILES += \
-Practica_aceleraciones.map \
+nodo_acelerometro.map \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-Practica_aceleraciones.list \
+nodo_acelerometro.list \
 
 
 # All Target
 all: main-build
 
 # Main-build Target
-main-build: Practica_aceleraciones.elf secondary-outputs
+main-build: nodo_acelerometro.elf secondary-outputs
 
 # Tool invocations
-Practica_aceleraciones.elf Practica_aceleraciones.map: $(OBJS) $(USER_OBJS) C:\Users\Juanm\OneDrive\Escritorio\Universidad\Sistemas\ ciberfisicos\ y\ seguridad\ hardware\Trabajo_workspace\Practica_aceleraciones\STM32L475VGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "Practica_aceleraciones.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Juanm\OneDrive\Escritorio\Universidad\Sistemas ciberfisicos y seguridad hardware\Trabajo_workspace\Practica_aceleraciones\STM32L475VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Practica_aceleraciones.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+nodo_acelerometro.elf nodo_acelerometro.map: $(OBJS) $(USER_OBJS) C:\Users\anton\STM32CubeIDE\trabajoSCSH\nodo_acelerometro\STM32L475VGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "nodo_acelerometro.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\anton\STM32CubeIDE\trabajoSCSH\nodo_acelerometro\STM32L475VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="nodo_acelerometro.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -76,14 +76,14 @@ default.size.stdout: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-Practica_aceleraciones.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "Practica_aceleraciones.list"
+nodo_acelerometro.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "nodo_acelerometro.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) Practica_aceleraciones.elf Practica_aceleraciones.list Practica_aceleraciones.map default.size.stdout
+	-$(RM) default.size.stdout nodo_acelerometro.elf nodo_acelerometro.list nodo_acelerometro.map
 	-@echo ' '
 
 secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)

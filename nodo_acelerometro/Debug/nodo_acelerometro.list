@@ -1,5 +1,5 @@
 
-Practica_aceleraciones.elf:     file format elf32-littlearm
+nodo_acelerometro.elf:     file format elf32-littlearm
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
@@ -37,13 +37,13 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  16 .debug_macro  00007262  00000000  00000000  00055210  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   0002967a  00000000  00000000  0005c472  2**0
+ 17 .debug_line   000296c9  00000000  00000000  0005c472  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    0010ccf5  00000000  00000000  00085aec  2**0
+ 18 .debug_str    0010ccac  00000000  00000000  00085b3b  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000050  00000000  00000000  001927e1  2**0
+ 19 .comment      00000050  00000000  00000000  001927e7  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  0000a9ec  00000000  00000000  00192834  2**2
+ 20 .debug_frame  0000a9ec  00000000  00000000  00192838  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -23289,6 +23289,7 @@ static portTASK_FUNCTION( prvIdleTask, pvParameters )
  800844c:	2b01      	cmp	r3, #1
  800844e:	d9f9      	bls.n	8008444 <prvIdleTask+0x8>
 			{
+
 				taskYIELD();
  8008450:	4b05      	ldr	r3, [pc, #20]	; (8008468 <prvIdleTask+0x2c>)
  8008452:	f04f 5280 	mov.w	r2, #268435456	; 0x10000000
