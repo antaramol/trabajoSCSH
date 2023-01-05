@@ -3431,7 +3431,6 @@ static portTASK_FUNCTION( prvIdleTask, pvParameters )
 			then a task other than the idle task is ready to execute. */
 			if( listCURRENT_LIST_LENGTH( &( pxReadyTasksLists[ tskIDLE_PRIORITY ] ) ) > ( UBaseType_t ) 1 )
 			{
-
 				taskYIELD();
 			}
 			else

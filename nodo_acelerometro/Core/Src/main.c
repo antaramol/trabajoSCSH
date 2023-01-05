@@ -61,10 +61,10 @@ const osThreadAttr_t sendAccel_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
-/* Definitions for Notifico_boton */
-osThreadId_t Notifico_botonHandle;
-const osThreadAttr_t Notifico_boton_attributes = {
-  .name = "Notifico_boton",
+/* Definitions for readAccel */
+osThreadId_t readAccelHandle;
+const osThreadAttr_t readAccel_attributes = {
+  .name = "readAccel",
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
@@ -88,7 +88,7 @@ static void MX_USART1_UART_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 void sendAccel_func(void *argument);
-void Notifico_botonfunc(void *argument);
+void readAccel_func(void *argument);
 
 /* USER CODE BEGIN PFP */
 ACCELERO_StatusTypeDef BSP_ACCELERO_Init_INT(void);
@@ -169,8 +169,8 @@ int main(void)
   /* creation of sendAccel */
   sendAccelHandle = osThreadNew(sendAccel_func, NULL, &sendAccel_attributes);
 
-  /* creation of Notifico_boton */
-  Notifico_botonHandle = osThreadNew(Notifico_botonfunc, NULL, &Notifico_boton_attributes);
+  /* creation of readAccel */
+  readAccelHandle = osThreadNew(readAccel_func, NULL, &readAccel_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -739,15 +739,15 @@ return ret;
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
-if (GPIO_Pin == LSM6DSL_INT1_EXTI11_Pin)
-{
-/* Aquí escribiremos nuestra funcionalidad*/
-osThreadFlagsSet(sendAccelHandle, 0x00000001U);
-}
-if (GPIO_Pin == BOTON_Pin){
-/* Aquí escribiremos nuestra funcionalidad*/
-	osThreadFlagsSet(Notifico_botonHandle, 0x00000001U);
-}
+	if (GPIO_Pin == LSM6DSL_INT1_EXTI11_Pin)
+	{
+		/* Aquí escribiremos nuestra funcionalidad*/
+		osThreadFlagsSet(sendAccelHandle, 0x00000001U);
+	}
+	if (GPIO_Pin == BOTON_Pin){
+		/* Aquí escribiremos nuestra funcionalidad*/
+		osThreadFlagsSet(readAccelHandle, 0x00000001U);
+	}
 
 }
 
@@ -771,64 +771,64 @@ void sendAccel_func(void *argument)
   /* Infinite loop */
 	for(;;)
 	{
-	osThreadFlagsWait(0x00000001U, osFlagsWaitAny, osWaitForever);
-	BSP_ACCELERO_AccGetXYZ(pDataXYZ);
-	tick = osKernelGetTickCount();
-	//printf("Tick: %ld Eje x: %d Eje y: %d Eje z: %d \r\n", tick, DataXYZ[0], DataXYZ[1], DataXYZ[2]);
-	//printf("Recogida datos\r\n");
-	espacio_cola=osMessageQueueGetSpace(AceleroHandle);
-	if(espacio_cola!=0){
-	printf("Espacio en la cola: %d\r\n",espacio_cola);
-	}
-	osMessageQueuePut(AceleroHandle,&DataXYZ[2],0,pdMS_TO_TICKS(10));
-	osMessageQueuePut(AceleroHandle,&tick,0,pdMS_TO_TICKS(10));
-	if(espacio_cola!=0){
-	printf("Tick: %ld Eje x: %d Eje y: %d Eje z: %d \r\n", tick, DataXYZ[0], DataXYZ[1], DataXYZ[2]);
-	printf("Se ha metido un dato de: %d\r\n",DataXYZ[2]);
-	printf("Se ha metido un tick de: %d\r\n",tick);
-	}
+		osThreadFlagsWait(0x00000001U, osFlagsWaitAny, osWaitForever);
+		BSP_ACCELERO_AccGetXYZ(pDataXYZ);
+		tick = osKernelGetTickCount();
+		//printf("Tick: %ld Eje x: %d Eje y: %d Eje z: %d \r\n", tick, DataXYZ[0], DataXYZ[1], DataXYZ[2]);
+		//printf("Recogida datos\r\n");
+		espacio_cola=osMessageQueueGetSpace(AceleroHandle);
+		//if(espacio_cola!=0){
+		printf("Espacio en la cola: %d\r\n",espacio_cola);
+		//}
+		if (espacio_cola != 0){
+			osMessageQueuePut(AceleroHandle,&DataXYZ[2],0,pdMS_TO_TICKS(10));
+			osMessageQueuePut(AceleroHandle,&tick,0,pdMS_TO_TICKS(10));
+			printf("Tick: %ld Eje x: %d Eje y: %d Eje z: %d \r\n", tick, DataXYZ[0], DataXYZ[1], DataXYZ[2]);
+			printf("Se ha metido un dato de: %d\r\n",DataXYZ[2]);
+			printf("Se ha metido un tick de: %d\r\n",tick);
+		}
 
 	}
   /* USER CODE END 5 */
 }
 
-/* USER CODE BEGIN Header_Notifico_botonfunc */
+/* USER CODE BEGIN Header_readAccel_func */
 /**
-* @brief Function implementing the Notifico_boton thread.
+* @brief Function implementing the readAccell thread.
 * @param argument: Not used
 * @retval None
 */
-/* USER CODE END Header_Notifico_botonfunc */
-void Notifico_botonfunc(void *argument)
+/* USER CODE END Header_readAccel_func */
+void readAccel_func(void *argument)
 {
-  /* USER CODE BEGIN Notifico_botonfunc */
+  /* USER CODE BEGIN readAccel_func */
 	uint32_t read_estado_flag;
 	uint32_t contador_cola;
 	uint16_t dato_cola;
 	uint16_t datos_cola[128];
-  /* Infinite loop */
-  for(;;)
-  {
-	  read_estado_flag=osThreadFlagsWait(0x00000001U, osFlagsWaitAny, pdMS_TO_TICKS(7000)); //Cada diez segundos
-	  //Cojo los datos:
-	  if(read_estado_flag == 0x00000001U){
-		  printf("Le he dado al boton\r\n");
-	  }
-	  else if(read_estado_flag == osErrorTimeout){
-		  printf("Ha saltado el timeout\r\n");
-	  }
-	  if(osMessageQueueGetSpace(AceleroHandle)==0){
-	  for(int i=0; i<128; i++){
-		  osMessageQueueGet(AceleroHandle, dato_cola, NULL, pdMS_TO_TICKS(10));
-		  datos_cola[i]=dato_cola;
-		  //contador_cola = osMessageQueueGetCount(AceleroHandle);
-	  }
-	 }
-	  else{
-	  osMessageQueueReset(AceleroHandle);
-	  }
-  }
-  /* USER CODE END Notifico_botonfunc */
+	/* Infinite loop */
+	for(;;)
+	{
+		read_estado_flag=osThreadFlagsWait(0x00000001U, osFlagsWaitAny, pdMS_TO_TICKS(7000)); //Cada diez segundos
+		//Cojo los datos:
+		if(read_estado_flag == 0x00000001U){
+			printf("Le he dado al boton\r\n");
+		}
+		else if(read_estado_flag == osErrorTimeout){
+			printf("Ha saltado el timeout\r\n");
+		}
+		if(osMessageQueueGetSpace(AceleroHandle)==0){
+			for(int i=0; i<128; i++){
+				osMessageQueueGet(AceleroHandle, dato_cola, NULL, pdMS_TO_TICKS(10));
+				datos_cola[i]=dato_cola;
+				//contador_cola = osMessageQueueGetCount(AceleroHandle);
+			}
+		}
+		else{
+			osMessageQueueReset(AceleroHandle);
+		}
+	}
+  /* USER CODE END readAccel_func */
 }
 
 /**

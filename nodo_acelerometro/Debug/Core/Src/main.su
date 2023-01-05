@@ -13,6 +13,6 @@
 ../Core/Src/main.c:721:24:BSP_ACCELERO_Init_INT	16	static
 ../Core/Src/main.c:741:6:HAL_GPIO_EXTI_Callback	16	static
 ../Core/Src/main.c:764:6:sendAccel_func	48	static
-../Core/Src/main.c:802:6:Notifico_botonfunc	288	static
+../Core/Src/main.c:802:6:readAccel_func	288	static
 ../Core/Src/main.c:842:6:HAL_TIM_PeriodElapsedCallback	16	static
 ../Core/Src/main.c:859:6:Error_Handler	4	static,ignoring_inline_asm
