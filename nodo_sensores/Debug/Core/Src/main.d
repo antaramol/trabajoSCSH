@@ -49,13 +49,13 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h \
- C:/Users/anton/STM32CubeIDE/trabajoSCSH/nodo_sensores/L4_IOT_Sensors/Drivers/BSP/B-L475E-IOT01/stm32l475e_iot01.h \
- C:/Users/anton/STM32CubeIDE/trabajoSCSH/nodo_sensores/L4_IOT_Sensors/Drivers/BSP/B-L475E-IOT01/stm32l475e_iot01_tsensor.h \
- C:/Users/anton/STM32CubeIDE/trabajoSCSH/nodo_sensores/L4_IOT_Sensors/Drivers/BSP/B-L475E-IOT01/stm32l475e_iot01.h \
- c:\users\anton\stm32cubeide\trabajoscsh\nodo_sensores\l4_iot_sensors\drivers\bsp\components\hts221\hts221.h \
- c:\users\anton\stm32cubeide\trabajoscsh\nodo_sensores\l4_iot_sensors\drivers\bsp\components\common\hsensor.h \
- c:\users\anton\stm32cubeide\trabajoscsh\nodo_sensores\l4_iot_sensors\drivers\bsp\components\common\tsensor.h \
- C:/Users/anton/STM32CubeIDE/trabajoSCSH/nodo_sensores/L4_IOT_Sensors/Drivers/BSP/B-L475E-IOT01/stm32l475e_iot01_hsensor.h
+ C:/Users/Jacin/workspace/trabajoSCSH/nodo_sensores/L4_IOT_Sensors/Drivers/BSP/B-L475E-IOT01/stm32l475e_iot01.h \
+ C:/Users/Jacin/workspace/trabajoSCSH/nodo_sensores/L4_IOT_Sensors/Drivers/BSP/B-L475E-IOT01/stm32l475e_iot01_tsensor.h \
+ C:/Users/Jacin/workspace/trabajoSCSH/nodo_sensores/L4_IOT_Sensors/Drivers/BSP/B-L475E-IOT01/stm32l475e_iot01.h \
+ c:\users\jacin\workspace\trabajoscsh\nodo_sensores\l4_iot_sensors\drivers\bsp\components\hts221\hts221.h \
+ c:\users\jacin\workspace\trabajoscsh\nodo_sensores\l4_iot_sensors\drivers\bsp\components\common\hsensor.h \
+ c:\users\jacin\workspace\trabajoscsh\nodo_sensores\l4_iot_sensors\drivers\bsp\components\common\tsensor.h \
+ C:/Users/Jacin/workspace/trabajoSCSH/nodo_sensores/L4_IOT_Sensors/Drivers/BSP/B-L475E-IOT01/stm32l475e_iot01_hsensor.h
 ../Core/Inc/main.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h:
 ../Core/Inc/stm32l4xx_hal_conf.h:
@@ -107,10 +107,10 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h:
-C:/Users/anton/STM32CubeIDE/trabajoSCSH/nodo_sensores/L4_IOT_Sensors/Drivers/BSP/B-L475E-IOT01/stm32l475e_iot01.h:
-C:/Users/anton/STM32CubeIDE/trabajoSCSH/nodo_sensores/L4_IOT_Sensors/Drivers/BSP/B-L475E-IOT01/stm32l475e_iot01_tsensor.h:
-C:/Users/anton/STM32CubeIDE/trabajoSCSH/nodo_sensores/L4_IOT_Sensors/Drivers/BSP/B-L475E-IOT01/stm32l475e_iot01.h:
-c:\users\anton\stm32cubeide\trabajoscsh\nodo_sensores\l4_iot_sensors\drivers\bsp\components\hts221\hts221.h:
-c:\users\anton\stm32cubeide\trabajoscsh\nodo_sensores\l4_iot_sensors\drivers\bsp\components\common\hsensor.h:
-c:\users\anton\stm32cubeide\trabajoscsh\nodo_sensores\l4_iot_sensors\drivers\bsp\components\common\tsensor.h:
-C:/Users/anton/STM32CubeIDE/trabajoSCSH/nodo_sensores/L4_IOT_Sensors/Drivers/BSP/B-L475E-IOT01/stm32l475e_iot01_hsensor.h:
+C:/Users/Jacin/workspace/trabajoSCSH/nodo_sensores/L4_IOT_Sensors/Drivers/BSP/B-L475E-IOT01/stm32l475e_iot01.h:
+C:/Users/Jacin/workspace/trabajoSCSH/nodo_sensores/L4_IOT_Sensors/Drivers/BSP/B-L475E-IOT01/stm32l475e_iot01_tsensor.h:
+C:/Users/Jacin/workspace/trabajoSCSH/nodo_sensores/L4_IOT_Sensors/Drivers/BSP/B-L475E-IOT01/stm32l475e_iot01.h:
+c:\users\jacin\workspace\trabajoscsh\nodo_sensores\l4_iot_sensors\drivers\bsp\components\hts221\hts221.h:
+c:\users\jacin\workspace\trabajoscsh\nodo_sensores\l4_iot_sensors\drivers\bsp\components\common\hsensor.h:
+c:\users\jacin\workspace\trabajoscsh\nodo_sensores\l4_iot_sensors\drivers\bsp\components\common\tsensor.h:
+C:/Users/Jacin/workspace/trabajoSCSH/nodo_sensores/L4_IOT_Sensors/Drivers/BSP/B-L475E-IOT01/stm32l475e_iot01_hsensor.h:

@@ -210,7 +210,6 @@ int main(void)
   /* USER CODE END RTOS_EVENTS */
 
   /* Start scheduler */
-  HAL_UART_Receive_IT(&huart1,&rec_data, sizeof(rec_data));
   osKernelStart();
 
   /* We should never get here as control is now taken by the scheduler */
