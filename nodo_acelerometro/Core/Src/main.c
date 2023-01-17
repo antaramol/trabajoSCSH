@@ -22,6 +22,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "es_wifi.h"
+#include "wifi.h"
 #include <stdio.h>
 #include "stm32l475e_iot01_accelero.h"
 /* USER CODE END Includes */
@@ -37,7 +39,13 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
+#define SSID     "RealmeJacinto"
+#define PASSWORD "jacjurtab"
+//#define WIFISECURITY WIFI_ECN_WPA2_PSK
+#define WIFISECURITY WIFI_ECN_OPEN
+#define SOCKET 0
+#define WIFI_READ_TIMEOUT 10000
+#define WIFI_WRITE_TIMEOUT 0
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -81,6 +89,8 @@ const osMessageQueueAttr_t Acelero_attributes = {
   .name = "Acelero"
 };
 /* USER CODE BEGIN PV */
+extern  SPI_HandleTypeDef hspi;
+static  uint8_t  IP_Addr[4];
 uint8_t monitoreo_normal=0;
 /* USER CODE END PV */
 
@@ -709,6 +719,9 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI1_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(EXTI1_IRQn);
+
   HAL_NVIC_SetPriority(EXTI9_5_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 
@@ -760,8 +773,95 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 		osThreadFlagsSet(readAccelHandle, 0x00000001U);
 	}
 
+	switch (GPIO_Pin)
+	  {
+	    case (GPIO_PIN_1):
+	    {
+	      SPI_WIFI_ISR();
+	      break;
+	    }
+	    default:
+	    {
+	      break;
+	    }
+	  }
+
 }
 
+static int wifi_start(void)
+{
+  uint8_t  MAC_Addr[6];
+  printf("wifistart\r\n");
+ /*Initialize and use WIFI module */
+  if(WIFI_Init() ==  WIFI_STATUS_OK)
+  {
+	printf("xddddddd\r\n");
+    printf(("ES-WIFI Initialized.\r\n"));
+    if(WIFI_GetMAC_Address(MAC_Addr) == WIFI_STATUS_OK)
+    {
+      printf("MAC asignada\r\n");
+      printf("> eS-WiFi module MAC Address : %02X:%02X:%02X:%02X:%02X:%02X\r\n",
+               MAC_Addr[0],
+               MAC_Addr[1],
+               MAC_Addr[2],
+               MAC_Addr[3],
+               MAC_Addr[4],
+               MAC_Addr[5]);
+    }
+    else
+    {
+      printf("> ERROR : CANNOT get MAC address\r\n");
+      return -1;
+    }
+  }
+  else
+  {
+	printf("Errorfifi\r\n");
+    return -1;
+  }
+  return 0;
+}
+
+int wifi_connect(void)
+{
+
+  wifi_start();
+
+  printf("Connecting to %s\r\n",SSID);
+  if( WIFI_Connect(SSID, PASSWORD, WIFISECURITY) == WIFI_STATUS_OK)
+  {
+    if(WIFI_GetIP_Address(IP_Addr) == WIFI_STATUS_OK)
+    {
+      printf("> es-wifi module connected: got IP Address : %d.%d.%d.%d\r\n",
+               IP_Addr[0],
+               IP_Addr[1],
+               IP_Addr[2],
+               IP_Addr[3]);
+    }
+    else
+    {
+		  printf(" ERROR : es-wifi module CANNOT get IP address\r\n");
+      return -1;
+    }
+  }
+  else
+  {
+		 printf("ERROR : es-wifi module NOT connected\n");
+     return -1;
+  }
+  return 0;
+}
+
+
+/**
+  * @brief  SPI3 line detection callback.
+  * @param  None
+  * @retval None
+  */
+void SPI3_IRQHandler(void)
+{
+  HAL_SPI_IRQHandler(&hspi);
+}
 
 /* USER CODE END 4 */
 
@@ -853,6 +953,7 @@ void wifiStartTask_function(void *argument)
 {
   /* USER CODE BEGIN wifiStartTask_function */
   /* Infinite loop */
+  wifi_connect();
   for(;;)
   {
     osDelay(1);
