@@ -81,6 +81,13 @@ const osThreadAttr_t RTC_set_attributes = {
   .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityAboveNormal,
 };
+/* Definitions for wifiStartTask */
+osThreadId_t wifiStartTaskHandle;
+const osThreadAttr_t wifiStartTask_attributes = {
+  .name = "wifiStartTask",
+  .stack_size = 512 * 4,
+  .priority = (osPriority_t) osPriorityBelowNormal,
+};
 /* Definitions for print_queue */
 osMessageQueueId_t print_queueHandle;
 const osMessageQueueAttr_t print_queue_attributes = {
@@ -114,6 +121,7 @@ static void MX_RTC_Init(void);
 void temp_task_function(void *argument);
 void print_task_func(void *argument);
 void RTC_set_func(void *argument);
+void wifiStartTask_function(void *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -200,6 +208,9 @@ int main(void)
 
   /* creation of RTC_set */
   RTC_setHandle = osThreadNew(RTC_set_func, NULL, &RTC_set_attributes);
+
+  /* creation of wifiStartTask */
+  wifiStartTaskHandle = osThreadNew(wifiStartTask_function, NULL, &wifiStartTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -1080,6 +1091,24 @@ void RTC_set_func(void *argument)
 	  	  	  osDelay(pdMS_TO_TICKS(10));
   }
   /* USER CODE END RTC_set_func */
+}
+
+/* USER CODE BEGIN Header_wifiStartTask_function */
+/**
+* @brief Function implementing the wifiStartTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_wifiStartTask_function */
+void wifiStartTask_function(void *argument)
+{
+  /* USER CODE BEGIN wifiStartTask_function */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END wifiStartTask_function */
 }
 
 /**

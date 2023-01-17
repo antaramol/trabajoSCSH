@@ -68,6 +68,13 @@ const osThreadAttr_t readAccel_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
+/* Definitions for wifiStartTask */
+osThreadId_t wifiStartTaskHandle;
+const osThreadAttr_t wifiStartTask_attributes = {
+  .name = "wifiStartTask",
+  .stack_size = 512 * 4,
+  .priority = (osPriority_t) osPriorityBelowNormal,
+};
 /* Definitions for Acelero */
 osMessageQueueId_t AceleroHandle;
 const osMessageQueueAttr_t Acelero_attributes = {
@@ -89,6 +96,7 @@ static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 void sendAccel_func(void *argument);
 void readAccel_func(void *argument);
+void wifiStartTask_function(void *argument);
 
 /* USER CODE BEGIN PFP */
 ACCELERO_StatusTypeDef BSP_ACCELERO_Init_INT(void);
@@ -171,6 +179,9 @@ int main(void)
 
   /* creation of readAccel */
   readAccelHandle = osThreadNew(readAccel_func, NULL, &readAccel_attributes);
+
+  /* creation of wifiStartTask */
+  wifiStartTaskHandle = osThreadNew(wifiStartTask_function, NULL, &wifiStartTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -829,6 +840,24 @@ void readAccel_func(void *argument)
 		}
 	}
   /* USER CODE END readAccel_func */
+}
+
+/* USER CODE BEGIN Header_wifiStartTask_function */
+/**
+* @brief Function implementing the wifiStartTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_wifiStartTask_function */
+void wifiStartTask_function(void *argument)
+{
+  /* USER CODE BEGIN wifiStartTask_function */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END wifiStartTask_function */
 }
 
 /**

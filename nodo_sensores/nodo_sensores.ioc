@@ -2,11 +2,11 @@
 CAD.formats=
 CAD.pinconfig=
 CAD.provider=
-FREERTOS.FootprintOK=true
+FREERTOS.FootprintOK=false
 FREERTOS.IPParameters=Tasks01,FootprintOK,Queues01,configTOTAL_HEAP_SIZE
 FREERTOS.Queues01=print_queue,8,uintptr_t,0,Dynamic,NULL,NULL;receive_queue,3,char,0,Dynamic,NULL,NULL
-FREERTOS.Tasks01=temp_task,24,256,temp_task_function,Default,NULL,Dynamic,NULL,NULL;print_task,24,128,print_task_func,Default,NULL,Dynamic,NULL,NULL;RTC_set,32,256,RTC_set_func,Default,NULL,Dynamic,NULL,NULL
-FREERTOS.configTOTAL_HEAP_SIZE=4500
+FREERTOS.Tasks01=temp_task,24,256,temp_task_function,Default,NULL,Dynamic,NULL,NULL;print_task,24,128,print_task_func,Default,NULL,Dynamic,NULL,NULL;RTC_set,32,256,RTC_set_func,Default,NULL,Dynamic,NULL,NULL;wifiStartTask,16,512,wifiStartTask_function,Default,NULL,Dynamic,NULL,NULL
+FREERTOS.configTOTAL_HEAP_SIZE=5000
 File.Version=6
 GPIO.groupedBy=Group By Peripherals
 KeepUserPlacement=false
