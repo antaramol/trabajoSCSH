@@ -7,43 +7,43 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
   1 .text         0000d770  08000190  08000190  00010190  2**4
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .rodata       00000958  0800d900  0800d900  0001d900  2**2
+  2 .rodata       00000960  0800d900  0800d900  0001d900  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  3 .ARM.extab    00000000  0800e258  0800e258  000200a8  2**0
+  3 .ARM.extab    00000000  0800e260  0800e260  000200a8  2**0
                   CONTENTS
-  4 .ARM          00000008  0800e258  0800e258  0001e258  2**2
+  4 .ARM          00000008  0800e260  0800e260  0001e260  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  5 .preinit_array 00000000  0800e260  0800e260  000200a8  2**0
+  5 .preinit_array 00000000  0800e268  0800e268  000200a8  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  6 .init_array   00000004  0800e260  0800e260  0001e260  2**2
+  6 .init_array   00000004  0800e268  0800e268  0001e268  2**2
                   CONTENTS, ALLOC, LOAD, DATA
-  7 .fini_array   00000004  0800e264  0800e264  0001e264  2**2
+  7 .fini_array   00000004  0800e26c  0800e26c  0001e26c  2**2
                   CONTENTS, ALLOC, LOAD, DATA
-  8 .data         000000a8  20000000  0800e268  00020000  2**2
+  8 .data         000000a8  20000000  0800e270  00020000  2**2
                   CONTENTS, ALLOC, LOAD, DATA
-  9 .bss          00003254  200000a8  0800e310  000200a8  2**2
+  9 .bss          00003254  200000a8  0800e318  000200a8  2**2
                   ALLOC
- 10 ._user_heap_stack 00000604  200032fc  0800e310  000232fc  2**0
+ 10 ._user_heap_stack 00000604  200032fc  0800e318  000232fc  2**0
                   ALLOC
  11 .ARM.attributes 00000030  00000000  00000000  000200a8  2**0
                   CONTENTS, READONLY
- 12 .debug_info   0002f375  00000000  00000000  000200d8  2**0
+ 12 .debug_info   0002f379  00000000  00000000  000200d8  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 00005dd0  00000000  00000000  0004f44d  2**0
+ 13 .debug_abbrev 00005dd0  00000000  00000000  0004f451  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_aranges 000029b8  00000000  00000000  00055220  2**3
+ 14 .debug_aranges 000029b8  00000000  00000000  00055228  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_ranges 00002770  00000000  00000000  00057bd8  2**3
+ 15 .debug_ranges 00002770  00000000  00000000  00057be0  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  00007e54  00000000  00000000  0005a348  2**0
+ 16 .debug_macro  00007e54  00000000  00000000  0005a350  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   0002c503  00000000  00000000  0006219c  2**0
+ 17 .debug_line   0002c4b9  00000000  00000000  000621a4  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    0010e17e  00000000  00000000  0008e69f  2**0
+ 18 .debug_str    0010e1a1  00000000  00000000  0008e65d  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000050  00000000  00000000  0019c81d  2**0
+ 19 .comment      00000050  00000000  00000000  0019c7fe  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  0000bf20  00000000  00000000  0019c870  2**2
+ 20 .debug_frame  0000bf20  00000000  00000000  0019c850  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -595,15 +595,15 @@ int main(void)
   while (1)
  800065e:	e7fe      	b.n	800065e <main+0x8a>
  8000660:	0800d930 	.word	0x0800d930
- 8000664:	0800e0b0 	.word	0x0800e0b0
+ 8000664:	0800e0b8 	.word	0x0800e0b8
  8000668:	2000070c 	.word	0x2000070c
- 800066c:	0800e044 	.word	0x0800e044
+ 800066c:	0800e04c 	.word	0x0800e04c
  8000670:	08000fd9 	.word	0x08000fd9
  8000674:	20000700 	.word	0x20000700
- 8000678:	0800e068 	.word	0x0800e068
+ 8000678:	0800e070 	.word	0x0800e070
  800067c:	08001085 	.word	0x08001085
  8000680:	20000704 	.word	0x20000704
- 8000684:	0800e08c 	.word	0x0800e08c
+ 8000684:	0800e094 	.word	0x0800e094
  8000688:	08001131 	.word	0x08001131
  800068c:	20000708 	.word	0x20000708
 
@@ -2142,7 +2142,7 @@ int wifi_connect(void)
  8000f44:	4819      	ldr	r0, [pc, #100]	; (8000fac <wifi_connect+0x74>)
  8000f46:	f00b fb17 	bl	800c578 <iprintf>
   if( WIFI_Connect(SSID, PASSWORD, WIFISECURITY) == WIFI_STATUS_OK)
- 8000f4a:	2200      	movs	r2, #0
+ 8000f4a:	2203      	movs	r2, #3
  8000f4c:	4918      	ldr	r1, [pc, #96]	; (8000fb0 <wifi_connect+0x78>)
  8000f4e:	4816      	ldr	r0, [pc, #88]	; (8000fa8 <wifi_connect+0x70>)
  8000f50:	f007 fdd4 	bl	8008afc <WIFI_Connect>
@@ -2206,12 +2206,12 @@ int wifi_connect(void)
  8000fa4:	bd80      	pop	{r7, pc}
  8000fa6:	bf00      	nop
  8000fa8:	0800d9f8 	.word	0x0800d9f8
- 8000fac:	0800da08 	.word	0x0800da08
- 8000fb0:	0800da1c 	.word	0x0800da1c
+ 8000fac:	0800da00 	.word	0x0800da00
+ 8000fb0:	0800da14 	.word	0x0800da14
  8000fb4:	20000710 	.word	0x20000710
- 8000fb8:	0800da28 	.word	0x0800da28
- 8000fbc:	0800da64 	.word	0x0800da64
- 8000fc0:	0800da94 	.word	0x0800da94
+ 8000fb8:	0800da24 	.word	0x0800da24
+ 8000fbc:	0800da60 	.word	0x0800da60
+ 8000fc0:	0800da90 	.word	0x0800da90
 
 08000fc4 <SPI3_IRQHandler>:
   * @brief  SPI3 line detection callback.
@@ -2321,10 +2321,10 @@ void sendAccel_func(void *argument)
 		osThreadFlagsWait(0x00000001U, osFlagsWaitAny, osWaitForever);
  800106e:	e7ba      	b.n	8000fe6 <sendAccel_func+0xe>
  8001070:	2000070c 	.word	0x2000070c
- 8001074:	0800dabc 	.word	0x0800dabc
- 8001078:	0800dad8 	.word	0x0800dad8
- 800107c:	0800db04 	.word	0x0800db04
- 8001080:	0800db24 	.word	0x0800db24
+ 8001074:	0800dab8 	.word	0x0800dab8
+ 8001078:	0800dad4 	.word	0x0800dad4
+ 800107c:	0800db00 	.word	0x0800db00
+ 8001080:	0800db20 	.word	0x0800db20
 
 08001084 <readAccel_func>:
 * @param argument: Not used
@@ -2414,8 +2414,8 @@ void readAccel_func(void *argument)
 		read_estado_flag=osThreadFlagsWait(0x00000001U, osFlagsWaitAny, pdMS_TO_TICKS(7000)); //Cada diez segundos
  8001120:	e7b8      	b.n	8001094 <readAccel_func+0x10>
  8001122:	bf00      	nop
- 8001124:	0800db44 	.word	0x0800db44
- 8001128:	0800db5c 	.word	0x0800db5c
+ 8001124:	0800db40 	.word	0x0800db40
+ 8001128:	0800db58 	.word	0x0800db58
  800112c:	2000070c 	.word	0x2000070c
 
 08001130 <wifiStartTask_function>:
@@ -4226,7 +4226,7 @@ LoopForever:
   ldr r1, =_edata
  8001ac0:	200000a8 	.word	0x200000a8
   ldr r2, =_sidata
- 8001ac4:	0800e268 	.word	0x0800e268
+ 8001ac4:	0800e270 	.word	0x0800e270
   ldr r2, =_sbss
  8001ac8:	200000a8 	.word	0x200000a8
   ldr r4, =_ebss
@@ -9483,7 +9483,7 @@ HAL_StatusTypeDef HAL_RCC_OscConfig(RCC_OscInitTypeDef  *RCC_OscInitStruct)
  80038d8:	e014      	b.n	8003904 <HAL_RCC_OscConfig+0x298>
  80038da:	bf00      	nop
  80038dc:	40021000 	.word	0x40021000
- 80038e0:	0800e0c8 	.word	0x0800e0c8
+ 80038e0:	0800e0d0 	.word	0x0800e0d0
  80038e4:	20000000 	.word	0x20000000
  80038e8:	20000004 	.word	0x20000004
  80038ec:	4ba0      	ldr	r3, [pc, #640]	; (8003b70 <HAL_RCC_OscConfig+0x504>)
@@ -10768,7 +10768,7 @@ HAL_StatusTypeDef HAL_RCC_ClockConfig(RCC_ClkInitTypeDef  *RCC_ClkInitStruct, ui
  8003fea:	bf00      	nop
  8003fec:	40022000 	.word	0x40022000
  8003ff0:	40021000 	.word	0x40021000
- 8003ff4:	0800e0c8 	.word	0x0800e0c8
+ 8003ff4:	0800e0d0 	.word	0x0800e0d0
  8003ff8:	20000000 	.word	0x20000000
  8003ffc:	20000004 	.word	0x20000004
 
@@ -10973,7 +10973,7 @@ uint32_t HAL_RCC_GetSysClockFreq(void)
  8004104:	4770      	bx	lr
  8004106:	bf00      	nop
  8004108:	40021000 	.word	0x40021000
- 800410c:	0800e0e0 	.word	0x0800e0e0
+ 800410c:	0800e0e8 	.word	0x0800e0e8
  8004110:	00f42400 	.word	0x00f42400
  8004114:	007a1200 	.word	0x007a1200
 
@@ -11022,7 +11022,7 @@ uint32_t HAL_RCC_GetPCLK1Freq(void)
  8004150:	4618      	mov	r0, r3
  8004152:	bd80      	pop	{r7, pc}
  8004154:	40021000 	.word	0x40021000
- 8004158:	0800e0d8 	.word	0x0800e0d8
+ 8004158:	0800e0e0 	.word	0x0800e0e0
 
 0800415c <HAL_RCC_GetPCLK2Freq>:
   * @note   Each time PCLK2 changes, this function must be called to update the
@@ -11049,7 +11049,7 @@ uint32_t HAL_RCC_GetPCLK2Freq(void)
  800417c:	4618      	mov	r0, r3
  800417e:	bd80      	pop	{r7, pc}
  8004180:	40021000 	.word	0x40021000
- 8004184:	0800e0d8 	.word	0x0800e0d8
+ 8004184:	0800e0e0 	.word	0x0800e0e0
 
 08004188 <HAL_RCC_GetClockConfig>:
   *         will be configured.
@@ -21827,8 +21827,8 @@ static void AT_ParseInfo(ES_WIFIObject_t *Obj,uint8_t *pdata)
  8007e52:	3710      	adds	r7, #16
  8007e54:	46bd      	mov	sp, r7
  8007e56:	bd80      	pop	{r7, pc}
- 8007e58:	0800dba4 	.word	0x0800dba4
- 8007e5c:	0800dba8 	.word	0x0800dba8
+ 8007e58:	0800dba0 	.word	0x0800dba0
+ 8007e5c:	0800dba4 	.word	0x0800dba4
 
 08007e60 <AT_ParseConnSettings>:
   * @param  NetSettings: settings
@@ -22044,7 +22044,7 @@ static void AT_ParseConnSettings(char *pdata, ES_WIFI_Network_t *NetSettings)
  8007fb6:	3710      	adds	r7, #16
  8007fb8:	46bd      	mov	sp, r7
  8007fba:	bd80      	pop	{r7, pc}
- 8007fbc:	0800dba4 	.word	0x0800dba4
+ 8007fbc:	0800dba0 	.word	0x0800dba0
 
 08007fc0 <AT_ParseIsConnected>:
   * @param  pdata: pointer to data
@@ -22202,8 +22202,8 @@ static ES_WIFI_Status_t AT_ExecuteCommand(ES_WIFIObject_t *Obj, uint8_t* cmd, ui
  80080aa:	46bd      	mov	sp, r7
  80080ac:	bd90      	pop	{r4, r7, pc}
  80080ae:	bf00      	nop
- 80080b0:	0800dbb8 	.word	0x0800dbb8
- 80080b4:	0800dbc4 	.word	0x0800dbc4
+ 80080b0:	0800dbb4 	.word	0x0800dbb4
+ 80080b4:	0800dbc0 	.word	0x0800dbc0
 
 080080b8 <ES_WIFI_Init>:
   * @brief  Initialize WIFI module.
@@ -22267,7 +22267,7 @@ ES_WIFI_Status_t  ES_WIFI_Init(ES_WIFIObject_t *Obj)
  800810a:	3710      	adds	r7, #16
  800810c:	46bd      	mov	sp, r7
  800810e:	bd80      	pop	{r7, pc}
- 8008110:	0800dbd4 	.word	0x0800dbd4
+ 8008110:	0800dbd0 	.word	0x0800dbd0
 
 08008114 <ES_WIFI_RegisterBusIO>:
 ES_WIFI_Status_t  ES_WIFI_RegisterBusIO(ES_WIFIObject_t *Obj, IO_Init_Func IO_Init,
@@ -22463,10 +22463,10 @@ ES_WIFI_Status_t ES_WIFI_Connect(ES_WIFIObject_t *Obj, const char* SSID,
  8008256:	46bd      	mov	sp, r7
  8008258:	bd80      	pop	{r7, pc}
  800825a:	bf00      	nop
- 800825c:	0800dbec 	.word	0x0800dbec
- 8008260:	0800dbf4 	.word	0x0800dbf4
- 8008264:	0800dbfc 	.word	0x0800dbfc
- 8008268:	0800dc04 	.word	0x0800dc04
+ 800825c:	0800dbe8 	.word	0x0800dbe8
+ 8008260:	0800dbf0 	.word	0x0800dbf0
+ 8008264:	0800dbf8 	.word	0x0800dbf8
+ 8008268:	0800dc00 	.word	0x0800dc00
 
 0800826c <ES_WIFI_IsConnected>:
 /**
@@ -22521,7 +22521,7 @@ uint8_t ES_WIFI_IsConnected(ES_WIFIObject_t *Obj)
  80082ba:	3710      	adds	r7, #16
  80082bc:	46bd      	mov	sp, r7
  80082be:	bd80      	pop	{r7, pc}
- 80082c0:	0800dc08 	.word	0x0800dc08
+ 80082c0:	0800dc04 	.word	0x0800dc04
 
 080082c4 <ES_WIFI_GetNetworkSettings>:
   * @param  Obj: pointer to module handle
@@ -22577,7 +22577,7 @@ ES_WIFI_Status_t ES_WIFI_GetNetworkSettings(ES_WIFIObject_t *Obj)
  800830e:	3710      	adds	r7, #16
  8008310:	46bd      	mov	sp, r7
  8008312:	bd80      	pop	{r7, pc}
- 8008314:	0800dc10 	.word	0x0800dc10
+ 8008314:	0800dc0c 	.word	0x0800dc0c
 
 08008318 <ES_WIFI_GetMACAddress>:
   * @param  Obj: pointer to module handle
@@ -22638,8 +22638,8 @@ ES_WIFI_Status_t ES_WIFI_GetMACAddress(ES_WIFIObject_t *Obj, uint8_t *mac)
  800836e:	46bd      	mov	sp, r7
  8008370:	bd80      	pop	{r7, pc}
  8008372:	bf00      	nop
- 8008374:	0800dc60 	.word	0x0800dc60
- 8008378:	0800dc64 	.word	0x0800dc64
+ 8008374:	0800dc5c 	.word	0x0800dc5c
+ 8008378:	0800dc60 	.word	0x0800dc60
 
 0800837c <SPI_WIFI_MspInit>:
   * @brief  Initialize SPI MSP
@@ -28516,9 +28516,9 @@ BaseType_t xReturn;
  800a2da:	3720      	adds	r7, #32
  800a2dc:	46bd      	mov	sp, r7
  800a2de:	bd80      	pop	{r7, pc}
- 800a2e0:	0800e130 	.word	0x0800e130
- 800a2e4:	0800e150 	.word	0x0800e150
- 800a2e8:	0800e110 	.word	0x0800e110
+ 800a2e0:	0800e138 	.word	0x0800e138
+ 800a2e4:	0800e158 	.word	0x0800e158
+ 800a2e8:	0800e118 	.word	0x0800e118
 
 0800a2ec <prvAddNewTaskToReadyList>:
 /*-----------------------------------------------------------*/
@@ -28921,7 +28921,7 @@ BaseType_t xReturn;
  800a4ee:	46bd      	mov	sp, r7
  800a4f0:	bd80      	pop	{r7, pc}
  800a4f2:	bf00      	nop
- 800a4f4:	0800e02c 	.word	0x0800e02c
+ 800a4f4:	0800e034 	.word	0x0800e034
  800a4f8:	0800ab5d 	.word	0x0800ab5d
  800a4fc:	20001e08 	.word	0x20001e08
  800a500:	20001910 	.word	0x20001910
@@ -31555,7 +31555,7 @@ BaseType_t xReturn = pdFAIL;
  800b350:	46bd      	mov	sp, r7
  800b352:	bd80      	pop	{r7, pc}
  800b354:	20001e40 	.word	0x20001e40
- 800b358:	0800e034 	.word	0x0800e034
+ 800b358:	0800e03c 	.word	0x0800e03c
  800b35c:	0800b499 	.word	0x0800b499
  800b360:	20001e44 	.word	0x20001e44
 
@@ -32655,7 +32655,7 @@ static void prvCheckForValidListAndQueue( void )
  800b960:	20001e3c 	.word	0x20001e3c
  800b964:	20001eec 	.word	0x20001eec
  800b968:	20001e4c 	.word	0x20001e4c
- 800b96c:	0800e03c 	.word	0x0800e03c
+ 800b96c:	0800e044 	.word	0x0800e044
 
 0800b970 <pxPortInitialiseStack>:
 
@@ -34295,7 +34295,7 @@ uint8_t *puc;
  800c2fa:	61a3      	str	r3, [r4, #24]
  800c2fc:	e7d2      	b.n	800c2a4 <__sinit+0xc>
  800c2fe:	bf00      	nop
- 800c300:	0800e170 	.word	0x0800e170
+ 800c300:	0800e178 	.word	0x0800e178
  800c304:	0800c231 	.word	0x0800c231
 
 0800c308 <__sfp>:
@@ -34350,7 +34350,7 @@ uint8_t *puc;
  800c386:	603b      	str	r3, [r7, #0]
  800c388:	e7ee      	b.n	800c368 <__sfp+0x60>
  800c38a:	bf00      	nop
- 800c38c:	0800e170 	.word	0x0800e170
+ 800c38c:	0800e178 	.word	0x0800e178
  800c390:	ffff0001 	.word	0xffff0001
 
 0800c394 <_fwalk_reent>:
@@ -34407,10 +34407,10 @@ uint8_t *puc;
  800c406:	4798      	blx	r3
  800c408:	3601      	adds	r6, #1
  800c40a:	e7f2      	b.n	800c3f2 <__libc_init_array+0x1e>
- 800c40c:	0800e260 	.word	0x0800e260
- 800c410:	0800e260 	.word	0x0800e260
- 800c414:	0800e260 	.word	0x0800e260
- 800c418:	0800e264 	.word	0x0800e264
+ 800c40c:	0800e268 	.word	0x0800e268
+ 800c410:	0800e268 	.word	0x0800e268
+ 800c414:	0800e268 	.word	0x0800e268
+ 800c418:	0800e26c 	.word	0x0800e26c
 
 0800c41c <__retarget_lock_init_recursive>:
  800c41c:	4770      	bx	lr
@@ -34694,9 +34694,9 @@ uint8_t *puc;
  800c672:	6022      	str	r2, [r4, #0]
  800c674:	701d      	strb	r5, [r3, #0]
  800c676:	e7db      	b.n	800c630 <_puts_r+0x88>
- 800c678:	0800e130 	.word	0x0800e130
- 800c67c:	0800e150 	.word	0x0800e150
- 800c680:	0800e110 	.word	0x0800e110
+ 800c678:	0800e138 	.word	0x0800e138
+ 800c67c:	0800e158 	.word	0x0800e158
+ 800c680:	0800e118 	.word	0x0800e118
 
 0800c684 <puts>:
  800c684:	4b02      	ldr	r3, [pc, #8]	; (800c690 <puts+0xc>)
@@ -34978,8 +34978,8 @@ uint8_t *puc;
  800c8f4:	e8bd 4070 	ldmia.w	sp!, {r4, r5, r6, lr}
  800c8f8:	f000 b806 	b.w	800c908 <__strtok_r>
  800c8fc:	20000044 	.word	0x20000044
- 800c900:	0800e174 	.word	0x0800e174
- 800c904:	0800e18b 	.word	0x0800e18b
+ 800c900:	0800e17c 	.word	0x0800e17c
+ 800c904:	0800e193 	.word	0x0800e193
 
 0800c908 <__strtok_r>:
  800c908:	b5f0      	push	{r4, r5, r6, r7, lr}
@@ -35090,9 +35090,9 @@ uint8_t *puc;
  800c9e8:	f04f 37ff 	mov.w	r7, #4294967295
  800c9ec:	e7ea      	b.n	800c9c4 <__swbuf_r+0x6c>
  800c9ee:	bf00      	nop
- 800c9f0:	0800e130 	.word	0x0800e130
- 800c9f4:	0800e150 	.word	0x0800e150
- 800c9f8:	0800e110 	.word	0x0800e110
+ 800c9f0:	0800e138 	.word	0x0800e138
+ 800c9f4:	0800e158 	.word	0x0800e158
+ 800c9f8:	0800e118 	.word	0x0800e118
 
 0800c9fc <_write_r>:
  800c9fc:	b538      	push	{r3, r4, r5, lr}
@@ -35202,9 +35202,9 @@ uint8_t *puc;
  800cae8:	e7f7      	b.n	800cada <__swsetup_r+0xba>
  800caea:	bf00      	nop
  800caec:	20000044 	.word	0x20000044
- 800caf0:	0800e130 	.word	0x0800e130
- 800caf4:	0800e150 	.word	0x0800e150
- 800caf8:	0800e110 	.word	0x0800e110
+ 800caf0:	0800e138 	.word	0x0800e138
+ 800caf4:	0800e158 	.word	0x0800e158
+ 800caf8:	0800e118 	.word	0x0800e118
 
 0800cafc <__assert_func>:
  800cafc:	b51f      	push	{r0, r1, r2, r3, r4, lr}
@@ -35227,9 +35227,9 @@ uint8_t *puc;
  800cb24:	e7f3      	b.n	800cb0e <__assert_func+0x12>
  800cb26:	bf00      	nop
  800cb28:	20000044 	.word	0x20000044
- 800cb2c:	0800e1e8 	.word	0x0800e1e8
- 800cb30:	0800e1f5 	.word	0x0800e1f5
- 800cb34:	0800e223 	.word	0x0800e223
+ 800cb2c:	0800e1f0 	.word	0x0800e1f0
+ 800cb30:	0800e1fd 	.word	0x0800e1fd
+ 800cb34:	0800e22b 	.word	0x0800e22b
 
 0800cb38 <_close_r>:
  800cb38:	b538      	push	{r3, r4, r5, lr}
@@ -35421,9 +35421,9 @@ uint8_t *puc;
  800ccca:	bf08      	it	eq
  800cccc:	68ec      	ldreq	r4, [r5, #12]
  800ccce:	e7da      	b.n	800cc86 <_fflush_r+0x22>
- 800ccd0:	0800e130 	.word	0x0800e130
- 800ccd4:	0800e150 	.word	0x0800e150
- 800ccd8:	0800e110 	.word	0x0800e110
+ 800ccd0:	0800e138 	.word	0x0800e138
+ 800ccd4:	0800e158 	.word	0x0800e158
+ 800ccd8:	0800e118 	.word	0x0800e118
 
 0800ccdc <fiprintf>:
  800ccdc:	b40e      	push	{r1, r2, r3}
@@ -35918,11 +35918,11 @@ uint8_t *puc;
  800d14c:	f000 f9d4 	bl	800d4f8 <_printf_i>
  800d150:	e7eb      	b.n	800d12a <_svfiprintf_r+0x1c2>
  800d152:	bf00      	nop
- 800d154:	0800e224 	.word	0x0800e224
- 800d158:	0800e22e 	.word	0x0800e22e
+ 800d154:	0800e22c 	.word	0x0800e22c
+ 800d158:	0800e236 	.word	0x0800e236
  800d15c:	00000000 	.word	0x00000000
  800d160:	0800ceb1 	.word	0x0800ceb1
- 800d164:	0800e22a 	.word	0x0800e22a
+ 800d164:	0800e232 	.word	0x0800e232
 
 0800d168 <__sfputc_r>:
  800d168:	6893      	ldr	r3, [r2, #8]
@@ -36205,14 +36205,14 @@ uint8_t *puc;
  800d3f4:	f000 f880 	bl	800d4f8 <_printf_i>
  800d3f8:	e7e4      	b.n	800d3c4 <_vfiprintf_r+0x208>
  800d3fa:	bf00      	nop
- 800d3fc:	0800e130 	.word	0x0800e130
- 800d400:	0800e150 	.word	0x0800e150
- 800d404:	0800e110 	.word	0x0800e110
- 800d408:	0800e224 	.word	0x0800e224
- 800d40c:	0800e22e 	.word	0x0800e22e
+ 800d3fc:	0800e138 	.word	0x0800e138
+ 800d400:	0800e158 	.word	0x0800e158
+ 800d404:	0800e118 	.word	0x0800e118
+ 800d408:	0800e22c 	.word	0x0800e22c
+ 800d40c:	0800e236 	.word	0x0800e236
  800d410:	00000000 	.word	0x00000000
  800d414:	0800d197 	.word	0x0800d197
- 800d418:	0800e22a 	.word	0x0800e22a
+ 800d418:	0800e232 	.word	0x0800e232
 
 0800d41c <_printf_common>:
  800d41c:	e92d 47f0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
@@ -36548,8 +36548,8 @@ uint8_t *puc;
  800d734:	f104 0619 	add.w	r6, r4, #25
  800d738:	e7f5      	b.n	800d726 <_printf_i+0x22e>
  800d73a:	bf00      	nop
- 800d73c:	0800e235 	.word	0x0800e235
- 800d740:	0800e246 	.word	0x0800e246
+ 800d73c:	0800e23d 	.word	0x0800e23d
+ 800d740:	0800e24e 	.word	0x0800e24e
 
 0800d744 <_read_r>:
  800d744:	b538      	push	{r3, r4, r5, lr}

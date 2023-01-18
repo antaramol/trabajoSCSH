@@ -39,10 +39,10 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-#define SSID     "RealmeJacinto"
-#define PASSWORD "jacjurtab"
-//#define WIFISECURITY WIFI_ECN_WPA2_PSK
-#define WIFISECURITY WIFI_ECN_OPEN
+#define SSID     "Antonio"
+#define PASSWORD "Antonio_psswrd"
+#define WIFISECURITY WIFI_ECN_WPA2_PSK
+//#define WIFISECURITY WIFI_ECN_OPEN
 #define SOCKET 0
 #define WIFI_READ_TIMEOUT 10000
 #define WIFI_WRITE_TIMEOUT 0
