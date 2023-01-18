@@ -68,10 +68,10 @@ const osThreadAttr_t RTC_set_attributes = {
   .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityAboveNormal,
 };
-/* Definitions for tempTask */
-osThreadId_t tempTaskHandle;
-const osThreadAttr_t tempTask_attributes = {
-  .name = "tempTask",
+/* Definitions for humidityTask */
+osThreadId_t humidityTaskHandle;
+const osThreadAttr_t humidityTask_attributes = {
+  .name = "humidityTask",
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
@@ -117,7 +117,7 @@ static void MX_USB_OTG_FS_PCD_Init(void);
 static void MX_TIM7_Init(void);
 static void MX_RTC_Init(void);
 void RTC_set_func(void *argument);
-void tempTask_func(void *argument);
+void humidityTask_func(void *argument);
 void printTask_func(void *argument);
 void tarea_UART_func(void *argument);
 
@@ -208,8 +208,8 @@ int main(void)
   /* creation of RTC_set */
   RTC_setHandle = osThreadNew(RTC_set_func, NULL, &RTC_set_attributes);
 
-  /* creation of tempTask */
-  tempTaskHandle = osThreadNew(tempTask_func, NULL, &tempTask_attributes);
+  /* creation of humidityTask */
+  humidityTaskHandle = osThreadNew(humidityTask_func, NULL, &humidityTask_attributes);
 
   /* creation of printTask */
   printTaskHandle = osThreadNew(printTask_func, NULL, &printTask_attributes);
@@ -986,7 +986,7 @@ void RTC_set_func(void *argument)
 
 	osMessageQueuePut(print_queueHandle, &msg_fecha_ok, 0, pdMS_TO_TICKS(500));
 
-	osThreadFlagsSet(tempTaskHandle,0x0001U);
+	osThreadFlagsSet(humidityTaskHandle,0x0001U);
 
 
   /* Infinite loop */
@@ -998,84 +998,79 @@ void RTC_set_func(void *argument)
   /* USER CODE END 5 */
 }
 
-/* USER CODE BEGIN Header_tempTask_func */
+/* USER CODE BEGIN Header_humidityTask_func */
 /**
-* @brief Function implementing the tempTask thread.
+* @brief Function implementing the humidityTask thread.
 * @param argument: Not used
 * @retval None
 */
-/* USER CODE END Header_tempTask_func */
-void tempTask_func(void *argument)
+/* USER CODE END Header_humidityTask_func */
+void humidityTask_func(void *argument)
 {
-  /* USER CODE BEGIN tempTask_func */
-  osStatus_t estado;
-  //char mensaje[]  = "Hola mundo\r\n";
-  char mensaje[100];
-  char *p_mensaje = mensaje;
+  /* USER CODE BEGIN humidityTask_func */
+	osStatus_t estado;
+	//char mensaje[]  = "Hola mundo\r\n";
+	char mensaje[100];
+	char *p_mensaje = mensaje;
 
-  //BSP_TSENSOR_Init();
-  BSP_HSENSOR_Init();
-  static float humidity_value = 0;
-
-  uint8_t horas,minutos,segundos,dia,mes,anio = 0;
-  uint32_t return_wait = 0U;
+	BSP_HSENSOR_Init();
+	static float humidity_value = 0;
+	uint8_t horas,minutos,segundos,dia,mes,anio = 0;
+	uint32_t return_wait = 0U;
 
 
-  printf("Temp task esperando\r\n");
-  return_wait = osThreadFlagsWait(0x0001U, osFlagsWaitAny, osWaitForever);
-  printf("Temp task se inicia\r\n");
+	printf("Temp task esperando\r\n");
+	return_wait = osThreadFlagsWait(0x0001U, osFlagsWaitAny, osWaitForever);
+	printf("Temp task se inicia\r\n");
 
-  /*
-  if (return_wait == osFlagsErrorTimeout)
-	  printf("Tiempo agotadoM\r\n");
-  else if(return_wait == 0x0001U)
-	  printf("Recibido notificacion\r\n");
-	  */
-
-
-  /* Infinite loop */
-  for(;;)
-  {
-	humidity_value = BSP_HSENSOR_ReadHumidity();
-	int hmdInt1 = humidity_value;
-	float hmdFrac = humidity_value - hmdInt1;
-	int hmdInt2 = trunc(hmdFrac * 100);
-
-	printf("Lectura temp realizada\r\n");
-	HAL_RTC_GetTime(&hrtc, &GetTime, RTC_FORMAT_BIN);
-	horas = GetTime.Hours;
-	minutos = GetTime.Minutes;
-	segundos = GetTime.Seconds;
-
-	HAL_RTC_GetDate(&hrtc, &GetDate, RTC_FORMAT_BIN);
-	anio = GetDate.Year;
-	dia = GetDate.Date;
-	mes = GetDate.Month;
+	/*
+	if (return_wait == osFlagsErrorTimeout)
+		printf("Tiempo agotadoM\r\n");
+	else if(return_wait == 0x0001U)
+		printf("Recibido notificacion\r\n");
+	 */
 
 
-	printf("Anio: %d\r\n",anio);
-	printf("Lectura fecha realizada\r\n");
-	//printf("fecha: %d/%d/%d hora: %d:%d:%d temp: %d.%02d grados\r\n",dia,mes,anio,horas,minutos,segundos,tmpInt1,tmpInt2);
-	snprintf(mensaje,100,"fecha: %d/%d/%d hora: %d:%d:%d humidity: %d.%02d\r\n",dia,mes,anio+2000,horas,minutos,segundos,hmdInt1,hmdInt2);
+	/* Infinite loop */
+	for(;;)
+	{
+		humidity_value = BSP_HSENSOR_ReadHumidity();
+		int hmdInt1 = humidity_value;
+		float hmdFrac = humidity_value - hmdInt1;
+		int hmdInt2 = trunc(hmdFrac * 100);
+
+		printf("Lectura temp realizada\r\n");
+		HAL_RTC_GetTime(&hrtc, &GetTime, RTC_FORMAT_BIN);
+		horas = GetTime.Hours;
+		minutos = GetTime.Minutes;
+		segundos = GetTime.Seconds;
+
+		HAL_RTC_GetDate(&hrtc, &GetDate, RTC_FORMAT_BIN);
+		anio = GetDate.Year;
+		dia = GetDate.Date;
+		mes = GetDate.Month;
+
+
+		printf("Anio: %d\r\n",anio);
+		printf("Lectura fecha realizada\r\n");
+		//printf("fecha: %d/%d/%d hora: %d:%d:%d temp: %d.%02d grados\r\n",dia,mes,anio,horas,minutos,segundos,tmpInt1,tmpInt2);
+		snprintf(mensaje,100,"fecha: %d/%d/%d hora: %d:%d:%d humidity: %d.%02d\r\n",dia,mes,anio+2000,horas,minutos,segundos,hmdInt1,hmdInt2);
 
 
 
-	//printf("MENSAJE: %s\r\n",mensaje);
-    estado = osMessageQueuePut(print_queueHandle, &p_mensaje, 0, pdMS_TO_TICKS(500));
-    if(estado == osOK){
-    	printf("Enviada a la cola\r\n");
-    }
-    else if(estado == osErrorTimeout){
-    	printf("Timeout agotado 1\r\n");
-    }
+		//printf("MENSAJE: %s\r\n",mensaje);
+		estado = osMessageQueuePut(print_queueHandle, &p_mensaje, 0, pdMS_TO_TICKS(500));
+		if(estado == osOK){
+			printf("Enviada a la cola\r\n");
+		}
+		else if(estado == osErrorTimeout){
+			printf("Timeout agotado 1\r\n");
+		}
 
+		osDelay(pdMS_TO_TICKS(3000));
+	}
 
-
-
-	osDelay(pdMS_TO_TICKS(3000));
-
-  }
-  /* USER CODE END tempTask_func */
+  /* USER CODE END humidityTask_func */
 }
 
 /* USER CODE BEGIN Header_printTask_func */
