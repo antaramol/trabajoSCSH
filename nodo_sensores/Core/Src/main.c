@@ -24,7 +24,7 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include "stm32l475e_iot01.h"
-#include "stm32l475e_iot01_tsensor.h"
+#include "stm32l475e_iot01_hsensor.h"
 #include <math.h>
 #include <string.h>
 /* USER CODE END Includes */
@@ -868,7 +868,7 @@ int _write(int file, char *ptr, int len)
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 
-	static osStatus_t estado;
+	//static osStatus_t estado;
 	if (huart == &huart1)
 	{
 		HAL_UART_Receive_IT(&huart1,&rec_data,1);
@@ -898,7 +898,7 @@ void RTC_set_func(void *argument)
 	uint8_t recibido[3];
 	//uint32_t flag_rec;
 	osStatus_t estado;
-	uint32_t return_wait = 0U;
+	//uint32_t return_wait = 0U;
 
 	uint16_t num_usuario;
 	uint8_t to_change[6];
@@ -1013,8 +1013,9 @@ void tempTask_func(void *argument)
   char mensaje[100];
   char *p_mensaje = mensaje;
 
-  BSP_TSENSOR_Init();
-  static float temp_value = 0;
+  //BSP_TSENSOR_Init();
+  BSP_HSENSOR_Init();
+  static float humidity_value = 0;
 
   uint8_t horas,minutos,segundos,dia,mes,anio = 0;
   uint32_t return_wait = 0U;
@@ -1035,11 +1036,10 @@ void tempTask_func(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	temp_value = BSP_TSENSOR_ReadTemp();
-	int tmpInt1 = temp_value;
-	float tmpFrac = temp_value - tmpInt1;
-	int tmpInt2 = trunc(tmpFrac * 100);
-    //printf("Medida de Temperatura: %d.%02d grados\r\n",tmpInt1,tmpInt2);
+	humidity_value = BSP_HSENSOR_ReadHumidity();
+	int hmdInt1 = humidity_value;
+	float hmdFrac = humidity_value - hmdInt1;
+	int hmdInt2 = trunc(hmdFrac * 100);
 
 	printf("Lectura temp realizada\r\n");
 	HAL_RTC_GetTime(&hrtc, &GetTime, RTC_FORMAT_BIN);
@@ -1056,7 +1056,7 @@ void tempTask_func(void *argument)
 	printf("Anio: %d\r\n",anio);
 	printf("Lectura fecha realizada\r\n");
 	//printf("fecha: %d/%d/%d hora: %d:%d:%d temp: %d.%02d grados\r\n",dia,mes,anio,horas,minutos,segundos,tmpInt1,tmpInt2);
-	snprintf(mensaje,100,"fecha: %d/%d/%d hora: %d:%d:%d temp: %d.%02d grados\r\n",dia,mes,anio+2000,horas,minutos,segundos,tmpInt1,tmpInt2);
+	snprintf(mensaje,100,"fecha: %d/%d/%d hora: %d:%d:%d humidity: %d.%02d\r\n",dia,mes,anio+2000,horas,minutos,segundos,hmdInt1,hmdInt2);
 
 
 
@@ -1128,11 +1128,11 @@ void tarea_UART_func(void *argument)
 {
   /* USER CODE BEGIN tarea_UART_func */
 	osStatus_t estado;
-	uint32_t return_wait = 0U;
+	//uint32_t return_wait = 0U;
   /* Infinite loop */
   for(;;)
   {
-	  return_wait = osThreadFlagsWait(0x0002U, osFlagsWaitAny, osWaitForever);
+	  osThreadFlagsWait(0x0002U, osFlagsWaitAny, osWaitForever);
 	  estado = osMessageQueuePut(receive_queueHandle, &rec_data,0,pdMS_TO_TICKS(200));
 	  if (estado == osOK)
 		  printf("Estado: ok\r\n");
