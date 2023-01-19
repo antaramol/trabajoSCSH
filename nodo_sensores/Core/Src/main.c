@@ -22,6 +22,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "es_wifi.h"
+#include "wifi.h"
 #include <stdio.h>
 #include "stm32l475e_iot01.h"
 #include "stm32l475e_iot01_hsensor.h"
@@ -40,7 +42,10 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
+#define SSID     "Antonio"
+#define PASSWORD "Antonio_psswrd"
+//#define WIFISECURITY WIFI_ECN_OPEN
+#define WIFISECURITY WIFI_ECN_WPA2_PSK
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -89,6 +94,13 @@ const osThreadAttr_t tarea_UART_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
+/* Definitions for wifiStart */
+osThreadId_t wifiStartHandle;
+const osThreadAttr_t wifiStart_attributes = {
+  .name = "wifiStart",
+  .stack_size = 512 * 4,
+  .priority = (osPriority_t) osPriorityBelowNormal,
+};
 /* Definitions for print_queue */
 osMessageQueueId_t print_queueHandle;
 const osMessageQueueAttr_t print_queue_attributes = {
@@ -102,6 +114,9 @@ const osMessageQueueAttr_t receive_queue_attributes = {
 /* USER CODE BEGIN PV */
 RTC_DateTypeDef GetDate; //Estructura para fijar/leer fecha
 RTC_TimeTypeDef GetTime; //Estructura para fijar/leer hora
+
+extern  SPI_HandleTypeDef hspi;
+static  uint8_t  IP_Addr[4];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -120,7 +135,9 @@ void RTC_set_func(void *argument);
 void humidityTask_func(void *argument);
 void printTask_func(void *argument);
 void tarea_UART_func(void *argument);
+void wifiStartTask(void *argument);
 
+static void MX_NVIC_Init(void);
 /* USER CODE BEGIN PFP */
 volatile unsigned long ulHighFrequencyTimerTicks;
 void configureTimerForRunTimeStats(void) {
@@ -174,6 +191,9 @@ int main(void)
   MX_USB_OTG_FS_PCD_Init();
   MX_TIM7_Init();
   MX_RTC_Init();
+
+  /* Initialize interrupts */
+  MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -216,6 +236,9 @@ int main(void)
 
   /* creation of tarea_UART */
   tarea_UARTHandle = osThreadNew(tarea_UART_func, NULL, &tarea_UART_attributes);
+
+  /* creation of wifiStart */
+  wifiStartHandle = osThreadNew(wifiStartTask, NULL, &wifiStart_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -301,6 +324,17 @@ void SystemClock_Config(void)
   /** Enable MSI Auto calibration
   */
   HAL_RCCEx_EnableMSIPLLMode();
+}
+
+/**
+  * @brief NVIC Configuration.
+  * @retval None
+  */
+static void MX_NVIC_Init(void)
+{
+  /* SPI3_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(SPI3_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(SPI3_IRQn);
 }
 
 /**
@@ -845,6 +879,9 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI1_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI1_IRQn);
+
   HAL_NVIC_SetPriority(EXTI9_5_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 
@@ -882,6 +919,100 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 			*/
 	}
 }
+static int wifi_start(void)
+{
+  uint8_t  MAC_Addr[6];
+
+ /*Initialize and use WIFI module */
+  if(WIFI_Init() ==  WIFI_STATUS_OK)
+  {
+    printf("ES-WIFI Initialized.\n");
+    if(WIFI_GetMAC_Address(MAC_Addr) == WIFI_STATUS_OK)
+    {
+      printf("> eS-WiFi module MAC Address : %02X:%02X:%02X:%02X:%02X:%02X\n",
+               MAC_Addr[0],
+               MAC_Addr[1],
+               MAC_Addr[2],
+               MAC_Addr[3],
+               MAC_Addr[4],
+               MAC_Addr[5]);
+    }
+    else
+    {
+      printf("> ERROR : CANNOT get MAC address\n");
+      return -1;
+    }
+  }
+  else
+  {
+    return -1;
+  }
+  return 0;
+}
+
+
+
+int wifi_connect(void)
+{
+
+  wifi_start();
+
+  printf("\nConnecting to %s , %s\n",SSID,PASSWORD);
+  if( WIFI_Connect(SSID, PASSWORD, WIFISECURITY) == WIFI_STATUS_OK)
+  {
+    if(WIFI_GetIP_Address(IP_Addr) == WIFI_STATUS_OK)
+    {
+      printf("> es-wifi module connected: got IP Address : %d.%d.%d.%d\n",
+               IP_Addr[0],
+               IP_Addr[1],
+               IP_Addr[2],
+               IP_Addr[3]);
+    }
+    else
+    {
+		  printf(" ERROR : es-wifi module CANNOT get IP address\n");
+      return -1;
+    }
+  }
+  else
+  {
+		 printf("ERROR : es-wifi module NOT connected\n");
+     return -1;
+  }
+  return 0;
+}
+
+/**
+  * @brief  EXTI line detection callback.
+  * @param  GPIO_Pin: Specifies the port pin connected to corresponding EXTI line.
+  * @retval None
+  */
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  switch (GPIO_Pin)
+  {
+    case (GPIO_PIN_1):
+    {
+      SPI_WIFI_ISR();
+      break;
+    }
+    default:
+    {
+      break;
+    }
+  }
+}
+
+/**
+  * @brief  SPI3 line detection callback.
+  * @param  None
+  * @retval None
+  */
+void SPI3_IRQHandler(void)
+{
+  HAL_SPI_IRQHandler(&hspi);
+}
+
 
 /* USER CODE END 4 */
 
@@ -1136,6 +1267,25 @@ void tarea_UART_func(void *argument)
 
   }
   /* USER CODE END tarea_UART_func */
+}
+
+/* USER CODE BEGIN Header_wifiStartTask */
+/**
+* @brief Function implementing the wifiStart thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_wifiStartTask */
+void wifiStartTask(void *argument)
+{
+  /* USER CODE BEGIN wifiStartTask */
+	wifi_connect();
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END wifiStartTask */
 }
 
 /**
