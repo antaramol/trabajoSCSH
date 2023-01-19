@@ -15,10 +15,10 @@ Core/Src/mqtt_priv.o: ../Core/Src/mqtt_priv.c \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h \
- C:/Users/Jacin/STM32Cube/Repository/STM32Cube_FW_L4_V1.17.0/Projects/B-L475E-IOT01A/Applications/WiFi/Common/Inc/wifi.h \
- C:/Users/Jacin/STM32Cube/Repository/STM32Cube_FW_L4_V1.17.0/Projects/B-L475E-IOT01A/Applications/WiFi/Common/Inc/es_wifi.h \
- C:/Users/Jacin/STM32Cube/Repository/STM32Cube_FW_L4_V1.17.0/Projects/B-L475E-IOT01A/Applications/WiFi/Common/Inc/es_wifi_conf.h \
- C:/Users/Jacin/STM32Cube/Repository/STM32Cube_FW_L4_V1.17.0/Projects/B-L475E-IOT01A/Applications/WiFi/Common/Inc/es_wifi_io.h \
+ C:/Users/Jacin/workspace/trabajoSCSH/nodo_acelerometro/Libraries/WIFI/Common/Inc/wifi.h \
+ C:/Users/Jacin/workspace/trabajoSCSH/nodo_acelerometro/Libraries/WIFI/Common/Inc/es_wifi.h \
+ C:/Users/Jacin/workspace/trabajoSCSH/nodo_acelerometro/Libraries/WIFI/Common/Inc/es_wifi_conf.h \
+ C:/Users/Jacin/workspace/trabajoSCSH/nodo_acelerometro/Libraries/WIFI/Common/Inc/es_wifi_io.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h \
  ../Core/Inc/stm32l4xx_hal_conf.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_rcc.h \
@@ -74,10 +74,10 @@ C:/Users/Jacin/workspace/trabajoSCSH/nodo_acelerometro/Libraries/coreMQTT/source
 ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h:
-C:/Users/Jacin/STM32Cube/Repository/STM32Cube_FW_L4_V1.17.0/Projects/B-L475E-IOT01A/Applications/WiFi/Common/Inc/wifi.h:
-C:/Users/Jacin/STM32Cube/Repository/STM32Cube_FW_L4_V1.17.0/Projects/B-L475E-IOT01A/Applications/WiFi/Common/Inc/es_wifi.h:
-C:/Users/Jacin/STM32Cube/Repository/STM32Cube_FW_L4_V1.17.0/Projects/B-L475E-IOT01A/Applications/WiFi/Common/Inc/es_wifi_conf.h:
-C:/Users/Jacin/STM32Cube/Repository/STM32Cube_FW_L4_V1.17.0/Projects/B-L475E-IOT01A/Applications/WiFi/Common/Inc/es_wifi_io.h:
+C:/Users/Jacin/workspace/trabajoSCSH/nodo_acelerometro/Libraries/WIFI/Common/Inc/wifi.h:
+C:/Users/Jacin/workspace/trabajoSCSH/nodo_acelerometro/Libraries/WIFI/Common/Inc/es_wifi.h:
+C:/Users/Jacin/workspace/trabajoSCSH/nodo_acelerometro/Libraries/WIFI/Common/Inc/es_wifi_conf.h:
+C:/Users/Jacin/workspace/trabajoSCSH/nodo_acelerometro/Libraries/WIFI/Common/Inc/es_wifi_io.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h:
 ../Core/Inc/stm32l4xx_hal_conf.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_rcc.h:

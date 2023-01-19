@@ -29,6 +29,9 @@
 #include "stm32l475e_iot01_hsensor.h"
 #include <math.h>
 #include <string.h>
+#include "core_mqtt.h"
+#include "mqtt_priv.h"
+#include "timers.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -46,6 +49,9 @@
 #define PASSWORD "Antonio_psswrd"
 //#define WIFISECURITY WIFI_ECN_OPEN
 #define WIFISECURITY WIFI_ECN_WPA2_PSK
+#define SOCKET 0
+#define WIFI_READ_TIMEOUT 10000
+#define WIFI_WRITE_TIMEOUT 0
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -1013,6 +1019,33 @@ void SPI3_IRQHandler(void)
   HAL_SPI_IRQHandler(&hspi);
 }
 
+void MQTTTask(void)
+{
+	const uint32_t ulMaxPublishCount = 5UL;
+	NetworkContext_t xNetworkContext = { 0 };
+	MQTTContext_t xMQTTContext;
+	MQTTStatus_t xMQTTStatus;
+	TransportStatus_t xNetworkStatus;
+	float ftemp;
+	char payLoad[16];
+	/* Attempt to connect to the MQTT broker. The socket is returned in
+	* the network context structure. */
+	xNetworkStatus = prvConnectToServer( &xNetworkContext );
+	configASSERT( xNetworkStatus == PLAINTEXT_TRANSPORT_SUCCESS );
+	//LOG(("Trying to create an MQTT connection\n"));
+	prvCreateMQTTConnectionWithBroker( &xMQTTContext, &xNetworkContext );
+	for( ; ; )
+	{
+		/* Publicar cada 5 segundos */
+		osDelay(5000);
+		ftemp=23.45;
+		sprintf(payLoad,"%02.2f",ftemp);
+		prvMQTTPublishToTopic(&xMQTTContext,pcTempTopic,payLoad);
+//		MQTT_ProcessLoop(&xMQTTContext);
+//		prvMQTTSubscribeToTopic(&xMQTTContext, pcTempTopic);
+	}
+}
+
 
 /* USER CODE END 4 */
 
@@ -1283,6 +1316,7 @@ void wifiStartTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
+	MQTTTask();
     osDelay(1);
   }
   /* USER CODE END wifiStartTask */

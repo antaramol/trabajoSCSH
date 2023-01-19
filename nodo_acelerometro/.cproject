@@ -47,7 +47,6 @@
 									<listOptionValue builtIn="false" value="../Core/Inc"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Libraries/coreMQTT/source/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Libraries/coreMQTT/source/interface}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;C:\Users\Jacin\STM32Cube\Repository\STM32Cube_FW_L4_V1.17.0\Projects\B-L475E-IOT01A\Applications\WiFi\Common\Inc&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Libraries/WIFI/Common/Inc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/L4_IOT_Sensors/Drivers/BSP/B-L475E-IOT01}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/L4_IOT_Sensors/Drivers/BSP/Components/lsm6dsl}&quot;"/>
