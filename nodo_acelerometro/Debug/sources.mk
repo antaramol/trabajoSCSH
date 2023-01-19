@@ -27,6 +27,8 @@ Drivers/STM32L4xx_HAL_Driver/Src \
 L4_IOT_Sensors/Drivers/BSP/B-L475E-IOT01 \
 L4_IOT_Sensors/Drivers/BSP/Components/lsm6dsl \
 Libraries/WIFI/Common/Src \
+Libraries/coreMQTT/source \
+Libraries/coreMQTT/source/interface \
 Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 \
 Middlewares/Third_Party/FreeRTOS/Source \
 Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F \

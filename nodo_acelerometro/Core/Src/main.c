@@ -26,6 +26,9 @@
 #include "wifi.h"
 #include <stdio.h>
 #include "stm32l475e_iot01_accelero.h"
+#include "core_mqtt.h"
+#include "mqtt_priv.h"
+#include "timers.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -39,8 +42,8 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-#define SSID     "Antonio"
-#define PASSWORD "Antonio_psswrd"
+#define SSID     "RealmeJacinto"
+#define PASSWORD "jacjurtab"
 #define WIFISECURITY WIFI_ECN_WPA2_PSK
 //#define WIFISECURITY WIFI_ECN_OPEN
 #define SOCKET 0
@@ -863,6 +866,34 @@ void SPI3_IRQHandler(void)
   HAL_SPI_IRQHandler(&hspi);
 }
 
+void MQTTTask(void)
+{
+	const uint32_t ulMaxPublishCount = 5UL;
+	NetworkContext_t xNetworkContext = { 0 };
+	MQTTContext_t xMQTTContext;
+	MQTTStatus_t xMQTTStatus;
+	TransportStatus_t xNetworkStatus;
+	float ftemp;
+	char payLoad[16];
+	/* Attempt to connect to the MQTT broker. The socket is returned in
+	* the network context structure. */
+	xNetworkStatus = prvConnectToServer( &xNetworkContext );
+	configASSERT( xNetworkStatus == PLAINTEXT_TRANSPORT_SUCCESS );
+	//LOG(("Trying to create an MQTT connection\n"));
+	prvCreateMQTTConnectionWithBroker( &xMQTTContext, &xNetworkContext );
+	for( ; ; )
+	{
+		/* Publicar cada 5 segundos */
+		osDelay(5000);
+		ftemp=23.45;
+		sprintf(payLoad,"%02.2f",ftemp);
+//		prvMQTTPublishToTopic(&xMQTTContext,pcTempTopic,payLoad);
+		MQTT_ProcessLoop(&xMQTTContext);
+		prvMQTTSubscribeToTopic(&xMQTTContext, pcTempTopic);
+	}
+}
+
+
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_sendAccel_func */
@@ -889,14 +920,14 @@ void sendAccel_func(void *argument)
 		//printf("Recogida datos\r\n");
 		espacio_cola=osMessageQueueGetSpace(AceleroHandle);
 		//if(espacio_cola!=0){
-		printf("Espacio en la cola: %d\r\n",espacio_cola);
+//		printf("Espacio en la cola: %d\r\n",espacio_cola);
 		//}
 		if (espacio_cola != 0){
 			osMessageQueuePut(AceleroHandle,&DataXYZ[2],0,pdMS_TO_TICKS(10));
 			osMessageQueuePut(AceleroHandle,&tick,0,pdMS_TO_TICKS(10));
-			printf("Tick: %ld Eje x: %d Eje y: %d Eje z: %d \r\n", tick, DataXYZ[0], DataXYZ[1], DataXYZ[2]);
-			printf("Se ha metido un dato de: %d\r\n",DataXYZ[2]);
-			printf("Se ha metido un tick de: %d\r\n",tick);
+//			printf("Tick: %ld Eje x: %d Eje y: %d Eje z: %d \r\n", tick, DataXYZ[0], DataXYZ[1], DataXYZ[2]);
+//			printf("Se ha metido un dato de: %d\r\n",DataXYZ[2]);
+//			printf("Se ha metido un tick de: %d\r\n",tick);
 		}
 
 	}
@@ -956,6 +987,7 @@ void wifiStartTask_function(void *argument)
   wifi_connect();
   for(;;)
   {
+	MQTTTask();
     osDelay(1);
   }
   /* USER CODE END wifiStartTask_function */
