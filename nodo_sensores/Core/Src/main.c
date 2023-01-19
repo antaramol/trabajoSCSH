@@ -123,6 +123,8 @@ RTC_TimeTypeDef GetTime; //Estructura para fijar/leer hora
 
 extern  SPI_HandleTypeDef hspi;
 static  uint8_t  IP_Addr[4];
+
+static float humidity_value = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -963,7 +965,7 @@ int wifi_connect(void)
 
   wifi_start();
 
-  printf("\nConnecting to %s , %s\n",SSID,PASSWORD);
+  printf("\nConnecting to %s, %s\n",SSID,PASSWORD);
   if( WIFI_Connect(SSID, PASSWORD, WIFISECURITY) == WIFI_STATUS_OK)
   {
     if(WIFI_GetIP_Address(IP_Addr) == WIFI_STATUS_OK)
@@ -1026,7 +1028,6 @@ void MQTTTask(void)
 	MQTTContext_t xMQTTContext;
 	MQTTStatus_t xMQTTStatus;
 	TransportStatus_t xNetworkStatus;
-	float ftemp;
 	char payLoad[16];
 	/* Attempt to connect to the MQTT broker. The socket is returned in
 	* the network context structure. */
@@ -1038,8 +1039,7 @@ void MQTTTask(void)
 	{
 		/* Publicar cada 5 segundos */
 		osDelay(5000);
-		ftemp=23.45;
-		sprintf(payLoad,"%02.2f",ftemp);
+		sprintf(payLoad,"%02.2f",humidity_value);
 		prvMQTTPublishToTopic(&xMQTTContext,pcTempTopic,payLoad);
 //		MQTT_ProcessLoop(&xMQTTContext);
 //		prvMQTTSubscribeToTopic(&xMQTTContext, pcTempTopic);
@@ -1151,6 +1151,7 @@ void RTC_set_func(void *argument)
 	osMessageQueuePut(print_queueHandle, &msg_fecha_ok, 0, pdMS_TO_TICKS(500));
 
 	osThreadFlagsSet(humidityTaskHandle,0x0001U);
+	osThreadFlagsSet(wifiStartHandle,0x0001U);
 
 
   /* Infinite loop */
@@ -1178,7 +1179,7 @@ void humidityTask_func(void *argument)
 	char *p_mensaje = mensaje;
 
 	BSP_HSENSOR_Init();
-	static float humidity_value = 0;
+
 	uint8_t horas,minutos,segundos,dia,mes,anio = 0;
 	uint32_t return_wait = 0U;
 
@@ -1313,6 +1314,9 @@ void wifiStartTask(void *argument)
 {
   /* USER CODE BEGIN wifiStartTask */
 	wifi_connect();
+	// Espera a que se haya configurado el RTC
+	osThreadFlagsWait(0x0001U, osFlagsWaitAny, osWaitForever);
+	printf("Comenzamos envio mqtt\r\n");
   /* Infinite loop */
   for(;;)
   {
