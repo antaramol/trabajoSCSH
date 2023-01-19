@@ -3,6 +3,6 @@
 ../Core/Src/mqtt_priv.c:128:6:prvMQTTPublishToTopic	48	static
 ../Core/Src/mqtt_priv.c:151:6:prvMQTTSubscribeToTopic	32	static
 ../Core/Src/mqtt_priv.c:214:6:prvMQTTProcessIncomingPublish	272	static
-../Core/Src/mqtt_priv.c:234:10:prvGetTimeMs	16	static
-../Core/Src/mqtt_priv.c:253:6:prvEventCallback	24	static
-../Core/Src/mqtt_priv.c:274:13:prvMQTTProcessResponse	40	static,ignoring_inline_asm
+../Core/Src/mqtt_priv.c:235:10:prvGetTimeMs	16	static
+../Core/Src/mqtt_priv.c:254:6:prvEventCallback	24	static
+../Core/Src/mqtt_priv.c:275:13:prvMQTTProcessResponse	40	static,ignoring_inline_asm

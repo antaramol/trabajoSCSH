@@ -42,8 +42,8 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-#define SSID     "RealmeJacinto"
-#define PASSWORD "jacjurtab"
+#define SSID     "Antonio"
+#define PASSWORD "Antonio_psswrd"
 #define WIFISECURITY WIFI_ECN_WPA2_PSK
 //#define WIFISECURITY WIFI_ECN_OPEN
 #define SOCKET 0
@@ -881,15 +881,13 @@ void MQTTTask(void)
 	configASSERT( xNetworkStatus == PLAINTEXT_TRANSPORT_SUCCESS );
 	//LOG(("Trying to create an MQTT connection\n"));
 	prvCreateMQTTConnectionWithBroker( &xMQTTContext, &xNetworkContext );
+	prvMQTTSubscribeToTopic(&xMQTTContext, pcTempTopic);
 	for( ; ; )
 	{
 		/* Publicar cada 5 segundos */
 		osDelay(5000);
-		ftemp=23.45;
-		sprintf(payLoad,"%02.2f",ftemp);
-//		prvMQTTPublishToTopic(&xMQTTContext,pcTempTopic,payLoad);
 		MQTT_ProcessLoop(&xMQTTContext);
-		prvMQTTSubscribeToTopic(&xMQTTContext, pcTempTopic);
+
 	}
 }
 

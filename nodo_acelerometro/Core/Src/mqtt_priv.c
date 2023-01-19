@@ -226,8 +226,9 @@ void prvMQTTProcessIncomingPublish( MQTTPublishInfo_t *pxPublishInfo )
 	printf("Topic \"%s\": publicado \"%s\"\n",buffer2,buffer1);
 
   // Actuar localmente sobre los LEDs o alguna otra cosa
-	if(buffer1[0]=='1') BSP_LED_On(LED2);
+	/*if(buffer1[0]=='1') BSP_LED_On(LED2);
 	if(buffer1[0]=='0') BSP_LED_Off(LED2);
+	*/
 
 }
 
