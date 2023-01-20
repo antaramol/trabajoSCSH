@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include "stm32l475e_iot01.h"
 #include "stm32l475e_iot01_hsensor.h"
+#include "stm32l475e_iot01_tsensor.h"
 #include <math.h>
 #include <string.h>
 #include "core_mqtt.h"
@@ -45,8 +46,8 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-#define SSID     "Antonio"
-#define PASSWORD "Antonio_psswrd"
+#define SSID     "Juanmapaes"
+#define PASSWORD "z0002cf9a53ea"
 //#define WIFISECURITY WIFI_ECN_OPEN
 #define WIFISECURITY WIFI_ECN_WPA2_PSK
 #define SOCKET 0
@@ -72,31 +73,17 @@ UART_HandleTypeDef huart3;
 
 PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
-/* Definitions for RTC_set */
-osThreadId_t RTC_setHandle;
-const osThreadAttr_t RTC_set_attributes = {
-  .name = "RTC_set",
-  .stack_size = 256 * 4,
-  .priority = (osPriority_t) osPriorityAboveNormal,
-};
 /* Definitions for humidityTask */
 osThreadId_t humidityTaskHandle;
 const osThreadAttr_t humidityTask_attributes = {
   .name = "humidityTask",
-  .stack_size = 128 * 4,
+  .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for printTask */
 osThreadId_t printTaskHandle;
 const osThreadAttr_t printTask_attributes = {
   .name = "printTask",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
-};
-/* Definitions for tarea_UART */
-osThreadId_t tarea_UARTHandle;
-const osThreadAttr_t tarea_UART_attributes = {
-  .name = "tarea_UART",
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
@@ -112,11 +99,6 @@ osMessageQueueId_t print_queueHandle;
 const osMessageQueueAttr_t print_queue_attributes = {
   .name = "print_queue"
 };
-/* Definitions for receive_queue */
-osMessageQueueId_t receive_queueHandle;
-const osMessageQueueAttr_t receive_queue_attributes = {
-  .name = "receive_queue"
-};
 /* USER CODE BEGIN PV */
 RTC_DateTypeDef GetDate; //Estructura para fijar/leer fecha
 RTC_TimeTypeDef GetTime; //Estructura para fijar/leer hora
@@ -124,7 +106,10 @@ RTC_TimeTypeDef GetTime; //Estructura para fijar/leer hora
 extern  SPI_HandleTypeDef hspi;
 static  uint8_t  IP_Addr[4];
 
-static float humidity_value = 0;
+static int humidity_value = 0;
+static float temperature_value = 0;
+static int tempInt1 = 0;
+static int tempInt2 = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -139,10 +124,8 @@ static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 static void MX_TIM7_Init(void);
 static void MX_RTC_Init(void);
-void RTC_set_func(void *argument);
 void humidityTask_func(void *argument);
 void printTask_func(void *argument);
-void tarea_UART_func(void *argument);
 void wifiStartTask(void *argument);
 
 static void MX_NVIC_Init(void);
@@ -225,25 +208,16 @@ int main(void)
   /* creation of print_queue */
   print_queueHandle = osMessageQueueNew (8, sizeof(uintptr_t), &print_queue_attributes);
 
-  /* creation of receive_queue */
-  receive_queueHandle = osMessageQueueNew (3, sizeof(uint8_t), &receive_queue_attributes);
-
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* creation of RTC_set */
-  RTC_setHandle = osThreadNew(RTC_set_func, NULL, &RTC_set_attributes);
-
   /* creation of humidityTask */
   humidityTaskHandle = osThreadNew(humidityTask_func, NULL, &humidityTask_attributes);
 
   /* creation of printTask */
   printTaskHandle = osThreadNew(printTask_func, NULL, &printTask_attributes);
-
-  /* creation of tarea_UART */
-  tarea_UARTHandle = osThreadNew(tarea_UART_func, NULL, &tarea_UART_attributes);
 
   /* creation of wifiStart */
   wifiStartHandle = osThreadNew(wifiStartTask, NULL, &wifiStart_attributes);
@@ -762,11 +736,11 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : BUTTON_EXTI13_Pin */
-  GPIO_InitStruct.Pin = BUTTON_EXTI13_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  /*Configure GPIO pins : BOTON_Pin VL53L0X_GPIO1_EXTI7_Pin LSM3MDL_DRDY_EXTI8_Pin */
+  GPIO_InitStruct.Pin = BOTON_Pin|VL53L0X_GPIO1_EXTI7_Pin|LSM3MDL_DRDY_EXTI8_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(BUTTON_EXTI13_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pins : ARD_A5_Pin ARD_A4_Pin ARD_A3_Pin ARD_A2_Pin
                            ARD_A1_Pin ARD_A0_Pin */
@@ -856,12 +830,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : VL53L0X_GPIO1_EXTI7_Pin LSM3MDL_DRDY_EXTI8_Pin */
-  GPIO_InitStruct.Pin = VL53L0X_GPIO1_EXTI7_Pin|LSM3MDL_DRDY_EXTI8_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-
   /*Configure GPIO pin : PMOD_SPI2_SCK_Pin */
   GPIO_InitStruct.Pin = PMOD_SPI2_SCK_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
@@ -887,7 +855,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI1_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(EXTI1_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(EXTI1_IRQn);
 
   HAL_NVIC_SetPriority(EXTI9_5_IRQn, 5, 0);
@@ -910,23 +878,8 @@ int _write(int file, char *ptr, int len)
 	return len;
 }
 
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
 
-	//static osStatus_t estado;
-	if (huart == &huart1)
-	{
-		HAL_UART_Receive_IT(&huart1,&rec_data,1);
-		printf("Recibido: %d\r\n",rec_data);
-		osThreadFlagsSet(tarea_UARTHandle,0x0002U);
-		/*estado = osMessageQueuePut(receive_queueHandle, &rec_data,0,pdMS_TO_TICKS(200));
-		if (estado == osOK)
-			printf("Estado: ok\r\n");
-		else
-			printf("Algo no va bien\r\n");
-			*/
-	}
-}
+
 static int wifi_start(void)
 {
   uint8_t  MAC_Addr[6];
@@ -1004,6 +957,12 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
       SPI_WIFI_ISR();
       break;
     }
+    case (BOTON_Pin):
+    {
+      printf("Le has dado al boton \r\n");
+      osThreadFlagsSet(wifiStartHandle, 0x00000001U);
+      break;
+    }
     default:
     {
       break;
@@ -1021,147 +980,35 @@ void SPI3_IRQHandler(void)
   HAL_SPI_IRQHandler(&hspi);
 }
 
-void MQTTTask(void)
-{
-	const uint32_t ulMaxPublishCount = 5UL;
-	NetworkContext_t xNetworkContext = { 0 };
-	MQTTContext_t xMQTTContext;
-	MQTTStatus_t xMQTTStatus;
-	TransportStatus_t xNetworkStatus;
-	char payLoad[16];
-	/* Attempt to connect to the MQTT broker. The socket is returned in
-	* the network context structure. */
-	xNetworkStatus = prvConnectToServer( &xNetworkContext );
-	configASSERT( xNetworkStatus == PLAINTEXT_TRANSPORT_SUCCESS );
-	//LOG(("Trying to create an MQTT connection\n"));
-	prvCreateMQTTConnectionWithBroker( &xMQTTContext, &xNetworkContext );
-	for( ; ; )
-	{
-		/* Publicar cada 5 segundos */
-		osDelay(5000);
-		sprintf(payLoad,"%02.2f",humidity_value);
-		prvMQTTPublishToTopic(&xMQTTContext,pcTempTopic,payLoad);
-//		MQTT_ProcessLoop(&xMQTTContext);
-//		prvMQTTSubscribeToTopic(&xMQTTContext, pcTempTopic);
-	}
-}
+//void MQTTTask(void)
+//{
+//	const uint32_t ulMaxPublishCount = 5UL;
+//	NetworkContext_t xNetworkContext = { 0 };
+//	MQTTContext_t xMQTTContext;
+//	MQTTStatus_t xMQTTStatus;
+//	TransportStatus_t xNetworkStatus;
+//	char payLoad[16];
+//	/* Attempt to connect to the MQTT broker. The socket is returned in
+//	* the network context structure. */
+//	xNetworkStatus = prvConnectToServer( &xNetworkContext );
+//	configASSERT( xNetworkStatus == PLAINTEXT_TRANSPORT_SUCCESS );
+//	//LOG(("Trying to create an MQTT connection\n"));
+//	prvCreateMQTTConnectionWithBroker( &xMQTTContext, &xNetworkContext );
+//	for( ; ; )
+//	{
+//		/* Publicar cada 5 segundos */
+//		//osDelay(30000);
+//		printf("Temperatura: %d.%01d , Humedad: %d \r\n",tempInt1,tempInt2,humidity_value);
+//		sprintf(payLoad,"T: %d.%01d , H: %d",tempInt1,tempInt2,humidity_value);
+//		prvMQTTPublishToTopic(&xMQTTContext,pcTempTopic,payLoad);
+//		osDelay(30000);
+////		MQTT_ProcessLoop(&xMQTTContext);
+////		prvMQTTSubscribeToTopic(&xMQTTContext, pcTempTopic);
+//	}
+//}
 
 
 /* USER CODE END 4 */
-
-/* USER CODE BEGIN Header_RTC_set_func */
-/**
-  * @brief  Function implementing the RTC_set thread.
-  * @param  argument: Not used
-  * @retval None
-  */
-/* USER CODE END Header_RTC_set_func */
-void RTC_set_func(void *argument)
-{
-  /* USER CODE BEGIN 5 */
-	uint8_t recibido[3];
-	//uint32_t flag_rec;
-	osStatus_t estado;
-	//uint32_t return_wait = 0U;
-
-	uint16_t num_usuario;
-	uint8_t to_change[6];
-	const char* msg_hora_ok = "\r\nHora cambiada correctamente\r\n";
-	const char* msg_fecha_ok = "Fecha cambiada correctamente\r\n";
-	const char* msg_error = "\r\nERROR: Valor no válido\r\n";
-	const char* msg_rtc1 = "\r\n\r\n========================\r\n"
-	"| Configurar rtc |\r\n"
-	"========================\r\n\r\n";
-	const char* msg[6] = {
-	"Hora (0-23): ", "\r\nMinuto (0-59): ","\r\nSegundo (0-59): ","\r\nDía (1-31): ","\r\nMes (1-12): ",
-	"\r\nAño (0-99): "};
-	uint8_t limit[6][2] = {{0,23},{0,59},{0,59},{1,31},{1,12},{0,99}};
-	//uint8_t *toChange[6] = {&GetTime.Hours, &GetTime.Minutes, &GetTime.Seconds, &GetDate.Date,&GetDate.Month, &GetDate.Year};
-
-	printf("Empieza el bucle\r\n");
-	estado = osMessageQueuePut(print_queueHandle, &msg_rtc1, 0, pdMS_TO_TICKS(500));
-	int i,j = 0;
-	for (i=0;i<6;){
-		estado = osMessageQueuePut(print_queueHandle, &msg[i], 0, pdMS_TO_TICKS(500));
-		printf("Esperando a que ser reciba el dato\r\n");
-
-		for (j=0;j<3;j++){
-			estado = osMessageQueueGet(receive_queueHandle, &recibido[j], NULL, osWaitForever);
-			printf("De la cola: %c\r\n",recibido[j]);
-			if(recibido[j]==13){
-				printf("Ha pulsado intro\r\n");
-				break;
-			}
-		}
-		printf("%d\r\n",j);
-		switch(j){
-		case 0:
-			num_usuario=0;
-			break;
-		case 1:
-			num_usuario = recibido[0]-48;
-			//i++;
-			break;
-		case 2:
-			num_usuario = 10*(recibido[0]-48)+recibido[1]-48;
-			//i++;
-			break;
-		case 3:
-			num_usuario = 100*(recibido[0]-48)+10*(recibido[1]-48)+recibido[2]-48;
-			break;
-		}
-		printf("Numero: %d\r\n",num_usuario);
-		printf("Rango: %d-%d\r\n",limit[i][0],limit[i][1]);
-		if (num_usuario<limit[i][0] || num_usuario>limit[i][1]){
-			estado = osMessageQueuePut(print_queueHandle, &msg_error, 0, pdMS_TO_TICKS(500));
-			if (estado == osOK)
-				printf("Enviado valor erroneo\r\n");
-			else
-				printf("Algo no va bien\r\n");
-		}else{
-			to_change[i]=num_usuario;
-			i++;
-		}
-
-	}
-
-	RTC_TimeTypeDef sTime = {0};
-	RTC_DateTypeDef sDate = {0};
-
-	sTime.Hours = to_change[0];
-	sTime.Minutes = to_change[1];
-	sTime.Seconds = to_change[2];
-
-	if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
-	  {
-	    Error_Handler();
-	  }
-
-	osMessageQueuePut(print_queueHandle, &msg_hora_ok, 0, pdMS_TO_TICKS(500));
-
-	sDate.Date = to_change[3];
-	sDate.Month = to_change[4];
-	sDate.Year = to_change[5];
-	printf("Anio: %d\r\n",to_change[5]);
-	if (HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BIN) != HAL_OK)
-	{
-		Error_Handler();
-	}
-
-	osMessageQueuePut(print_queueHandle, &msg_fecha_ok, 0, pdMS_TO_TICKS(500));
-
-	osThreadFlagsSet(humidityTaskHandle,0x0001U);
-	osThreadFlagsSet(wifiStartHandle,0x0001U);
-
-
-  /* Infinite loop */
-  for(;;)
-  {
-
-	  osDelay(pdMS_TO_TICKS(1000));
-  }
-  /* USER CODE END 5 */
-}
 
 /* USER CODE BEGIN Header_humidityTask_func */
 /**
@@ -1172,70 +1019,48 @@ void RTC_set_func(void *argument)
 /* USER CODE END Header_humidityTask_func */
 void humidityTask_func(void *argument)
 {
-  /* USER CODE BEGIN humidityTask_func */
+  /* USER CODE BEGIN 5 */
 	osStatus_t estado;
-	//char mensaje[]  = "Hola mundo\r\n";
-	char mensaje[100];
-	char *p_mensaje = mensaje;
+		char mensaje[100];
+		char *p_mensaje = mensaje;
 
-	BSP_HSENSOR_Init();
+		BSP_HSENSOR_Init();
+		BSP_TSENSOR_Init();
 
-	uint8_t horas,minutos,segundos,dia,mes,anio = 0;
-	uint32_t return_wait = 0U;
+		uint8_t horas,minutos,segundos,dia,mes,anio = 0;
+		uint32_t return_wait = 0U;
 
-
-	printf("Temp task esperando\r\n");
-	return_wait = osThreadFlagsWait(0x0001U, osFlagsWaitAny, osWaitForever);
-	printf("Temp task se inicia\r\n");
-
-	/*
-	if (return_wait == osFlagsErrorTimeout)
-		printf("Tiempo agotadoM\r\n");
-	else if(return_wait == 0x0001U)
-		printf("Recibido notificacion\r\n");
-	 */
+		printf("Temp y humidity task se inicia\r\n");
 
 
-	/* Infinite loop */
-	for(;;)
-	{
-		humidity_value = BSP_HSENSOR_ReadHumidity();
-		int hmdInt1 = humidity_value;
-		float hmdFrac = humidity_value - hmdInt1;
-		int hmdInt2 = trunc(hmdFrac * 100);
-
-		printf("Lectura temp realizada\r\n");
-		HAL_RTC_GetTime(&hrtc, &GetTime, RTC_FORMAT_BIN);
-		horas = GetTime.Hours;
-		minutos = GetTime.Minutes;
-		segundos = GetTime.Seconds;
-
-		HAL_RTC_GetDate(&hrtc, &GetDate, RTC_FORMAT_BIN);
-		anio = GetDate.Year;
-		dia = GetDate.Date;
-		mes = GetDate.Month;
+		/* Infinite loop */
+		for(;;)
+		{
+			//LECTURA DE LA HUMEDAD (sin decimales):
+			humidity_value = BSP_HSENSOR_ReadHumidity();
+			int hmdInt1 = humidity_value;
 
 
-		printf("Anio: %d\r\n",anio);
-		printf("Lectura fecha realizada\r\n");
-		//printf("fecha: %d/%d/%d hora: %d:%d:%d temp: %d.%02d grados\r\n",dia,mes,anio,horas,minutos,segundos,tmpInt1,tmpInt2);
-		snprintf(mensaje,100,"fecha: %d/%d/%d hora: %d:%d:%d humidity: %d.%02d\r\n",dia,mes,anio+2000,horas,minutos,segundos,hmdInt1,hmdInt2);
+			//LECTURA DE LA TEMPERATURA (con 1 decimal):
+			temperature_value = BSP_TSENSOR_ReadTemp();
+			tempInt1 = temperature_value;
+			float hmdFrac = temperature_value - tempInt1;
+			tempInt2 = trunc(hmdFrac * 10);
 
+			printf("Lectura humedad y temperatura realizada\r\n");
 
+			snprintf(mensaje,100,"Temp: %d.%01d , humidity: %d\r\n",tempInt1,tempInt2,hmdInt1);
+			estado = osMessageQueuePut(print_queueHandle, &p_mensaje, 0, pdMS_TO_TICKS(500));
+			if(estado == osOK){
+				printf("Enviada a la cola\r\n");
+			}
+			else if(estado == osErrorTimeout){
+				printf("Timeout agotado 1\r\n");
+			}
 
-		//printf("MENSAJE: %s\r\n",mensaje);
-		estado = osMessageQueuePut(print_queueHandle, &p_mensaje, 0, pdMS_TO_TICKS(500));
-		if(estado == osOK){
-			printf("Enviada a la cola\r\n");
+			osDelay(30000);
 		}
-		else if(estado == osErrorTimeout){
-			printf("Timeout agotado 1\r\n");
-		}
-
-		osDelay(pdMS_TO_TICKS(3000));
-	}
-
-  /* USER CODE END humidityTask_func */
+  /* USER CODE END 5 */
 }
 
 /* USER CODE BEGIN Header_printTask_func */
@@ -1254,9 +1079,8 @@ void printTask_func(void *argument)
   for(;;)
   {
 	  estado = osMessageQueueGet(print_queueHandle, &mensaje, NULL, osWaitForever);
-	  printf("Se ha recibido algo en print task\r\n");
-	  //printf("Mensaje print task: %s\r\n",mensaje);
-	  //printf("Longitud: %d",strlen((char*)mensaje));
+	  //printf("Se ha recibido algo en print task\r\n");
+
 	  if (estado == osOK)
 	  {
 		  //printf("%s",(char*)mensaje);
@@ -1271,36 +1095,10 @@ void printTask_func(void *argument)
 		  printf("Error en la tarea print\r\n");
 	  }
 
-	  //osDelay(pdMS_TO_TICKS(3000));
+	  osDelay(30000);
 
   }
   /* USER CODE END printTask_func */
-}
-
-/* USER CODE BEGIN Header_tarea_UART_func */
-/**
-* @brief Function implementing the tarea_UART thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_tarea_UART_func */
-void tarea_UART_func(void *argument)
-{
-  /* USER CODE BEGIN tarea_UART_func */
-	osStatus_t estado;
-	//uint32_t return_wait = 0U;
-  /* Infinite loop */
-  for(;;)
-  {
-	  osThreadFlagsWait(0x0002U, osFlagsWaitAny, osWaitForever);
-	  estado = osMessageQueuePut(receive_queueHandle, &rec_data,0,pdMS_TO_TICKS(200));
-	  if (estado == osOK)
-		  printf("Estado: ok\r\n");
-	  else
-		  printf("Algo no va bien\r\n");
-
-  }
-  /* USER CODE END tarea_UART_func */
 }
 
 /* USER CODE BEGIN Header_wifiStartTask */
@@ -1315,13 +1113,43 @@ void wifiStartTask(void *argument)
   /* USER CODE BEGIN wifiStartTask */
 	wifi_connect();
 	// Espera a que se haya configurado el RTC
-	osThreadFlagsWait(0x0001U, osFlagsWaitAny, osWaitForever);
+
+
+	const uint32_t ulMaxPublishCount = 5UL;
+	NetworkContext_t xNetworkContext = { 0 };
+	MQTTContext_t xMQTTContext;
+	MQTTStatus_t xMQTTStatus;
+	TransportStatus_t xNetworkStatus;
+	char payLoad[16];
+	char payLoad1[16];  //Este payload puede servir para mandar una notificacion de que se ha superado la temperatura umbral
+	/* Attempt to connect to the MQTT broker. The socket is returned in
+	* the network context structure. */
+	xNetworkStatus = prvConnectToServer( &xNetworkContext );
+	configASSERT( xNetworkStatus == PLAINTEXT_TRANSPORT_SUCCESS );
+	//LOG(("Trying to create an MQTT connection\n"));
+	prvCreateMQTTConnectionWithBroker( &xMQTTContext, &xNetworkContext );
+
+
+
 	printf("Comenzamos envio mqtt\r\n");
   /* Infinite loop */
   for(;;)
   {
-	MQTTTask();
-    osDelay(1);
+	osThreadFlagsWait(0x00000001U, osFlagsWaitAny, pdMS_TO_TICKS(10000)); //AQUÍ PONER QUE ES CADA MEDIA HORA.
+
+	printf("Temperatura: %d.%01d , Humedad: %d \r\n",tempInt1,tempInt2,humidity_value);
+	sprintf(payLoad,"T: %d.%01d , H: %d",tempInt1,tempInt2,humidity_value);
+	prvMQTTPublishToTopic(&xMQTTContext,pcTempTopic,payLoad);
+
+	if(tempInt1>22){
+		sprintf(payLoad1,"1");
+		prvMQTTPublishToTopic(&xMQTTContext,pcTempSupTopic,payLoad1);
+	}
+
+
+	//MQTTTask();
+    //osDelay(1800000);
+	osDelay(1);
   }
   /* USER CODE END wifiStartTask */
 }
