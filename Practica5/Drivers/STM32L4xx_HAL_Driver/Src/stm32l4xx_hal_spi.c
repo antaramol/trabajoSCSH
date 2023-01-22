@@ -9,17 +9,7 @@
   *           + IO operation functions
   *           + Peripheral Control functions
   *           + Peripheral State functions
-  ******************************************************************************
-  * @attention
   *
-  * Copyright (c) 2017 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
   @verbatim
   ==============================================================================
                         ##### How to use this driver #####
@@ -194,6 +184,18 @@
             (#) RX processes are HAL_SPI_Receive(), HAL_SPI_Receive_IT() and HAL_SPI_Receive_DMA()
             (#) TX processes are HAL_SPI_Transmit(), HAL_SPI_Transmit_IT() and HAL_SPI_Transmit_DMA()
 
+  ******************************************************************************
+  * @attention
+  *
+  * <h2><center>&copy; Copyright (c) 2017 STMicroelectronics.
+  * All rights reserved.</center></h2>
+  *
+  * This software component is licensed by ST under BSD 3-Clause license,
+  * the "License"; You may not use this file except in compliance with the
+  * License. You may obtain a copy of the License at:
+  *                        opensource.org/licenses/BSD-3-Clause
+  *
+  ******************************************************************************
   */
 
 /* Includes ------------------------------------------------------------------*/
@@ -1007,8 +1009,6 @@ HAL_StatusTypeDef HAL_SPI_Receive(SPI_HandleTypeDef *hspi, uint8_t *pData, uint1
 {
 #if (USE_SPI_CRC != 0U)
   __IO uint32_t tmpreg = 0U;
-  __IO uint8_t  *ptmpreg8;
-  __IO uint8_t  tmpreg8 = 0;
 #endif /* USE_SPI_CRC */
   uint32_t tickstart;
   HAL_StatusTypeDef errorcode = HAL_OK;
@@ -1182,12 +1182,10 @@ HAL_StatusTypeDef HAL_SPI_Receive(SPI_HandleTypeDef *hspi, uint8_t *pData, uint1
     }
     else
     {
-      /* Initialize the 8bit temporary pointer */
-      ptmpreg8 = (__IO uint8_t *)&hspi->Instance->DR;
       /* Read 8bit CRC */
-      tmpreg8 = *ptmpreg8;
+      tmpreg = READ_REG(*(__IO uint8_t *)&hspi->Instance->DR);
       /* To avoid GCC warning */
-      UNUSED(tmpreg8);
+      UNUSED(tmpreg);
 
       if ((hspi->Init.DataSize == SPI_DATASIZE_8BIT) && (hspi->Init.CRCLength == SPI_CRC_LENGTH_16BIT))
       {
@@ -1199,9 +1197,9 @@ HAL_StatusTypeDef HAL_SPI_Receive(SPI_HandleTypeDef *hspi, uint8_t *pData, uint1
           goto error;
         }
         /* Read 8bit CRC again in case of 16bit CRC in 8bit Data mode */
-        tmpreg8 = *ptmpreg8;
+        tmpreg = READ_REG(*(__IO uint8_t *)&hspi->Instance->DR);
         /* To avoid GCC warning */
-        UNUSED(tmpreg8);
+        UNUSED(tmpreg);
       }
     }
   }
@@ -1246,17 +1244,17 @@ error :
 HAL_StatusTypeDef HAL_SPI_TransmitReceive(SPI_HandleTypeDef *hspi, uint8_t *pTxData, uint8_t *pRxData, uint16_t Size,
                                           uint32_t Timeout)
 {
+#if (USE_SPI_CRC != 0U)
+  __IO uint32_t tmpreg = 0U;
+#endif /* USE_SPI_CRC */
   uint16_t             initial_TxXferCount;
   uint16_t             initial_RxXferCount;
   uint32_t             tmp_mode;
   HAL_SPI_StateTypeDef tmp_state;
   uint32_t             tickstart;
 #if (USE_SPI_CRC != 0U)
-  __IO uint32_t tmpreg = 0U;
   uint32_t             spi_cr1;
   uint32_t             spi_cr2;
-  __IO uint8_t  *ptmpreg8;
-  __IO uint8_t  tmpreg8 = 0;
 #endif /* USE_SPI_CRC */
 
   /* Variable used to alternate Rx and Tx during transfer */
@@ -1496,12 +1494,10 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive(SPI_HandleTypeDef *hspi, uint8_t *pTxD
     }
     else
     {
-      /* Initialize the 8bit temporary pointer */
-      ptmpreg8 = (__IO uint8_t *)&hspi->Instance->DR;
       /* Read 8bit CRC */
-      tmpreg8 = *ptmpreg8;
+      tmpreg = READ_REG(*(__IO uint8_t *)&hspi->Instance->DR);
       /* To avoid GCC warning */
-      UNUSED(tmpreg8);
+      UNUSED(tmpreg);
 
       if (hspi->Init.CRCLength == SPI_CRC_LENGTH_16BIT)
       {
@@ -1513,9 +1509,9 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive(SPI_HandleTypeDef *hspi, uint8_t *pTxD
           goto error;
         }
         /* Read 8bit CRC again in case of 16bit CRC in 8bit Data mode */
-        tmpreg8 = *ptmpreg8;
+        tmpreg = READ_REG(*(__IO uint8_t *)&hspi->Instance->DR);
         /* To avoid GCC warning */
-        UNUSED(tmpreg8);
+        UNUSED(tmpreg);
       }
     }
   }
@@ -3072,8 +3068,6 @@ static void SPI_DMAReceiveCplt(DMA_HandleTypeDef *hdma)
   uint32_t tickstart;
 #if (USE_SPI_CRC != 0U)
   __IO uint32_t tmpreg = 0U;
-  __IO uint8_t  *ptmpreg8;
-  __IO uint8_t  tmpreg8 = 0;
 #endif /* USE_SPI_CRC */
 
   /* Init tickstart for timeout management*/
@@ -3105,12 +3099,10 @@ static void SPI_DMAReceiveCplt(DMA_HandleTypeDef *hdma)
       }
       else
       {
-        /* Initialize the 8bit temporary pointer */
-        ptmpreg8 = (__IO uint8_t *)&hspi->Instance->DR;
         /* Read 8bit CRC */
-        tmpreg8 = *ptmpreg8;
+        tmpreg = READ_REG(*(__IO uint8_t *)&hspi->Instance->DR);
         /* To avoid GCC warning */
-        UNUSED(tmpreg8);
+        UNUSED(tmpreg);
 
         if (hspi->Init.CRCLength == SPI_CRC_LENGTH_16BIT)
         {
@@ -3120,9 +3112,9 @@ static void SPI_DMAReceiveCplt(DMA_HandleTypeDef *hdma)
             SET_BIT(hspi->ErrorCode, HAL_SPI_ERROR_CRC);
           }
           /* Read 8bit CRC again in case of 16bit CRC in 8bit Data mode */
-          tmpreg8 = *ptmpreg8;
+          tmpreg = READ_REG(*(__IO uint8_t *)&hspi->Instance->DR);
           /* To avoid GCC warning */
-          UNUSED(tmpreg8);
+          UNUSED(tmpreg);
         }
       }
     }
@@ -3189,8 +3181,6 @@ static void SPI_DMATransmitReceiveCplt(DMA_HandleTypeDef *hdma)
   uint32_t tickstart;
 #if (USE_SPI_CRC != 0U)
   __IO uint32_t tmpreg = 0U;
-  __IO uint8_t  *ptmpreg8;
-  __IO uint8_t  tmpreg8 = 0;
 #endif /* USE_SPI_CRC */
 
   /* Init tickstart for timeout management*/
@@ -3214,12 +3204,10 @@ static void SPI_DMATransmitReceiveCplt(DMA_HandleTypeDef *hdma)
           /* Error on the CRC reception */
           SET_BIT(hspi->ErrorCode, HAL_SPI_ERROR_CRC);
         }
-        /* Initialize the 8bit temporary pointer */
-        ptmpreg8 = (__IO uint8_t *)&hspi->Instance->DR;
-        /* Read 8bit CRC */
-        tmpreg8 = *ptmpreg8;
+        /* Read CRC to Flush DR and RXNE flag */
+        tmpreg = READ_REG(*(__IO uint8_t *)&hspi->Instance->DR);
         /* To avoid GCC warning */
-        UNUSED(tmpreg8);
+        UNUSED(tmpreg);
       }
       else
       {
@@ -3566,15 +3554,12 @@ static void SPI_2linesRxISR_8BIT(struct __SPI_HandleTypeDef *hspi)
   */
 static void SPI_2linesRxISR_8BITCRC(struct __SPI_HandleTypeDef *hspi)
 {
-  __IO uint8_t  *ptmpreg8;
-  __IO uint8_t  tmpreg8 = 0;
+  __IO uint32_t tmpreg = 0U;
 
-  /* Initialize the 8bit temporary pointer */
-  ptmpreg8 = (__IO uint8_t *)&hspi->Instance->DR;
   /* Read 8bit CRC to flush Data Register */
-  tmpreg8 = *ptmpreg8;
+  tmpreg = READ_REG(*(__IO uint8_t *)&hspi->Instance->DR);
   /* To avoid GCC warning */
-  UNUSED(tmpreg8);
+  UNUSED(tmpreg);
 
   hspi->CRCSize--;
 
@@ -3686,7 +3671,7 @@ static void SPI_2linesRxISR_16BITCRC(struct __SPI_HandleTypeDef *hspi)
   /* Read 16bit CRC to flush Data Register */
   tmpreg = READ_REG(hspi->Instance->DR);
   /* To avoid GCC warning */
-  UNUSED(tmpreg);
+  UNUSED(tmpreg);  
 
   /* Disable RXNE interrupt */
   __HAL_SPI_DISABLE_IT(hspi, SPI_IT_RXNE);
@@ -3741,15 +3726,12 @@ static void SPI_2linesTxISR_16BIT(struct __SPI_HandleTypeDef *hspi)
   */
 static void SPI_RxISR_8BITCRC(struct __SPI_HandleTypeDef *hspi)
 {
-  __IO uint8_t  *ptmpreg8;
-  __IO uint8_t  tmpreg8 = 0;
+  __IO uint32_t tmpreg = 0U;
 
-  /* Initialize the 8bit temporary pointer */
-  ptmpreg8 = (__IO uint8_t *)&hspi->Instance->DR;
   /* Read 8bit CRC to flush Data Register */
-  tmpreg8 = *ptmpreg8;
+  tmpreg = READ_REG(*(__IO uint8_t *)&hspi->Instance->DR);
   /* To avoid GCC warning */
-  UNUSED(tmpreg8);
+  UNUSED(tmpreg);
 
   hspi->CRCSize--;
 
@@ -3958,7 +3940,7 @@ static HAL_StatusTypeDef SPI_WaitFlagStateUntilTimeout(SPI_HandleTypeDef *hspi, 
         return HAL_TIMEOUT;
       }
       /* If Systick is disabled or not incremented, deactivate timeout to go in disable loop procedure */
-      if (count == 0U)
+      if(count == 0U)
       {
         tmp_timeout = 0U;
       }
@@ -3982,18 +3964,14 @@ static HAL_StatusTypeDef SPI_WaitFlagStateUntilTimeout(SPI_HandleTypeDef *hspi, 
 static HAL_StatusTypeDef SPI_WaitFifoStateUntilTimeout(SPI_HandleTypeDef *hspi, uint32_t Fifo, uint32_t State,
                                                        uint32_t Timeout, uint32_t Tickstart)
 {
+  __IO uint32_t tmpreg;
   __IO uint32_t count;
   uint32_t tmp_timeout;
   uint32_t tmp_tickstart;
-  __IO uint8_t  *ptmpreg8;
-  __IO uint8_t  tmpreg8 = 0;
 
   /* Adjust Timeout value  in case of end of transfer */
   tmp_timeout = Timeout - (HAL_GetTick() - Tickstart);
   tmp_tickstart = HAL_GetTick();
-
-  /* Initialize the 8bit temporary pointer */
-  ptmpreg8 = (__IO uint8_t *)&hspi->Instance->DR;
 
   /* Calculate Timeout based on a software loop to avoid blocking issue if Systick is disabled */
   count = tmp_timeout * ((SystemCoreClock * 35U) >> 20U);
@@ -4003,9 +3981,9 @@ static HAL_StatusTypeDef SPI_WaitFifoStateUntilTimeout(SPI_HandleTypeDef *hspi, 
     if ((Fifo == SPI_SR_FRLVL) && (State == SPI_FRLVL_EMPTY))
     {
       /* Flush Data Register by a blank read */
-      tmpreg8 = *ptmpreg8;
+      tmpreg = READ_REG(*((__IO uint8_t *)&hspi->Instance->DR));
       /* To avoid GCC warning */
-      UNUSED(tmpreg8);
+      UNUSED(tmpreg);
     }
 
     if (Timeout != HAL_MAX_DELAY)
@@ -4040,10 +4018,10 @@ static HAL_StatusTypeDef SPI_WaitFifoStateUntilTimeout(SPI_HandleTypeDef *hspi, 
         return HAL_TIMEOUT;
       }
       /* If Systick is disabled or not incremented, deactivate timeout to go in disable loop procedure */
-      if (count == 0U)
+      if(count == 0U)
       {
         tmp_timeout = 0U;
-      }
+      }      
       count--;
     }
   }
@@ -4434,3 +4412,4 @@ static void SPI_AbortTx_ISR(SPI_HandleTypeDef *hspi)
   * @}
   */
 
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

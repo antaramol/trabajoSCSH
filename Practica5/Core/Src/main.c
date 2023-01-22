@@ -91,6 +91,13 @@ const osThreadAttr_t tarea_UART_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
+/* Definitions for temporizador */
+osThreadId_t temporizadorHandle;
+const osThreadAttr_t temporizador_attributes = {
+  .name = "temporizador",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
 /* Definitions for print_queue */
 osMessageQueueId_t print_queueHandle;
 const osMessageQueueAttr_t print_queue_attributes = {
@@ -126,6 +133,7 @@ void RTC_set_func(void *argument);
 void readAccel_func(void *argument);
 void printTask_func(void *argument);
 void tarea_UART_func(void *argument);
+void temporizador_func(void *argument);
 
 /* USER CODE BEGIN PFP */
 volatile unsigned long ulHighFrequencyTimerTicks;
@@ -230,6 +238,9 @@ int main(void)
 
   /* creation of tarea_UART */
   tarea_UARTHandle = osThreadNew(tarea_UART_func, NULL, &tarea_UART_attributes);
+
+  /* creation of temporizador */
+  temporizadorHandle = osThreadNew(temporizador_func, NULL, &temporizador_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -1069,16 +1080,22 @@ void readAccel_func(void *argument)
 	int16_t *pDataXYZ = DataXYZ;
 
 
-
-	static float temp_value = 0;
-
 	uint8_t horas,minutos,segundos,dia,mes,anio = 0;
 	uint32_t return_wait = 0U;
+
+	uint16_t iter; // Se usa para iterar en 64 o 1024 aceleraciones
 
 
 	printf("ReadAccel task esperando\r\n");
 	// Esperamos que el usuario configure el RTC y que el acelerometro este activo
 	return_wait = osThreadFlagsWait(0x0003U, osFlagsWaitAll, osWaitForever);
+
+	//Activamos el temporizador
+	osThreadFlagsSet(temporizadorHandle,0x0001U);
+
+	//Terminamos la tarea de configuracion del RTC
+	osThreadTerminate(RTC_setHandle);
+
 	printf("ReadAccel task se inicia\r\n");
 
 	/*
@@ -1092,49 +1109,50 @@ void readAccel_func(void *argument)
 	/* Infinite loop */
 	for(;;)
 	{
-		/*temp_value = BSP_TSENSOR_ReadTemp();
-		int tmpInt1 = temp_value;
-		float tmpFrac = temp_value - tmpInt1;
-		int tmpInt2 = trunc(tmpFrac * 100);
-		//printf("Medida de Temperatura: %d.%02d grados\r\n",tmpInt1,tmpInt2);
-		*/
 
-		//nticks = osKernelGetTickCount();
-		BSP_ACCELERO_AccGetXYZ(pDataXYZ);
-		//printf("Tick: %ld	Eje x: %d	Eje y: %d	Eje z: %d\r\n",nticks,DataXYZ[0],DataXYZ[1],DataXYZ[2]);
+		for (iter=0 ; iter<64 ; iter++){
+			BSP_ACCELERO_AccGetXYZ(pDataXYZ);
+			//printf("Tick: %ld	Eje x: %d	Eje y: %d	Eje z: %d\r\n",nticks,DataXYZ[0],DataXYZ[1],DataXYZ[2]);
 
-		printf("Lectura accel realizada\r\n");
-		HAL_RTC_GetTime(&hrtc, &GetTime, RTC_FORMAT_BIN);
-		horas = GetTime.Hours;
-		minutos = GetTime.Minutes;
-		segundos = GetTime.Seconds;
+			//printf("Lectura accel realizada\r\n");
+			HAL_RTC_GetTime(&hrtc, &GetTime, RTC_FORMAT_BIN);
+			horas = GetTime.Hours;
+			minutos = GetTime.Minutes;
+			segundos = GetTime.Seconds;
 
-		HAL_RTC_GetDate(&hrtc, &GetDate, RTC_FORMAT_BIN);
-		anio = GetDate.Year;
-		dia = GetDate.Date;
-		mes = GetDate.Month;
+			HAL_RTC_GetDate(&hrtc, &GetDate, RTC_FORMAT_BIN);
+			anio = GetDate.Year;
+			dia = GetDate.Date;
+			mes = GetDate.Month;
 
 
-		printf("Anio: %d\r\n",anio);
-		printf("Lectura fecha realizada\r\n");
-		//printf("fecha: %d/%d/%d hora: %d:%d:%d temp: %d.%02d grados\r\n",dia,mes,anio,horas,minutos,segundos,tmpInt1,tmpInt2);
-		snprintf(mensaje,100,"fecha: %d/%d/%d hora: %d:%d:%d Eje x: %d	Eje y: %d	Eje z: %d\r\n",dia,mes,anio+2000,horas,minutos,segundos,DataXYZ[0],DataXYZ[1],DataXYZ[2]);
+			//printf("Anio: %d\r\n",anio);
+			//printf("Lectura fecha realizada\r\n");
+			//printf("fecha: %d/%d/%d hora: %d:%d:%d temp: %d.%02d grados\r\n",dia,mes,anio,horas,minutos,segundos,tmpInt1,tmpInt2);
+			snprintf(mensaje,100,"fecha: %d/%d/%d hora: %d:%d:%d Eje x: %d	Eje y: %d	Eje z: %d\r\n",dia,mes,anio+2000,horas,minutos,segundos,DataXYZ[0],DataXYZ[1],DataXYZ[2]);
 
 
 
-		//printf("MENSAJE: %s\r\n",mensaje);
-		estado = osMessageQueuePut(print_queueHandle, &p_mensaje, 0, pdMS_TO_TICKS(500));
-		if(estado == osOK){
-			printf("Enviada a la cola\r\n");
-		}
-		else if(estado == osErrorTimeout){
-			printf("Timeout agotado 1\r\n");
+			//printf("MENSAJE: %s\r\n",mensaje);
+			estado = osMessageQueuePut(print_queueHandle, &p_mensaje, 0, pdMS_TO_TICKS(500));
+			/*if(estado == osOK){
+				printf("Enviada a la cola\r\n");
+			}
+			else if(estado == osErrorTimeout){
+				printf("Timeout agotado 1\r\n");
+			}*/
+
 		}
 
+		printf("Se han enviado todas las aceleraciones, esperamos media hora o hasta que alguien pulse el boton\r\n");
+		osThreadFlagsWait(0x0006U, osFlagsWaitAny, osWaitForever); //espera media hora o que alguien pulse el boton
+		if(estado == osFlagsErrorTimeout){
+			printf("Ha pasado media hora\r\n");
+		}
+		else {
+			printf("Usuario quiere enviar aceleraciones\r\n");
+		}
 
-		printf("Esperamos media hora o hasta que alguien pulse el boton\r\n");
-		osThreadFlagsWait(0x0002U, osFlagsWaitAll, osWaitForever); //espera media hora o que alguien pulse el boton
-		printf("Se ha pulsado el boton o ha pasado media hora\r\n");
 		//osDelay(pdMS_TO_TICKS(1000));
 
 	}
@@ -1204,6 +1222,27 @@ void tarea_UART_func(void *argument)
 
   }
   /* USER CODE END tarea_UART_func */
+}
+
+/* USER CODE BEGIN Header_temporizador_func */
+/**
+* @brief Function implementing the temporizador thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_temporizador_func */
+void temporizador_func(void *argument)
+{
+  /* USER CODE BEGIN temporizador_func */
+	osThreadFlagsWait(0x0001U, osFlagsWaitAll, osWaitForever);
+	printf("Temporizador activado\r\n");
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(pdMS_TO_TICKS(10000)); //Periodo en ms con el que se mandan las aceleraciones
+    osThreadFlagsSet(readAccelHandle,0x0004U);
+  }
+  /* USER CODE END temporizador_func */
 }
 
 /**
