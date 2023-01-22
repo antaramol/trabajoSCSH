@@ -23,6 +23,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
+#include<stdbool.h>
 #include "stm32l475e_iot01.h"
 #include <math.h>
 #include <string.h>
@@ -73,7 +74,7 @@ const osThreadAttr_t RTC_set_attributes = {
 osThreadId_t readAccelHandle;
 const osThreadAttr_t readAccel_attributes = {
   .name = "readAccel",
-  .stack_size = 128 * 4,
+  .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for printTask */
@@ -105,6 +106,8 @@ RTC_DateTypeDef GetDate; //Estructura para fijar/leer fecha
 RTC_TimeTypeDef GetTime; //Estructura para fijar/leer hora
 
 ACCELERO_StatusTypeDef status_acc;
+
+bool modo_continuo = false;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -731,11 +734,11 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : BUTTON_EXTI13_Pin */
-  GPIO_InitStruct.Pin = BUTTON_EXTI13_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  /*Configure GPIO pins : BOTON_Pin VL53L0X_GPIO1_EXTI7_Pin LSM3MDL_DRDY_EXTI8_Pin */
+  GPIO_InitStruct.Pin = BOTON_Pin|VL53L0X_GPIO1_EXTI7_Pin|LSM3MDL_DRDY_EXTI8_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(BUTTON_EXTI13_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pins : ARD_A5_Pin ARD_A4_Pin ARD_A3_Pin ARD_A2_Pin
                            ARD_A1_Pin ARD_A0_Pin */
@@ -825,12 +828,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : VL53L0X_GPIO1_EXTI7_Pin LSM3MDL_DRDY_EXTI8_Pin */
-  GPIO_InitStruct.Pin = VL53L0X_GPIO1_EXTI7_Pin|LSM3MDL_DRDY_EXTI8_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-
   /*Configure GPIO pin : PMOD_SPI2_SCK_Pin */
   GPIO_InitStruct.Pin = PMOD_SPI2_SCK_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
@@ -917,10 +914,23 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-	if (GPIO_Pin == LSM6DSL_INT1_EXTI11_Pin)
+	switch (GPIO_Pin)
 	{
-		/* Aquí escribiremos nuestra funcionalidad*/
-		osThreadFlagsSet(readAccelHandle,0x0001U);
+		case (LSM6DSL_INT1_EXTI11_Pin):
+		{
+			osThreadFlagsSet(readAccelHandle,0x0001U);
+			break;
+		}
+		case(BOTON_Pin):
+		{
+			printf("Ha pulsado el boton\r\n");
+			osThreadFlagsSet(readAccelHandle,0x0002U);
+			break;
+		}
+		default:
+		{
+		  break;
+		}
 	}
 }
 
@@ -1048,14 +1058,13 @@ void RTC_set_func(void *argument)
 /* USER CODE END Header_readAccel_func */
 void readAccel_func(void *argument)
 {
-
   /* USER CODE BEGIN readAccel_func */
 	osStatus_t estado;
   //char mensaje[]  = "Hola mundo\r\n";
 	char mensaje[100];
 	char *p_mensaje = mensaje;
 
-	uint32_t nticks = 0;
+	//uint32_t nticks = 0;
 	int16_t DataXYZ[3];
 	int16_t *pDataXYZ = DataXYZ;
 
@@ -1090,7 +1099,7 @@ void readAccel_func(void *argument)
 		//printf("Medida de Temperatura: %d.%02d grados\r\n",tmpInt1,tmpInt2);
 		*/
 
-		nticks = osKernelGetTickCount();
+		//nticks = osKernelGetTickCount();
 		BSP_ACCELERO_AccGetXYZ(pDataXYZ);
 		//printf("Tick: %ld	Eje x: %d	Eje y: %d	Eje z: %d\r\n",nticks,DataXYZ[0],DataXYZ[1],DataXYZ[2]);
 
@@ -1123,9 +1132,10 @@ void readAccel_func(void *argument)
 		}
 
 
-
-
-		osDelay(pdMS_TO_TICKS(1000));
+		printf("Esperamos media hora o hasta que alguien pulse el boton\r\n");
+		osThreadFlagsWait(0x0002U, osFlagsWaitAll, osWaitForever); //espera media hora o que alguien pulse el boton
+		printf("Se ha pulsado el boton o ha pasado media hora\r\n");
+		//osDelay(pdMS_TO_TICKS(1000));
 
 	}
   /* USER CODE END readAccel_func */
@@ -1147,7 +1157,7 @@ void printTask_func(void *argument)
   for(;;)
   {
 	  estado = osMessageQueueGet(print_queueHandle, &mensaje, NULL, osWaitForever);
-	  printf("Se ha recibido algo en print task\r\n");
+	  //printf("Se ha recibido algo en print task\r\n");
 	  //printf("Mensaje print task: %s\r\n",mensaje);
 	  //printf("Longitud: %d",strlen((char*)mensaje));
 	  if (estado == osOK)
