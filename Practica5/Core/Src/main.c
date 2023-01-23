@@ -131,6 +131,13 @@ const osThreadAttr_t wifiStartTask_attributes = {
   .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
+/* Definitions for mqttSubscribe */
+osThreadId_t mqttSubscribeHandle;
+const osThreadAttr_t mqttSubscribe_attributes = {
+  .name = "mqttSubscribe",
+  .stack_size = 256 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
 /* Definitions for print_queue */
 osMessageQueueId_t print_queueHandle;
 const osMessageQueueAttr_t print_queue_attributes = {
@@ -152,6 +159,11 @@ bool modo_continuo = false;
 extern  SPI_HandleTypeDef hspi;
 static  uint8_t  IP_Addr[4];
 
+const uint32_t ulMaxPublishCount = 5UL;
+NetworkContext_t xNetworkContext = { 0 };
+MQTTContext_t xMQTTContext;
+MQTTStatus_t xMQTTStatus;
+TransportStatus_t xNetworkStatus;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -173,6 +185,7 @@ void tarea_UART_func(void *argument);
 void temporizador_func(void *argument);
 void sendMQTT_func(void *argument);
 void wifiStartTask_func(void *argument);
+void mqttSubscribe_func(void *argument);
 
 /* USER CODE BEGIN PFP */
 volatile unsigned long ulHighFrequencyTimerTicks;
@@ -286,6 +299,9 @@ int main(void)
 
   /* creation of wifiStartTask */
   wifiStartTaskHandle = osThreadNew(wifiStartTask_func, NULL, &wifiStartTask_attributes);
+
+  /* creation of mqttSubscribe */
+  mqttSubscribeHandle = osThreadNew(mqttSubscribe_func, NULL, &mqttSubscribe_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -1073,7 +1089,18 @@ void SPI3_IRQHandler(void)
   HAL_SPI_IRQHandler(&hspi);
 }
 
+void MQTT_context_Init(void){
+	/* Attempt to connect to the MQTT broker. The socket is returned in
+	* the network context structure. */
+	xNetworkStatus = prvConnectToServer( &xNetworkContext );
+	printf("Mitad de la definicion mqtt\r\n");
+	configASSERT( xNetworkStatus == PLAINTEXT_TRANSPORT_SUCCESS );
+	//LOG(("Trying to create an MQTT connection\n"));
+	prvCreateMQTTConnectionWithBroker( &xMQTTContext, &xNetworkContext );
+	prvMQTTSubscribeToTopic(&xMQTTContext,pcTempTopic2);
+	printf("Contexto mqtt inicializado\r\n");
 
+}
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_RTC_set_func */
@@ -1403,38 +1430,15 @@ void sendMQTT_func(void *argument)
 	uint16_t iter;
 	uint16_t max_iter;
 
-	printf("Definimos mqtt\r\n");
-
-	const uint32_t ulMaxPublishCount = 5UL;
-	NetworkContext_t xNetworkContext = { 0 };
-	MQTTContext_t xMQTTContext;
-	MQTTStatus_t xMQTTStatus;
-	TransportStatus_t xNetworkStatus;
 	char payLoad[16];
 
-	printf("Esperamos a que este conectado al wifi\r\n");
+
 	osThreadFlagsWait(0x0001U, osFlagsWaitAny, osWaitForever);
-	printf("Ya se ha conectado al wifi\r\n");
-
-	/* Attempt to connect to the MQTT broker. The socket is returned in
-	* the network context structure. */
-	xNetworkStatus = prvConnectToServer( &xNetworkContext );
-	printf("Mitad de la definicion mqtt\r\n");
-	configASSERT( xNetworkStatus == PLAINTEXT_TRANSPORT_SUCCESS );
-	//LOG(("Trying to create an MQTT connection\n"));
-	prvCreateMQTTConnectionWithBroker( &xMQTTContext, &xNetworkContext );
-	prvMQTTSubscribeToTopic(&xMQTTContext,pcTempTopic2);
-
-	printf("Definido mqtt\r\n");
-
-	osThreadFlagsSet(readAccelHandle,0x0002U);
-
 
 
   /* Infinite loop */
   for(;;)
   {
-	  MQTT_ProcessLoop(&xMQTTContext);
 	  return_wait = osThreadFlagsWait(MODO_NORMAL | MODO_CONTINUO, osFlagsWaitAny, osWaitForever);
 	  if(return_wait == MODO_NORMAL){
 		  printf("Vamos a recibir 64 aceleraciones\r\n");
@@ -1474,13 +1478,41 @@ void wifiStartTask_func(void *argument)
   /* USER CODE BEGIN wifiStartTask_func */
 	osThreadFlagsWait(0x0001U, osFlagsWaitAny, osWaitForever);
 	wifi_connect();
+	MQTT_context_Init();
+
+	osThreadFlagsSet(mqttSubscribeHandle,0x0001U);
 	osThreadFlagsSet(sendMQTTHandle,0x0001U);
+	osThreadFlagsSet(readAccelHandle,0x0002U);
   /* Infinite loop */
   for(;;)
   {
 	  osDelay(pdMS_TO_TICKS(1));
   }
   /* USER CODE END wifiStartTask_func */
+}
+
+/* USER CODE BEGIN Header_mqttSubscribe_func */
+/**
+* @brief Function implementing the mqttSubscribe thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_mqttSubscribe_func */
+void mqttSubscribe_func(void *argument)
+{
+  /* USER CODE BEGIN mqttSubscribe_func */
+
+	osThreadFlagsWait(0x0001U, osFlagsWaitAny, osWaitForever);
+
+
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(pdMS_TO_TICKS(1000));
+	MQTT_ProcessLoop(&xMQTTContext);
+
+  }
+  /* USER CODE END mqttSubscribe_func */
 }
 
 /**

@@ -7,6 +7,6 @@ client.connect("test.mosquitto.org", 1883, 60)
 
 i = 0;
 while True:
-    client.publish("SCF/trabajoFinal/Humdidity", str(i))
+    client.publish("SCF/trabajoFinal/TempSup", str(i))
     i = i + 1
     time.sleep(5)
