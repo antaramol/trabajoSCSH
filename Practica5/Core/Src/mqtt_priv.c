@@ -223,11 +223,11 @@ void prvMQTTProcessIncomingPublish( MQTTPublishInfo_t *pxPublishInfo )
 	memcpy(buffer2,pxPublishInfo->pTopicName,min(127,pxPublishInfo->topicNameLength));
 	buffer2[min(1023,pxPublishInfo->topicNameLength)]='\0';
 
-	LOG(("Topic \"%s\": publicado \"%s\"\n",buffer2,buffer1));
+	printf("Topic \"%s\": publicado \"%s\"\n",buffer2,buffer1);
 
   // Actuar localmente sobre los LEDs o alguna otra cosa
-	if(buffer1[0]=='1') BSP_LED_On(LED2);
-	if(buffer1[0]=='0') BSP_LED_Off(LED2);
+	//if(buffer1[0]=='1') BSP_LED_On(LED2);
+	//if(buffer1[0]=='0') BSP_LED_Off(LED2);
 
 }
 

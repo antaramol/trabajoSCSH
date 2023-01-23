@@ -1423,6 +1423,8 @@ void sendMQTT_func(void *argument)
 	configASSERT( xNetworkStatus == PLAINTEXT_TRANSPORT_SUCCESS );
 	//LOG(("Trying to create an MQTT connection\n"));
 	prvCreateMQTTConnectionWithBroker( &xMQTTContext, &xNetworkContext );
+	prvMQTTSubscribeToTopic(&xMQTTContext,pcTempTopic2);
+
 	printf("Definido mqtt\r\n");
 
 	osThreadFlagsSet(readAccelHandle,0x0002U);
@@ -1432,6 +1434,7 @@ void sendMQTT_func(void *argument)
   /* Infinite loop */
   for(;;)
   {
+	  MQTT_ProcessLoop(&xMQTTContext);
 	  return_wait = osThreadFlagsWait(MODO_NORMAL | MODO_CONTINUO, osFlagsWaitAny, osWaitForever);
 	  if(return_wait == MODO_NORMAL){
 		  printf("Vamos a recibir 64 aceleraciones\r\n");

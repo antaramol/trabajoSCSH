@@ -15,7 +15,7 @@ extern "C" {
 #define MQTTCLIENT_IDENTIFIER "BRIyOA0hGBcPJBchBiU6Bjc"
 #define TOPIC_COUNT (1)
 #define pcTempTopic "SCF/trabajoFinal/Accel"
-#define pcTempTopic2 "SistCiberFis_antonio/SCF/LED"
+#define pcTempTopic2 "SCF/trabajoFinal/TempSup"
 
 // Define strings for these parameters or set them to NULL. Do not use empty string ("")
 #define mqttUserName NULL
