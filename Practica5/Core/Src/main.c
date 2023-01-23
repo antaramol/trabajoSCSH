@@ -29,6 +29,9 @@
 #include <string.h>
 #include "stm32l475e_iot01_accelero.h"
 
+#include "es_wifi.h"
+#include "wifi.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -48,6 +51,13 @@
 #define MUESTRAS_NORMAL 64
 #define MUESTRAS_CONTINUO 1024
 
+#define SSID     "DIGIFIBRA-HAeH"
+#define PASSWORD "uxHXKubx5D"
+#define WIFISECURITY WIFI_ECN_WPA2_PSK
+//#define WIFISECURITY WIFI_ECN_OPEN
+#define SOCKET 0
+#define WIFI_READ_TIMEOUT 10000
+#define WIFI_WRITE_TIMEOUT 0
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -110,6 +120,13 @@ const osThreadAttr_t sendMQTT_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
+/* Definitions for wifiStartTask */
+osThreadId_t wifiStartTaskHandle;
+const osThreadAttr_t wifiStartTask_attributes = {
+  .name = "wifiStartTask",
+  .stack_size = 256 * 4,
+  .priority = (osPriority_t) osPriorityBelowNormal,
+};
 /* Definitions for print_queue */
 osMessageQueueId_t print_queueHandle;
 const osMessageQueueAttr_t print_queue_attributes = {
@@ -127,6 +144,10 @@ RTC_TimeTypeDef GetTime; //Estructura para fijar/leer hora
 ACCELERO_StatusTypeDef status_acc;
 
 bool modo_continuo = true;
+
+extern  SPI_HandleTypeDef hspi;
+static  uint8_t  IP_Addr[4];
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -147,6 +168,7 @@ void printTask_func(void *argument);
 void tarea_UART_func(void *argument);
 void temporizador_func(void *argument);
 void sendMQTT_func(void *argument);
+void wifiStartTask_func(void *argument);
 
 /* USER CODE BEGIN PFP */
 volatile unsigned long ulHighFrequencyTimerTicks;
@@ -230,7 +252,7 @@ int main(void)
 
   /* Create the queue(s) */
   /* creation of print_queue */
-  print_queueHandle = osMessageQueueNew (15, sizeof(uintptr_t), &print_queue_attributes);
+  print_queueHandle = osMessageQueueNew (10, sizeof(uintptr_t), &print_queue_attributes);
 
   /* creation of receive_queue */
   receive_queueHandle = osMessageQueueNew (3, sizeof(uint8_t), &receive_queue_attributes);
@@ -257,6 +279,9 @@ int main(void)
 
   /* creation of sendMQTT */
   sendMQTTHandle = osThreadNew(sendMQTT_func, NULL, &sendMQTT_attributes);
+
+  /* creation of wifiStartTask */
+  wifiStartTaskHandle = osThreadNew(wifiStartTask_func, NULL, &wifiStartTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -880,6 +905,9 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI1_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(EXTI1_IRQn);
+
   HAL_NVIC_SetPriority(EXTI9_5_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 
@@ -954,12 +982,93 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 			osThreadFlagsSet(readAccelHandle,0x0002U);
 			break;
 		}
+		case (GPIO_PIN_1):
+		{
+			SPI_WIFI_ISR();
+			break;
+		}
 		default:
 		{
 		  break;
 		}
 	}
 }
+
+static int wifi_start(void)
+{
+  uint8_t  MAC_Addr[6];
+  printf("wifistart\r\n");
+ /*Initialize and use WIFI module */
+  if(WIFI_Init() ==  WIFI_STATUS_OK)
+  {
+	printf("xddddddd\r\n");
+    printf(("ES-WIFI Initialized.\r\n"));
+    if(WIFI_GetMAC_Address(MAC_Addr) == WIFI_STATUS_OK)
+    {
+      printf("MAC asignada\r\n");
+      printf("> eS-WiFi module MAC Address : %02X:%02X:%02X:%02X:%02X:%02X\r\n",
+               MAC_Addr[0],
+               MAC_Addr[1],
+               MAC_Addr[2],
+               MAC_Addr[3],
+               MAC_Addr[4],
+               MAC_Addr[5]);
+    }
+    else
+    {
+      printf("> ERROR : CANNOT get MAC address\r\n");
+      return -1;
+    }
+  }
+  else
+  {
+	printf("Errorfifi\r\n");
+    return -1;
+  }
+  return 0;
+}
+
+int wifi_connect(void)
+{
+
+  wifi_start();
+
+  printf("Connecting to %s\r\n",SSID);
+  if( WIFI_Connect(SSID, PASSWORD, WIFISECURITY) == WIFI_STATUS_OK)
+  {
+    if(WIFI_GetIP_Address(IP_Addr) == WIFI_STATUS_OK)
+    {
+      printf("> es-wifi module connected: got IP Address : %d.%d.%d.%d\r\n",
+               IP_Addr[0],
+               IP_Addr[1],
+               IP_Addr[2],
+               IP_Addr[3]);
+    }
+    else
+    {
+		  printf(" ERROR : es-wifi module CANNOT get IP address\r\n");
+      return -1;
+    }
+  }
+  else
+  {
+		 printf("ERROR : es-wifi module NOT connected\n");
+     return -1;
+  }
+  return 0;
+}
+
+
+/**
+  * @brief  SPI3 line detection callback.
+  * @param  None
+  * @retval None
+  */
+void SPI3_IRQHandler(void)
+{
+  HAL_SPI_IRQHandler(&hspi);
+}
+
 
 /* USER CODE END 4 */
 
@@ -1154,7 +1263,8 @@ void readAccel_func(void *argument)
 			//printf("Anio: %d\r\n",anio);
 			//printf("Lectura fecha realizada\r\n");
 			//printf("fecha: %d/%d/%d hora: %d:%d:%d temp: %d.%02d grados\r\n",dia,mes,anio,horas,minutos,segundos,tmpInt1,tmpInt2);
-			snprintf(mensaje,100,"fecha: %d/%d/%d hora: %d:%d:%d Eje x: %d	Eje y: %d	Eje z: %d\r\n",dia,mes,anio+2000,horas,minutos,segundos,DataXYZ[0],DataXYZ[1],DataXYZ[2]);
+			//snprintf(mensaje,100,"fecha: %d/%d/%d hora: %d:%d:%d Eje x: %d	Eje y: %d	Eje z: %d\r\n",dia,mes,anio+2000,horas,minutos,segundos,DataXYZ[0],DataXYZ[1],DataXYZ[2]);
+			snprintf(mensaje,100,"%d,%d,%d,%d,%d,%d,%d,%d,%d\r\n",dia,mes,anio+2000,horas,minutos,segundos,DataXYZ[0],DataXYZ[1],DataXYZ[2]);
 
 
 
@@ -1169,7 +1279,7 @@ void readAccel_func(void *argument)
 
 		}
 
-		printf("Se han enviado todas las aceleraciones, esperamos media hora o hasta que alguien pulse el boton\r\n");
+		printf("Se han leido todas las aceleraciones, esperamos media hora o hasta que alguien pulse el boton\r\n");
 		return_wait = osThreadFlagsWait(0x0006U, osFlagsWaitAny, osWaitForever); //espera media hora o que alguien pulse el boton
 		if(return_wait == osFlagsErrorTimeout){
 			printf("Ha pasado media hora\r\n");
@@ -1264,7 +1374,7 @@ void temporizador_func(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(pdMS_TO_TICKS(10000)); //Periodo en ms con el que se mandan las aceleraciones
+    osDelay(pdMS_TO_TICKS(1000000)); //Periodo en ms con el que se mandan las aceleraciones
     osThreadFlagsSet(readAccelHandle,0x0004U);
   }
   /* USER CODE END temporizador_func */
@@ -1312,6 +1422,25 @@ void sendMQTT_func(void *argument)
 
   }
   /* USER CODE END sendMQTT_func */
+}
+
+/* USER CODE BEGIN Header_wifiStartTask_func */
+/**
+* @brief Function implementing the wifiStartTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_wifiStartTask_func */
+void wifiStartTask_func(void *argument)
+{
+  /* USER CODE BEGIN wifiStartTask_func */
+	wifi_connect();
+  /* Infinite loop */
+  for(;;)
+  {
+	  osDelay(pdMS_TO_TICKS(1));
+  }
+  /* USER CODE END wifiStartTask_func */
 }
 
 /**

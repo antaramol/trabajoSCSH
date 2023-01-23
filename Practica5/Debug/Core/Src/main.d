@@ -54,7 +54,12 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/L4_IOT_Sensors/Drivers/BSP/B-L475E-IOT01/stm32l475e_iot01.h \
  c:\users\anton\stm32cubeide\trabajoscsh\practica5\l4_iot_sensors\drivers\bsp\components\lsm6dsl\lsm6dsl.h \
  c:\users\anton\stm32cubeide\trabajoscsh\practica5\l4_iot_sensors\drivers\bsp\components\common\accelero.h \
- c:\users\anton\stm32cubeide\trabajoscsh\practica5\l4_iot_sensors\drivers\bsp\components\common\gyro.h
+ c:\users\anton\stm32cubeide\trabajoscsh\practica5\l4_iot_sensors\drivers\bsp\components\common\gyro.h \
+ C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi.h \
+ C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi_conf.h \
+ C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/wifi.h \
+ C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi.h \
+ C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi_io.h
 ../Core/Inc/main.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h:
 ../Core/Inc/stm32l4xx_hal_conf.h:
@@ -112,3 +117,8 @@ C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/L4_IOT_Sensors/Drivers/BSP/B-L
 c:\users\anton\stm32cubeide\trabajoscsh\practica5\l4_iot_sensors\drivers\bsp\components\lsm6dsl\lsm6dsl.h:
 c:\users\anton\stm32cubeide\trabajoscsh\practica5\l4_iot_sensors\drivers\bsp\components\common\accelero.h:
 c:\users\anton\stm32cubeide\trabajoscsh\practica5\l4_iot_sensors\drivers\bsp\components\common\gyro.h:
+C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi.h:
+C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi_conf.h:
+C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/wifi.h:
+C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi.h:
+C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi_io.h:
