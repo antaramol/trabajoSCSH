@@ -32,6 +32,10 @@
 #include "es_wifi.h"
 #include "wifi.h"
 
+#include "core_mqtt.h"
+#include "mqtt_priv.h"
+#include "timers.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -83,13 +87,13 @@ osThreadId_t RTC_setHandle;
 const osThreadAttr_t RTC_set_attributes = {
   .name = "RTC_set",
   .stack_size = 256 * 4,
-  .priority = (osPriority_t) osPriorityAboveNormal,
+  .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for readAccel */
 osThreadId_t readAccelHandle;
 const osThreadAttr_t readAccel_attributes = {
   .name = "readAccel",
-  .stack_size = 256 * 4,
+  .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for printTask */
@@ -117,7 +121,7 @@ const osThreadAttr_t temporizador_attributes = {
 osThreadId_t sendMQTTHandle;
 const osThreadAttr_t sendMQTT_attributes = {
   .name = "sendMQTT",
-  .stack_size = 128 * 4,
+  .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for wifiStartTask */
@@ -125,7 +129,7 @@ osThreadId_t wifiStartTaskHandle;
 const osThreadAttr_t wifiStartTask_attributes = {
   .name = "wifiStartTask",
   .stack_size = 256 * 4,
-  .priority = (osPriority_t) osPriorityBelowNormal,
+  .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for print_queue */
 osMessageQueueId_t print_queueHandle;
@@ -143,7 +147,7 @@ RTC_TimeTypeDef GetTime; //Estructura para fijar/leer hora
 
 ACCELERO_StatusTypeDef status_acc;
 
-bool modo_continuo = true;
+bool modo_continuo = false;
 
 extern  SPI_HandleTypeDef hspi;
 static  uint8_t  IP_Addr[4];
@@ -1173,7 +1177,9 @@ void RTC_set_func(void *argument)
 
 	osMessageQueuePut(print_queueHandle, &msg_fecha_ok, 0, pdMS_TO_TICKS(500));
 
-	osThreadFlagsSet(readAccelHandle,0x0002U);
+	osThreadFlagsSet(wifiStartTaskHandle,0x0001U);
+
+	//osThreadFlagsSet(readAccelHandle,0x0002U);
 
 
   /* Infinite loop */
@@ -1396,6 +1402,33 @@ void sendMQTT_func(void *argument)
 
 	uint16_t iter;
 	uint16_t max_iter;
+
+	printf("Definimos mqtt\r\n");
+
+	const uint32_t ulMaxPublishCount = 5UL;
+	NetworkContext_t xNetworkContext = { 0 };
+	MQTTContext_t xMQTTContext;
+	MQTTStatus_t xMQTTStatus;
+	TransportStatus_t xNetworkStatus;
+	char payLoad[16];
+
+	printf("Esperamos a que este conectado al wifi\r\n");
+	osThreadFlagsWait(0x0001U, osFlagsWaitAny, osWaitForever);
+	printf("Ya se ha conectado al wifi\r\n");
+
+	/* Attempt to connect to the MQTT broker. The socket is returned in
+	* the network context structure. */
+	xNetworkStatus = prvConnectToServer( &xNetworkContext );
+	printf("Mitad de la definicion mqtt\r\n");
+	configASSERT( xNetworkStatus == PLAINTEXT_TRANSPORT_SUCCESS );
+	//LOG(("Trying to create an MQTT connection\n"));
+	prvCreateMQTTConnectionWithBroker( &xMQTTContext, &xNetworkContext );
+	printf("Definido mqtt\r\n");
+
+	osThreadFlagsSet(readAccelHandle,0x0002U);
+
+
+
   /* Infinite loop */
   for(;;)
   {
@@ -1415,7 +1448,9 @@ void sendMQTT_func(void *argument)
 		  if (estado == osOK)
 		  {
 			  //printf("%s",(char*)mensaje);
-			  HAL_UART_Transmit(&huart1, (uint8_t*)mensaje, strlen(mensaje),10);
+			  //HAL_UART_Transmit(&huart1, (uint8_t*)mensaje, strlen(mensaje),10);
+			  sprintf(payLoad,"%s",mensaje);
+			  prvMQTTPublishToTopic(&xMQTTContext,pcTempTopic,payLoad);
 		  }
 	  }
 	  printf("Espacio en la cola: %d\r\n",osMessageQueueGetSpace(print_queueHandle));
@@ -1434,7 +1469,9 @@ void sendMQTT_func(void *argument)
 void wifiStartTask_func(void *argument)
 {
   /* USER CODE BEGIN wifiStartTask_func */
+	osThreadFlagsWait(0x0001U, osFlagsWaitAny, osWaitForever);
 	wifi_connect();
+	osThreadFlagsSet(sendMQTTHandle,0x0001U);
   /* Infinite loop */
   for(;;)
   {

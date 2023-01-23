@@ -59,7 +59,14 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi_conf.h \
  C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/wifi.h \
  C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi.h \
- C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi_io.h
+ C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi_io.h \
+ C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/coreMQTT/source/include/core_mqtt.h \
+ C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/coreMQTT/source/include/core_mqtt_serializer.h \
+ C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/coreMQTT/source/include/core_mqtt_config.h \
+ C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/coreMQTT/source/interface/transport_interface.h \
+ ../Core/Inc/mqtt_priv.h ../Core/Inc/mqtt_priv_config.h \
+ ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h \
+ ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h
 ../Core/Inc/main.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h:
 ../Core/Inc/stm32l4xx_hal_conf.h:
@@ -122,3 +129,11 @@ C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_w
 C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/wifi.h:
 C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi.h:
 C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi_io.h:
+C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/coreMQTT/source/include/core_mqtt.h:
+C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/coreMQTT/source/include/core_mqtt_serializer.h:
+C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/coreMQTT/source/include/core_mqtt_config.h:
+C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/coreMQTT/source/interface/transport_interface.h:
+../Core/Inc/mqtt_priv.h:
+../Core/Inc/mqtt_priv_config.h:
+../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h:
+../Middlewares/Third_Party/FreeRTOS/Source/include/task.h:
