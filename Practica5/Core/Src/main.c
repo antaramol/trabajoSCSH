@@ -42,6 +42,11 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
+#define MODO_NORMAL 0x0001U
+#define MODO_CONTINUO 0x0002U
+
+#define MUESTRAS_NORMAL 64
+#define MUESTRAS_CONTINUO 1024
 
 /* USER CODE END PM */
 
@@ -98,6 +103,13 @@ const osThreadAttr_t temporizador_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
+/* Definitions for sendMQTT */
+osThreadId_t sendMQTTHandle;
+const osThreadAttr_t sendMQTT_attributes = {
+  .name = "sendMQTT",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
 /* Definitions for print_queue */
 osMessageQueueId_t print_queueHandle;
 const osMessageQueueAttr_t print_queue_attributes = {
@@ -114,7 +126,7 @@ RTC_TimeTypeDef GetTime; //Estructura para fijar/leer hora
 
 ACCELERO_StatusTypeDef status_acc;
 
-bool modo_continuo = false;
+bool modo_continuo = true;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -134,6 +146,7 @@ void readAccel_func(void *argument);
 void printTask_func(void *argument);
 void tarea_UART_func(void *argument);
 void temporizador_func(void *argument);
+void sendMQTT_func(void *argument);
 
 /* USER CODE BEGIN PFP */
 volatile unsigned long ulHighFrequencyTimerTicks;
@@ -217,7 +230,7 @@ int main(void)
 
   /* Create the queue(s) */
   /* creation of print_queue */
-  print_queueHandle = osMessageQueueNew (8, sizeof(uintptr_t), &print_queue_attributes);
+  print_queueHandle = osMessageQueueNew (15, sizeof(uintptr_t), &print_queue_attributes);
 
   /* creation of receive_queue */
   receive_queueHandle = osMessageQueueNew (3, sizeof(uint8_t), &receive_queue_attributes);
@@ -241,6 +254,9 @@ int main(void)
 
   /* creation of temporizador */
   temporizadorHandle = osThreadNew(temporizador_func, NULL, &temporizador_attributes);
+
+  /* creation of sendMQTT */
+  sendMQTTHandle = osThreadNew(sendMQTT_func, NULL, &sendMQTT_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -1084,7 +1100,7 @@ void readAccel_func(void *argument)
 	uint32_t return_wait = 0U;
 
 	uint16_t iter; // Se usa para iterar en 64 o 1024 aceleraciones
-
+	uint16_t max_iter;
 
 	printf("ReadAccel task esperando\r\n");
 	// Esperamos que el usuario configure el RTC y que el acelerometro este activo
@@ -1095,6 +1111,8 @@ void readAccel_func(void *argument)
 
 	//Terminamos la tarea de configuracion del RTC
 	osThreadTerminate(RTC_setHandle);
+	osThreadTerminate(printTaskHandle);
+	osMessageQueueReset(print_queueHandle);
 
 	printf("ReadAccel task se inicia\r\n");
 
@@ -1109,8 +1127,15 @@ void readAccel_func(void *argument)
 	/* Infinite loop */
 	for(;;)
 	{
+		if (modo_continuo){
+			max_iter = MUESTRAS_CONTINUO;
+			osThreadFlagsSet(sendMQTTHandle,MODO_CONTINUO);
+		}else{
+			max_iter = MUESTRAS_NORMAL;
+			osThreadFlagsSet(sendMQTTHandle,MODO_NORMAL);
+		}
 
-		for (iter=0 ; iter<64 ; iter++){
+		for (iter=0 ; iter<max_iter ; iter++){
 			BSP_ACCELERO_AccGetXYZ(pDataXYZ);
 			//printf("Tick: %ld	Eje x: %d	Eje y: %d	Eje z: %d\r\n",nticks,DataXYZ[0],DataXYZ[1],DataXYZ[2]);
 
@@ -1145,12 +1170,12 @@ void readAccel_func(void *argument)
 		}
 
 		printf("Se han enviado todas las aceleraciones, esperamos media hora o hasta que alguien pulse el boton\r\n");
-		osThreadFlagsWait(0x0006U, osFlagsWaitAny, osWaitForever); //espera media hora o que alguien pulse el boton
-		if(estado == osFlagsErrorTimeout){
+		return_wait = osThreadFlagsWait(0x0006U, osFlagsWaitAny, osWaitForever); //espera media hora o que alguien pulse el boton
+		if(return_wait == osFlagsErrorTimeout){
 			printf("Ha pasado media hora\r\n");
 		}
 		else {
-			printf("Usuario quiere enviar aceleraciones\r\n");
+			printf("El usuario quiere enviar aceleraciones\r\n");
 		}
 
 		//osDelay(pdMS_TO_TICKS(1000));
@@ -1243,6 +1268,50 @@ void temporizador_func(void *argument)
     osThreadFlagsSet(readAccelHandle,0x0004U);
   }
   /* USER CODE END temporizador_func */
+}
+
+/* USER CODE BEGIN Header_sendMQTT_func */
+/**
+* @brief Function implementing the sendMQTT thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_sendMQTT_func */
+void sendMQTT_func(void *argument)
+{
+  /* USER CODE BEGIN sendMQTT_func */
+	uint32_t return_wait = 0U;
+	osStatus_t estado;
+	uintptr_t mensaje;
+
+	uint16_t iter;
+	uint16_t max_iter;
+  /* Infinite loop */
+  for(;;)
+  {
+	  return_wait = osThreadFlagsWait(MODO_NORMAL | MODO_CONTINUO, osFlagsWaitAny, osWaitForever);
+	  if(return_wait == MODO_NORMAL){
+		  printf("Vamos a recibir 64 aceleraciones\r\n");
+		  max_iter = MUESTRAS_NORMAL;
+
+	  }
+	  else if(return_wait == MODO_CONTINUO){
+		  printf("Vamos a recibir 1024 aceleraciones\r\n");
+		  max_iter = MUESTRAS_CONTINUO;
+	  }
+	  for (iter=0;iter<max_iter;iter++){
+		  estado = osMessageQueueGet(print_queueHandle, &mensaje, NULL, osWaitForever);
+
+		  if (estado == osOK)
+		  {
+			  //printf("%s",(char*)mensaje);
+			  HAL_UART_Transmit(&huart1, (uint8_t*)mensaje, strlen(mensaje),10);
+		  }
+	  }
+	  printf("Espacio en la cola: %d\r\n",osMessageQueueGetSpace(print_queueHandle));
+
+  }
+  /* USER CODE END sendMQTT_func */
 }
 
 /**
