@@ -99,6 +99,11 @@ osMessageQueueId_t print_queueHandle;
 const osMessageQueueAttr_t print_queue_attributes = {
   .name = "print_queue"
 };
+/* Definitions for Send_HyT */
+osMessageQueueId_t Send_HyTHandle;
+const osMessageQueueAttr_t Send_HyT_attributes = {
+  .name = "Send_HyT"
+};
 /* USER CODE BEGIN PV */
 RTC_DateTypeDef GetDate; //Estructura para fijar/leer fecha
 RTC_TimeTypeDef GetTime; //Estructura para fijar/leer hora
@@ -207,6 +212,9 @@ int main(void)
   /* Create the queue(s) */
   /* creation of print_queue */
   print_queueHandle = osMessageQueueNew (8, sizeof(uintptr_t), &print_queue_attributes);
+
+  /* creation of Send_HyT */
+  Send_HyTHandle = osMessageQueueNew (3, sizeof(int), &Send_HyT_attributes);
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
@@ -1047,6 +1055,16 @@ void humidityTask_func(void *argument)
 			float hmdFrac = temperature_value - tempInt1;
 			tempInt2 = trunc(hmdFrac * 10);
 
+
+			//Crear una tarea para enviar los valores por ella y hacer también un flag_set.
+
+			//osThreadFlagsSet(wifiStartHandle, 0x00000002U);
+			osMessageQueuePut(Send_HyTHandle, &hmdInt1, 0, pdMS_TO_TICKS(0));
+			osMessageQueuePut(Send_HyTHandle, &tempInt1, 0, pdMS_TO_TICKS(0));
+			osMessageQueuePut(Send_HyTHandle, &tempInt2, 0, pdMS_TO_TICKS(0));
+
+
+
 			printf("Lectura humedad y temperatura realizada\r\n");
 
 			snprintf(mensaje,100,"Temp: %d.%01d , humidity: %d\r\n",tempInt1,tempInt2,hmdInt1);
@@ -1114,7 +1132,7 @@ void wifiStartTask(void *argument)
 	wifi_connect();
 	// Espera a que se haya configurado el RTC
 
-
+	int hum,dec1,dec2;
 	const uint32_t ulMaxPublishCount = 5UL;
 	NetworkContext_t xNetworkContext = { 0 };
 	MQTTContext_t xMQTTContext;
@@ -1135,10 +1153,16 @@ void wifiStartTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	osThreadFlagsWait(0x00000001U, osFlagsWaitAny, pdMS_TO_TICKS(10000)); //AQUÍ PONER QUE ES CADA MEDIA HORA.
+	osThreadFlagsWait(0x00000001U, osFlagsWaitAny, pdMS_TO_TICKS(10000)); //AQU�? PONER QUE ES CADA MEDIA HORA.
+
+
+	osMessageQueueGet(Send_HyTHandle, &hum, NULL, pdMS_TO_TICKS(1));
+	osMessageQueueGet(Send_HyTHandle, &dec1, NULL, pdMS_TO_TICKS(1));
+	osMessageQueueGet(Send_HyTHandle, &dec2, NULL, pdMS_TO_TICKS(1));
 
 	printf("Temperatura: %d.%01d , Humedad: %d \r\n",tempInt1,tempInt2,humidity_value);
-	sprintf(payLoad,"T: %d.%01d , H: %d",tempInt1,tempInt2,humidity_value);
+	sprintf(payLoad,"T: %d.%01d , H: %d",dec1,dec2,hum);
+	//sprintf(payLoad,"T: %d.%01d , H: %d",tempInt1,tempInt2,humidity_value);
 	prvMQTTPublishToTopic(&xMQTTContext,pcTempTopic,payLoad);
 
 	if(tempInt1>22){
