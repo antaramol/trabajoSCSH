@@ -8,5 +8,6 @@ client.connect("test.mosquitto.org", 1883, 60)
 i = 0;
 while True:
     client.publish("SCF/trabajoFinal/TempSup", str(i))
-    i = i + 1
+    i = 1
+    print("Mensaje publicado: ", str(i))
     time.sleep(5)
