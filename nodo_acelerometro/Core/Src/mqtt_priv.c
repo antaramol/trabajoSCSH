@@ -5,6 +5,9 @@
 #include <mqtt_priv.h>
 #include "stm32l475e_iot01.h"
 
+#include <stdbool.h>
+
+volatile bool modo_continuo = false;
 static uint8_t ucSharedBuffer[ NETWORK_BUFFER_SIZE ];
 /** @brief Static buffer used to hold MQTT messages being sent and received. */
 static MQTTFixedBuffer_t xBuffer =
@@ -33,7 +36,7 @@ static uint16_t usSubscribePacketIdentifier;
 static uint32_t ulGlobalEntryTimeMs;
 
 
-TransportStatus_t prvConnectToServer( NetworkContext_t * pxNetworkContext )
+TransportStatus_t prvConnectToServer( NetworkContext_t * pxNetworkContext, uint8_t socket )
 {
    TransportStatus_t xNetworkStatus;
    uint8_t ret;
@@ -43,15 +46,15 @@ TransportStatus_t prvConnectToServer( NetworkContext_t * pxNetworkContext )
     do
     {
         /* Establish a TCP connection with the MQTT broker. */
-        printf("Create a TCP connection to %s:%d.\n",
+        LOG( ( "Create a TCP connection to %s:%d.\n",
                    MQTT_BROKER_ENDPOINT,
-                   MQTT_BROKER_PORT);
-        ret=WIFI_OpenClientConnection(SOCKET, WIFI_TCP_PROTOCOL, "mqtt", ipaddr , MQTT_BROKER_PORT, 0);
+                   MQTT_BROKER_PORT ) );
+        ret=WIFI_OpenClientConnection(socket, WIFI_TCP_PROTOCOL, "mqtt", ipaddr , MQTT_BROKER_PORT, 0);
 		if(ret!=WIFI_STATUS_OK) {
-			printf("Error in opening MQTT connection: %d\n",ret);
+			LOG(("Error in opening MQTT connection: %d\n",ret));
 			osDelay(pdMS_TO_TICKS(10000));
 		} else {
-	        pxNetworkContext->socket = SOCKET;
+	        pxNetworkContext->socket = socket;
 	        pxNetworkContext->socket_open=1;
 	        memcpy(pxNetworkContext->ipaddr,ipaddr,4*sizeof(uint8_t));
 	        pxNetworkContext->remote_port=MQTT_BROKER_PORT;
@@ -84,7 +87,7 @@ void prvCreateMQTTConnectionWithBroker( MQTTContext_t * pxMQTTContext,
                          &xBuffer );
 
     configASSERT( xResult == MQTTSuccess );
-    printf(("MQTT initialized\n"));
+    LOG(("MQTT initialized\n"));
 
     /* Many fields not used in this demo so start with everything at 0. */
     ( void ) memset( ( void * ) &xConnectInfo, 0x00, sizeof( xConnectInfo ) );
@@ -121,7 +124,7 @@ void prvCreateMQTTConnectionWithBroker( MQTTContext_t * pxMQTTContext,
                             1000U,
                             &xSessionPresent );
     configASSERT( xResult == MQTTSuccess );
-    printf(("MQTT connected to broker\n"));
+    LOG(("MQTT connected to broker\n"));
 
 }
 
@@ -144,7 +147,7 @@ void prvMQTTPublishToTopic( MQTTContext_t * pxMQTTContext, char * topic, void * 
 
     /* Send PUBLISH packet. Packet ID is not used for a QoS0 publish. */
     xResult = MQTT_Publish( pxMQTTContext, &xMQTTPublishInfo, 0U );
-    if(xResult==MQTTSuccess) printf(("Published to topic %s: %s\n",topic,payload));
+    //if(xResult==MQTTSuccess) LOG(("Published to topic %s: %s\n",topic,payload));
     //configASSERT( xResult == MQTTSuccess );
 }
 
@@ -175,8 +178,8 @@ void prvMQTTSubscribeToTopic( MQTTContext_t * pxMQTTContext, char * topic )
                                   xMQTTSubscription,
                                   1, /* Only subscribing to one topic. */
                                   usSubscribePacketIdentifier );
-        if(xResult==MQTTSuccess) printf("Subscription to %s, result: %d, success\n",topic,xResult);
-        else printf("Subscription to %s, result: %d, failed\n",topic,xResult);
+        if(xResult==MQTTSuccess) LOG(("Subscription to %s, result: %d, success\n",topic,xResult));
+        else LOG(("Subscription to %s, result: %d, failed\n",topic,xResult));
         //configASSERT( xResult == MQTTSuccess );
 
         /* Process incoming packet from the broker. After sending the
@@ -226,9 +229,8 @@ void prvMQTTProcessIncomingPublish( MQTTPublishInfo_t *pxPublishInfo )
 	printf("Topic \"%s\": publicado \"%s\"\n",buffer2,buffer1);
 
   // Actuar localmente sobre los LEDs o alguna otra cosa
-	/*if(buffer1[0]=='1') BSP_LED_On(LED2);
-	if(buffer1[0]=='0') BSP_LED_Off(LED2);
-	*/
+	if(buffer1[0]=='1') modo_continuo = true;
+	if(buffer1[0]=='0') modo_continuo = false;
 
 }
 
@@ -306,7 +308,7 @@ static void prvMQTTProcessResponse( MQTTPacketInfo_t * pxIncomingPacket,
             break;
 
         case MQTT_PACKET_TYPE_UNSUBACK:
-            printf("Unsubscribed from the topic.");
+            LOG( ( "Unsubscribed from the topic.") );
             /* Make sure ACK packet identifier matches with Request packet
              * identifier. */
             //configASSERT( usUnsubscribePacketIdentifier == usPacketId );
@@ -316,14 +318,14 @@ static void prvMQTTProcessResponse( MQTTPacketInfo_t * pxIncomingPacket,
 
             /* Nothing to be done from application as library handles
              * PINGRESP with the use of MQTT_ProcessLoop API function. */
-            printf("PINGRESP should not be handled by the application "
-                       "callback when using MQTT_ProcessLoop.\n" );
+            LOG( ( "PINGRESP should not be handled by the application "
+                       "callback when using MQTT_ProcessLoop.\n" ) );
             break;
 
         /* Any other packet type is invalid. */
         default:
-            printf("prvMQTTProcessResponse() called with unknown packet type:(%02X).",
-                       pxIncomingPacket->type );
+            LOG( ( "prvMQTTProcessResponse() called with unknown packet type:(%02X).",
+                       pxIncomingPacket->type ) );
     }
 }
 
