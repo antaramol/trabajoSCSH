@@ -5,6 +5,9 @@
 #include <mqtt_priv.h>
 #include "stm32l475e_iot01.h"
 
+#include <stdbool.h>
+
+volatile bool modo_continuo = false;
 static uint8_t ucSharedBuffer[ NETWORK_BUFFER_SIZE ];
 /** @brief Static buffer used to hold MQTT messages being sent and received. */
 static MQTTFixedBuffer_t xBuffer =
@@ -144,7 +147,7 @@ void prvMQTTPublishToTopic( MQTTContext_t * pxMQTTContext, char * topic, void * 
 
     /* Send PUBLISH packet. Packet ID is not used for a QoS0 publish. */
     xResult = MQTT_Publish( pxMQTTContext, &xMQTTPublishInfo, 0U );
-    if(xResult==MQTTSuccess) LOG(("Published to topic %s: %s\n",topic,payload));
+    //if(xResult==MQTTSuccess) LOG(("Published to topic %s: %s\n",topic,payload));
     //configASSERT( xResult == MQTTSuccess );
 }
 
@@ -226,8 +229,8 @@ void prvMQTTProcessIncomingPublish( MQTTPublishInfo_t *pxPublishInfo )
 	printf("Topic \"%s\": publicado \"%s\"\n",buffer2,buffer1);
 
   // Actuar localmente sobre los LEDs o alguna otra cosa
-	//if(buffer1[0]=='1') BSP_LED_On(LED2);
-	//if(buffer1[0]=='0') BSP_LED_Off(LED2);
+	if(buffer1[0]=='1') modo_continuo = true;
+	if(buffer1[0]=='0') modo_continuo = false;
 
 }
 

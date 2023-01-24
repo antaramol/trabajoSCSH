@@ -49,21 +49,21 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h \
- C:/Users/Jacin/workspace/trabajoSCSH/Practica5/L4_IOT_Sensors/Drivers/BSP/B-L475E-IOT01/stm32l475e_iot01.h \
- C:/Users/Jacin/workspace/trabajoSCSH/Practica5/L4_IOT_Sensors/Drivers/BSP/B-L475E-IOT01/stm32l475e_iot01_accelero.h \
- C:/Users/Jacin/workspace/trabajoSCSH/Practica5/L4_IOT_Sensors/Drivers/BSP/B-L475E-IOT01/stm32l475e_iot01.h \
- c:\users\jacin\workspace\trabajoscsh\practica5\l4_iot_sensors\drivers\bsp\components\lsm6dsl\lsm6dsl.h \
- c:\users\jacin\workspace\trabajoscsh\practica5\l4_iot_sensors\drivers\bsp\components\common\accelero.h \
- c:\users\jacin\workspace\trabajoscsh\practica5\l4_iot_sensors\drivers\bsp\components\common\gyro.h \
- C:/Users/Jacin/workspace/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi.h \
- C:/Users/Jacin/workspace/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi_conf.h \
- C:/Users/Jacin/workspace/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/wifi.h \
- C:/Users/Jacin/workspace/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi.h \
- C:/Users/Jacin/workspace/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi_io.h \
- C:/Users/Jacin/workspace/trabajoSCSH/Practica5/Libraries/coreMQTT/source/include/core_mqtt.h \
- C:/Users/Jacin/workspace/trabajoSCSH/Practica5/Libraries/coreMQTT/source/include/core_mqtt_serializer.h \
- C:/Users/Jacin/workspace/trabajoSCSH/Practica5/Libraries/coreMQTT/source/include/core_mqtt_config.h \
- C:/Users/Jacin/workspace/trabajoSCSH/Practica5/Libraries/coreMQTT/source/interface/transport_interface.h \
+ C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/L4_IOT_Sensors/Drivers/BSP/B-L475E-IOT01/stm32l475e_iot01.h \
+ C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/L4_IOT_Sensors/Drivers/BSP/B-L475E-IOT01/stm32l475e_iot01_accelero.h \
+ C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/L4_IOT_Sensors/Drivers/BSP/B-L475E-IOT01/stm32l475e_iot01.h \
+ c:\users\anton\stm32cubeide\trabajoscsh\practica5\l4_iot_sensors\drivers\bsp\components\lsm6dsl\lsm6dsl.h \
+ c:\users\anton\stm32cubeide\trabajoscsh\practica5\l4_iot_sensors\drivers\bsp\components\common\accelero.h \
+ c:\users\anton\stm32cubeide\trabajoscsh\practica5\l4_iot_sensors\drivers\bsp\components\common\gyro.h \
+ C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi.h \
+ C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi_conf.h \
+ C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/wifi.h \
+ C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi.h \
+ C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi_io.h \
+ C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/coreMQTT/source/include/core_mqtt.h \
+ C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/coreMQTT/source/include/core_mqtt_serializer.h \
+ C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/coreMQTT/source/include/core_mqtt_config.h \
+ C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/coreMQTT/source/interface/transport_interface.h \
  ../Core/Inc/mqtt_priv.h ../Core/Inc/mqtt_priv_config.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h
@@ -118,21 +118,21 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h:
-C:/Users/Jacin/workspace/trabajoSCSH/Practica5/L4_IOT_Sensors/Drivers/BSP/B-L475E-IOT01/stm32l475e_iot01.h:
-C:/Users/Jacin/workspace/trabajoSCSH/Practica5/L4_IOT_Sensors/Drivers/BSP/B-L475E-IOT01/stm32l475e_iot01_accelero.h:
-C:/Users/Jacin/workspace/trabajoSCSH/Practica5/L4_IOT_Sensors/Drivers/BSP/B-L475E-IOT01/stm32l475e_iot01.h:
-c:\users\jacin\workspace\trabajoscsh\practica5\l4_iot_sensors\drivers\bsp\components\lsm6dsl\lsm6dsl.h:
-c:\users\jacin\workspace\trabajoscsh\practica5\l4_iot_sensors\drivers\bsp\components\common\accelero.h:
-c:\users\jacin\workspace\trabajoscsh\practica5\l4_iot_sensors\drivers\bsp\components\common\gyro.h:
-C:/Users/Jacin/workspace/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi.h:
-C:/Users/Jacin/workspace/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi_conf.h:
-C:/Users/Jacin/workspace/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/wifi.h:
-C:/Users/Jacin/workspace/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi.h:
-C:/Users/Jacin/workspace/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi_io.h:
-C:/Users/Jacin/workspace/trabajoSCSH/Practica5/Libraries/coreMQTT/source/include/core_mqtt.h:
-C:/Users/Jacin/workspace/trabajoSCSH/Practica5/Libraries/coreMQTT/source/include/core_mqtt_serializer.h:
-C:/Users/Jacin/workspace/trabajoSCSH/Practica5/Libraries/coreMQTT/source/include/core_mqtt_config.h:
-C:/Users/Jacin/workspace/trabajoSCSH/Practica5/Libraries/coreMQTT/source/interface/transport_interface.h:
+C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/L4_IOT_Sensors/Drivers/BSP/B-L475E-IOT01/stm32l475e_iot01.h:
+C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/L4_IOT_Sensors/Drivers/BSP/B-L475E-IOT01/stm32l475e_iot01_accelero.h:
+C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/L4_IOT_Sensors/Drivers/BSP/B-L475E-IOT01/stm32l475e_iot01.h:
+c:\users\anton\stm32cubeide\trabajoscsh\practica5\l4_iot_sensors\drivers\bsp\components\lsm6dsl\lsm6dsl.h:
+c:\users\anton\stm32cubeide\trabajoscsh\practica5\l4_iot_sensors\drivers\bsp\components\common\accelero.h:
+c:\users\anton\stm32cubeide\trabajoscsh\practica5\l4_iot_sensors\drivers\bsp\components\common\gyro.h:
+C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi.h:
+C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi_conf.h:
+C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/wifi.h:
+C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi.h:
+C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi_io.h:
+C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/coreMQTT/source/include/core_mqtt.h:
+C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/coreMQTT/source/include/core_mqtt_serializer.h:
+C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/coreMQTT/source/include/core_mqtt_config.h:
+C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/coreMQTT/source/interface/transport_interface.h:
 ../Core/Inc/mqtt_priv.h:
 ../Core/Inc/mqtt_priv_config.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h:

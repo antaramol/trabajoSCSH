@@ -23,7 +23,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
-#include<stdbool.h>
+#include <stdbool.h>
 #include "stm32l475e_iot01.h"
 #include <math.h>
 #include <string.h>
@@ -51,14 +51,15 @@
 /* USER CODE BEGIN PM */
 #define MODO_NORMAL 0x0001U
 #define MODO_CONTINUO 0x0002U
+#define TIMER_MQTT 0x0004U
 
 #define MUESTRAS_NORMAL 64
 #define MUESTRAS_CONTINUO 1024
 
-#define SSID     "RealmeJacinto"
+#define SSID     "DIGIFIBRA-HAeH"
 #define PASSWORD "uxHXKubx5D"
-//#define WIFISECURITY WIFI_ECN_WPA2_PSK
-#define WIFISECURITY WIFI_ECN_OPEN
+#define WIFISECURITY WIFI_ECN_WPA2_PSK
+//#define WIFISECURITY WIFI_ECN_OPEN
 #define SOCKET 0
 #define SOCKETSUBS 1
 #define WIFI_READ_TIMEOUT 10000
@@ -94,7 +95,7 @@ const osThreadAttr_t RTC_set_attributes = {
 osThreadId_t readAccelHandle;
 const osThreadAttr_t readAccel_attributes = {
   .name = "readAccel",
-  .stack_size = 128 * 4,
+  .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for printTask */
@@ -122,7 +123,7 @@ const osThreadAttr_t temporizador_attributes = {
 osThreadId_t sendMQTTHandle;
 const osThreadAttr_t sendMQTT_attributes = {
   .name = "sendMQTT",
-  .stack_size = 256 * 4,
+  .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for wifiStartTask */
@@ -132,11 +133,11 @@ const osThreadAttr_t wifiStartTask_attributes = {
   .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
-/* Definitions for mqttSubscribe */
-osThreadId_t mqttSubscribeHandle;
-const osThreadAttr_t mqttSubscribe_attributes = {
-  .name = "mqttSubscribe",
-  .stack_size = 512 * 4,
+/* Definitions for temp_sub */
+osThreadId_t temp_subHandle;
+const osThreadAttr_t temp_sub_attributes = {
+  .name = "temp_sub",
+  .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for print_queue */
@@ -155,7 +156,7 @@ RTC_TimeTypeDef GetTime; //Estructura para fijar/leer hora
 
 ACCELERO_StatusTypeDef status_acc;
 
-bool modo_continuo = false;
+volatile extern bool modo_continuo;
 
 extern  SPI_HandleTypeDef hspi;
 static  uint8_t  IP_Addr[4];
@@ -181,7 +182,7 @@ void tarea_UART_func(void *argument);
 void temporizador_func(void *argument);
 void sendMQTT_func(void *argument);
 void wifiStartTask_func(void *argument);
-void mqttSubscribe_func(void *argument);
+void temp_sub_func(void *argument);
 
 /* USER CODE BEGIN PFP */
 volatile unsigned long ulHighFrequencyTimerTicks;
@@ -296,8 +297,8 @@ int main(void)
   /* creation of wifiStartTask */
   wifiStartTaskHandle = osThreadNew(wifiStartTask_func, NULL, &wifiStartTask_attributes);
 
-  /* creation of mqttSubscribe */
-  mqttSubscribeHandle = osThreadNew(mqttSubscribe_func, NULL, &mqttSubscribe_attributes);
+  /* creation of temp_sub */
+  temp_subHandle = osThreadNew(temp_sub_func, NULL, &temp_sub_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -1230,15 +1231,11 @@ void readAccel_func(void *argument)
 
 	printf("ReadAccel task esperando\r\n");
 	// Esperamos que el usuario configure el RTC y que el acelerometro este activo
-	return_wait = osThreadFlagsWait(0x0003U, osFlagsWaitAll, osWaitForever);
+	return_wait = osThreadFlagsWait(0x0008U, osFlagsWaitAll, osWaitForever);
 
 	//Activamos el temporizador
 	osThreadFlagsSet(temporizadorHandle,0x0001U);
 
-	//Terminamos la tarea de configuracion del RTC
-	osThreadTerminate(RTC_setHandle);
-	osThreadTerminate(printTaskHandle);
-	osMessageQueueReset(print_queueHandle);
 
 	printf("ReadAccel task se inicia\r\n");
 
@@ -1253,6 +1250,14 @@ void readAccel_func(void *argument)
 	/* Infinite loop */
 	for(;;)
 	{
+		return_wait = osThreadFlagsWait(0x0006U, osFlagsWaitAny, osWaitForever); //espera media hora o que alguien pulse el boton
+		if(return_wait == osFlagsErrorTimeout){
+			printf("Ha pasado media hora\r\n");
+		}
+		else {
+			printf("El usuario quiere enviar aceleraciones, modo continuo = %d\r\n",modo_continuo);
+		}
+
 		if (modo_continuo){
 			max_iter = MUESTRAS_CONTINUO;
 			osThreadFlagsSet(sendMQTTHandle,MODO_CONTINUO);
@@ -1297,13 +1302,7 @@ void readAccel_func(void *argument)
 		}
 
 		printf("Se han leido todas las aceleraciones, esperamos media hora o hasta que alguien pulse el boton\r\n");
-		return_wait = osThreadFlagsWait(0x0006U, osFlagsWaitAny, osWaitForever); //espera media hora o que alguien pulse el boton
-		if(return_wait == osFlagsErrorTimeout){
-			printf("Ha pasado media hora\r\n");
-		}
-		else {
-			printf("El usuario quiere enviar aceleraciones\r\n");
-		}
+
 
 		//osDelay(pdMS_TO_TICKS(1000));
 
@@ -1419,32 +1418,57 @@ void sendMQTT_func(void *argument)
 
 	osThreadFlagsWait(0x0001U, osFlagsWaitAny, osWaitForever);
 
+	const uint32_t ulMaxPublishCount = 5UL;
+	NetworkContext_t xNetworkContext = { 0 };
+	MQTTContext_t xMQTTContext;
+	MQTTStatus_t xMQTTStatus;
+	TransportStatus_t xNetworkStatus;
+
+	/* Attempt to connect to the MQTT broker. The socket is returned in
+	* the network context structure. */
+	xNetworkStatus = prvConnectToServer( &xNetworkContext, SOCKET );
+	printf("Mitad de la definicion mqtt\r\n");
+	configASSERT( xNetworkStatus == PLAINTEXT_TRANSPORT_SUCCESS );
+	//LOG(("Trying to create an MQTT connection\n"));
+	prvCreateMQTTConnectionWithBroker( &xMQTTContext, &xNetworkContext );
+	prvMQTTSubscribeToTopic(&xMQTTContext,pcTempTopic2);
+	printf("Contexto mqtt inicializado\r\n");
+
+	osThreadFlagsSet(readAccelHandle,0x0008U);
+	osThreadFlagsSet(temp_subHandle, 0x0001U);
+
 
   /* Infinite loop */
   for(;;)
   {
-	  return_wait = osThreadFlagsWait(MODO_NORMAL | MODO_CONTINUO, osFlagsWaitAny, osWaitForever);
-	  if(return_wait == MODO_NORMAL){
-		  printf("Vamos a recibir 64 aceleraciones\r\n");
-		  max_iter = MUESTRAS_NORMAL;
+	  return_wait = osThreadFlagsWait(MODO_NORMAL | MODO_CONTINUO | TIMER_MQTT, osFlagsWaitAny, osWaitForever);
 
-	  }
-	  else if(return_wait == MODO_CONTINUO){
-		  printf("Vamos a recibir 1024 aceleraciones\r\n");
-		  max_iter = MUESTRAS_CONTINUO;
-	  }
-	  for (iter=0;iter<max_iter;iter++){
-		  estado = osMessageQueueGet(print_queueHandle, &mensaje, NULL, osWaitForever);
+	  if (return_wait == TIMER_MQTT){
+		  MQTT_ProcessLoop(&xMQTTContext);
+	  }else{
+		  if(return_wait == MODO_NORMAL){
+			  printf("Vamos a recibir 64 aceleraciones\r\n");
+			  max_iter = MUESTRAS_NORMAL;
 
-		  if (estado == osOK)
-		  {
-			  //printf("%s",(char*)mensaje);
-			  //HAL_UART_Transmit(&huart1, (uint8_t*)mensaje, strlen(mensaje),10);
-			  sprintf(payLoad,"%s",mensaje);
-//			  prvMQTTPublishToTopic(&xMQTTContext,pcTempTopic,payLoad);
 		  }
+		  else if(return_wait == MODO_CONTINUO){
+			  printf("Vamos a recibir 1024 aceleraciones\r\n");
+			  max_iter = MUESTRAS_CONTINUO;
+		  }
+		  for (iter=0;iter<max_iter;iter++){
+			  estado = osMessageQueueGet(print_queueHandle, &mensaje, NULL, osWaitForever);
+
+			  if (estado == osOK)
+			  {
+				  //printf("%s",(char*)mensaje);
+				  //HAL_UART_Transmit(&huart1, (uint8_t*)mensaje, strlen(mensaje),10);
+				  sprintf(payLoad,"%s",mensaje);
+				  prvMQTTPublishToTopic(&xMQTTContext,pcTempTopic,payLoad);
+			  }
+		  }
+
+		  //printf("Espacio en la cola: %d\r\n",osMessageQueueGetSpace(print_queueHandle));
 	  }
-	  printf("Espacio en la cola: %d\r\n",osMessageQueueGetSpace(print_queueHandle));
 
   }
   /* USER CODE END sendMQTT_func */
@@ -1461,12 +1485,24 @@ void wifiStartTask_func(void *argument)
 {
   /* USER CODE BEGIN wifiStartTask_func */
 	osThreadFlagsWait(0x0001U, osFlagsWaitAny, osWaitForever);
+
+
+
 	wifi_connect();
 //	MQTT_context_Init();
 
-	osThreadFlagsSet(mqttSubscribeHandle,0x0001U);
-//	osThreadFlagsSet(sendMQTTHandle,0x0001U);
+	//Terminamos las tarea de configuracion del RTC
+	osThreadTerminate(RTC_setHandle);
+	osThreadTerminate(printTaskHandle);
+	osMessageQueueReset(print_queueHandle);
+	osMessageQueueDelete(receive_queueHandle);
+
+//	osThreadFlagsSet(mqttSubscribeHandle,0x0001U);
+	osThreadFlagsSet(sendMQTTHandle,0x0001U);
 //	osThreadFlagsSet(readAccelHandle,0x0002U);
+
+
+
   /* Infinite loop */
   for(;;)
   {
@@ -1475,44 +1511,24 @@ void wifiStartTask_func(void *argument)
   /* USER CODE END wifiStartTask_func */
 }
 
-/* USER CODE BEGIN Header_mqttSubscribe_func */
+/* USER CODE BEGIN Header_temp_sub_func */
 /**
-* @brief Function implementing the mqttSubscribe thread.
+* @brief Function implementing the temp_sub thread.
 * @param argument: Not used
 * @retval None
 */
-/* USER CODE END Header_mqttSubscribe_func */
-void mqttSubscribe_func(void *argument)
+/* USER CODE END Header_temp_sub_func */
+void temp_sub_func(void *argument)
 {
-  /* USER CODE BEGIN mqttSubscribe_func */
-
+  /* USER CODE BEGIN temp_sub_func */
 	osThreadFlagsWait(0x0001U, osFlagsWaitAny, osWaitForever);
-
-	const uint32_t ulMaxPublishCount = 5UL;
-	NetworkContext_t xNetworkContext = { 0 };
-	MQTTContext_t xMQTTContext;
-	MQTTStatus_t xMQTTStatus;
-	TransportStatus_t xNetworkStatus;
-
-	/* Attempt to connect to the MQTT broker. The socket is returned in
-	* the network context structure. */
-	xNetworkStatus = prvConnectToServer( &xNetworkContext, SOCKETSUBS );
-	printf("Mitad de la definicion mqtt\r\n");
-	configASSERT( xNetworkStatus == PLAINTEXT_TRANSPORT_SUCCESS );
-	//LOG(("Trying to create an MQTT connection\n"));
-	prvCreateMQTTConnectionWithBroker( &xMQTTContext, &xNetworkContext );
-	prvMQTTSubscribeToTopic(&xMQTTContext,pcTempTopic2);
-	printf("Contexto mqtt inicializado\r\n");
-
-
   /* Infinite loop */
   for(;;)
   {
-    osDelay(pdMS_TO_TICKS(1000));
-	MQTT_ProcessLoop(&xMQTTContext);
-
+    osDelay(pdMS_TO_TICKS(15000));
+    osThreadFlagsSet(sendMQTTHandle, TIMER_MQTT);
   }
-  /* USER CODE END mqttSubscribe_func */
+  /* USER CODE END temp_sub_func */
 }
 
 /**
