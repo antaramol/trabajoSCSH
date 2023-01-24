@@ -1,8 +1,8 @@
 Libraries/WIFI/Common/Src/es_wifi_io.o: \
  ../Libraries/WIFI/Common/Src/es_wifi_io.c \
- C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi.h \
- C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi_conf.h \
- C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi_io.h \
+ C:/Users/Jacin/workspace/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi.h \
+ C:/Users/Jacin/workspace/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi_conf.h \
+ C:/Users/Jacin/workspace/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi_io.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h \
  ../Core/Inc/stm32l4xx_hal_conf.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_rcc.h \
@@ -42,10 +42,10 @@ Libraries/WIFI/Common/Src/es_wifi_io.o: \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim_ex.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart_ex.h \
- C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi_conf.h
-C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi.h:
-C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi_conf.h:
-C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi_io.h:
+ C:/Users/Jacin/workspace/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi_conf.h
+C:/Users/Jacin/workspace/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi.h:
+C:/Users/Jacin/workspace/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi_conf.h:
+C:/Users/Jacin/workspace/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi_io.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h:
 ../Core/Inc/stm32l4xx_hal_conf.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_rcc.h:
@@ -85,4 +85,4 @@ C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_w
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim_ex.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart_ex.h:
-C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi_conf.h:
+C:/Users/Jacin/workspace/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi_conf.h:

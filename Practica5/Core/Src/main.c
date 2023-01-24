@@ -55,11 +55,12 @@
 #define MUESTRAS_NORMAL 64
 #define MUESTRAS_CONTINUO 1024
 
-#define SSID     "DIGIFIBRA-HAeH"
+#define SSID     "RealmeJacinto"
 #define PASSWORD "uxHXKubx5D"
-#define WIFISECURITY WIFI_ECN_WPA2_PSK
-//#define WIFISECURITY WIFI_ECN_OPEN
+//#define WIFISECURITY WIFI_ECN_WPA2_PSK
+#define WIFISECURITY WIFI_ECN_OPEN
 #define SOCKET 0
+#define SOCKETSUBS 1
 #define WIFI_READ_TIMEOUT 10000
 #define WIFI_WRITE_TIMEOUT 0
 /* USER CODE END PM */
@@ -135,7 +136,7 @@ const osThreadAttr_t wifiStartTask_attributes = {
 osThreadId_t mqttSubscribeHandle;
 const osThreadAttr_t mqttSubscribe_attributes = {
   .name = "mqttSubscribe",
-  .stack_size = 256 * 4,
+  .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for print_queue */
@@ -159,11 +160,6 @@ bool modo_continuo = false;
 extern  SPI_HandleTypeDef hspi;
 static  uint8_t  IP_Addr[4];
 
-const uint32_t ulMaxPublishCount = 5UL;
-NetworkContext_t xNetworkContext = { 0 };
-MQTTContext_t xMQTTContext;
-MQTTStatus_t xMQTTStatus;
-TransportStatus_t xNetworkStatus;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -1089,18 +1085,6 @@ void SPI3_IRQHandler(void)
   HAL_SPI_IRQHandler(&hspi);
 }
 
-void MQTT_context_Init(void){
-	/* Attempt to connect to the MQTT broker. The socket is returned in
-	* the network context structure. */
-	xNetworkStatus = prvConnectToServer( &xNetworkContext );
-	printf("Mitad de la definicion mqtt\r\n");
-	configASSERT( xNetworkStatus == PLAINTEXT_TRANSPORT_SUCCESS );
-	//LOG(("Trying to create an MQTT connection\n"));
-	prvCreateMQTTConnectionWithBroker( &xMQTTContext, &xNetworkContext );
-	prvMQTTSubscribeToTopic(&xMQTTContext,pcTempTopic2);
-	printf("Contexto mqtt inicializado\r\n");
-
-}
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_RTC_set_func */
@@ -1457,7 +1441,7 @@ void sendMQTT_func(void *argument)
 			  //printf("%s",(char*)mensaje);
 			  //HAL_UART_Transmit(&huart1, (uint8_t*)mensaje, strlen(mensaje),10);
 			  sprintf(payLoad,"%s",mensaje);
-			  prvMQTTPublishToTopic(&xMQTTContext,pcTempTopic,payLoad);
+//			  prvMQTTPublishToTopic(&xMQTTContext,pcTempTopic,payLoad);
 		  }
 	  }
 	  printf("Espacio en la cola: %d\r\n",osMessageQueueGetSpace(print_queueHandle));
@@ -1478,11 +1462,11 @@ void wifiStartTask_func(void *argument)
   /* USER CODE BEGIN wifiStartTask_func */
 	osThreadFlagsWait(0x0001U, osFlagsWaitAny, osWaitForever);
 	wifi_connect();
-	MQTT_context_Init();
+//	MQTT_context_Init();
 
 	osThreadFlagsSet(mqttSubscribeHandle,0x0001U);
-	osThreadFlagsSet(sendMQTTHandle,0x0001U);
-	osThreadFlagsSet(readAccelHandle,0x0002U);
+//	osThreadFlagsSet(sendMQTTHandle,0x0001U);
+//	osThreadFlagsSet(readAccelHandle,0x0002U);
   /* Infinite loop */
   for(;;)
   {
@@ -1503,6 +1487,22 @@ void mqttSubscribe_func(void *argument)
   /* USER CODE BEGIN mqttSubscribe_func */
 
 	osThreadFlagsWait(0x0001U, osFlagsWaitAny, osWaitForever);
+
+	const uint32_t ulMaxPublishCount = 5UL;
+	NetworkContext_t xNetworkContext = { 0 };
+	MQTTContext_t xMQTTContext;
+	MQTTStatus_t xMQTTStatus;
+	TransportStatus_t xNetworkStatus;
+
+	/* Attempt to connect to the MQTT broker. The socket is returned in
+	* the network context structure. */
+	xNetworkStatus = prvConnectToServer( &xNetworkContext, SOCKETSUBS );
+	printf("Mitad de la definicion mqtt\r\n");
+	configASSERT( xNetworkStatus == PLAINTEXT_TRANSPORT_SUCCESS );
+	//LOG(("Trying to create an MQTT connection\n"));
+	prvCreateMQTTConnectionWithBroker( &xMQTTContext, &xNetworkContext );
+	prvMQTTSubscribeToTopic(&xMQTTContext,pcTempTopic2);
+	printf("Contexto mqtt inicializado\r\n");
 
 
   /* Infinite loop */

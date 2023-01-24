@@ -33,7 +33,7 @@ static uint16_t usSubscribePacketIdentifier;
 static uint32_t ulGlobalEntryTimeMs;
 
 
-TransportStatus_t prvConnectToServer( NetworkContext_t * pxNetworkContext )
+TransportStatus_t prvConnectToServer( NetworkContext_t * pxNetworkContext, uint8_t socket )
 {
    TransportStatus_t xNetworkStatus;
    uint8_t ret;
@@ -46,12 +46,12 @@ TransportStatus_t prvConnectToServer( NetworkContext_t * pxNetworkContext )
         LOG( ( "Create a TCP connection to %s:%d.\n",
                    MQTT_BROKER_ENDPOINT,
                    MQTT_BROKER_PORT ) );
-        ret=WIFI_OpenClientConnection(SOCKET, WIFI_TCP_PROTOCOL, "mqtt", ipaddr , MQTT_BROKER_PORT, 0);
+        ret=WIFI_OpenClientConnection(socket, WIFI_TCP_PROTOCOL, "mqtt", ipaddr , MQTT_BROKER_PORT, 0);
 		if(ret!=WIFI_STATUS_OK) {
 			LOG(("Error in opening MQTT connection: %d\n",ret));
 			osDelay(pdMS_TO_TICKS(10000));
 		} else {
-	        pxNetworkContext->socket = SOCKET;
+	        pxNetworkContext->socket = socket;
 	        pxNetworkContext->socket_open=1;
 	        memcpy(pxNetworkContext->ipaddr,ipaddr,4*sizeof(uint8_t));
 	        pxNetworkContext->remote_port=MQTT_BROKER_PORT;

@@ -1,11 +1,11 @@
 Libraries/coreMQTT/source/interface/transport_interface.o: \
  ../Libraries/coreMQTT/source/interface/transport_interface.c \
  ../Libraries/coreMQTT/source/interface/transport_interface.h \
- C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi.h \
- C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi_conf.h \
- C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/wifi.h \
- C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi.h \
- C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi_io.h \
+ C:/Users/Jacin/workspace/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi.h \
+ C:/Users/Jacin/workspace/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi_conf.h \
+ C:/Users/Jacin/workspace/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/wifi.h \
+ C:/Users/Jacin/workspace/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi.h \
+ C:/Users/Jacin/workspace/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi_io.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h \
  ../Core/Inc/stm32l4xx_hal_conf.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_rcc.h \
@@ -46,11 +46,11 @@ Libraries/coreMQTT/source/interface/transport_interface.o: \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart_ex.h
 ../Libraries/coreMQTT/source/interface/transport_interface.h:
-C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi.h:
-C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi_conf.h:
-C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/wifi.h:
-C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi.h:
-C:/Users/anton/STM32CubeIDE/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi_io.h:
+C:/Users/Jacin/workspace/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi.h:
+C:/Users/Jacin/workspace/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi_conf.h:
+C:/Users/Jacin/workspace/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/wifi.h:
+C:/Users/Jacin/workspace/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi.h:
+C:/Users/Jacin/workspace/trabajoSCSH/Practica5/Libraries/WIFI/Common/Inc/es_wifi_io.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h:
 ../Core/Inc/stm32l4xx_hal_conf.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_rcc.h:

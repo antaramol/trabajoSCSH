@@ -69,8 +69,8 @@ all: main-build
 main-build: Practica5.elf secondary-outputs
 
 # Tool invocations
-Practica5.elf Practica5.map: $(OBJS) $(USER_OBJS) C:\Users\anton\STM32CubeIDE\trabajoSCSH\Practica5\STM32L475VGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "Practica5.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\anton\STM32CubeIDE\trabajoSCSH\Practica5\STM32L475VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Practica5.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Practica5.elf Practica5.map: $(OBJS) $(USER_OBJS) C:\Users\Jacin\workspace\trabajoSCSH\Practica5\STM32L475VGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "Practica5.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Jacin\workspace\trabajoSCSH\Practica5\STM32L475VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Practica5.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
