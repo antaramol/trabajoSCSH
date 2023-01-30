@@ -1273,10 +1273,10 @@ void readAccel_func(void *argument)
 
 		if (modo_continuo){
 			max_iter = MUESTRAS_CONTINUO;
-			osThreadFlagsSet(sendMQTTHandle,MODO_CONTINUO);
+			//osThreadFlagsSet(sendMQTTHandle,MODO_CONTINUO);
 		}else{
 			max_iter = MUESTRAS_NORMAL;
-			osThreadFlagsSet(sendMQTTHandle,MODO_NORMAL);
+			//osThreadFlagsSet(sendMQTTHandle,MODO_NORMAL);
 		}
 
 		for (iter=0 ; iter<max_iter ; iter++){
@@ -1298,13 +1298,14 @@ void readAccel_func(void *argument)
 			//printf("Anio: %d\r\n",anio);
 			//printf("Lectura fecha realizada\r\n");
 			//printf("fecha: %d/%d/%d hora: %d:%d:%d temp: %d.%02d grados\r\n",dia,mes,anio,horas,minutos,segundos,tmpInt1,tmpInt2);
-			//snprintf(mensaje,100,"fecha: %d/%d/%d hora: %d:%d:%d Eje x: %d	Eje y: %d	Eje z: %d\r\n",dia,mes,anio+2000,horas,minutos,segundos,DataXYZ[0],DataXYZ[1],DataXYZ[2]);
-			snprintf(mensaje,100,"%d,%d,%d,%d,%d,%d,%d,%d,%d\r\n",dia,mes,anio+2000,horas,minutos,segundos,DataXYZ[0],DataXYZ[1],DataXYZ[2]);
+			snprintf(mensaje,100,"%d/%d/%d %d:%d:%d %d,%d,%d\r\n",dia,mes,anio+2000,horas,minutos,segundos,DataXYZ[0],DataXYZ[1],DataXYZ[2]);
+//			snprintf(mensaje,100,"%d,%d,%d,%d,%d,%d,%d,%d,%d\r\n",dia,mes,anio+2000,horas,minutos,segundos,DataXYZ[0],DataXYZ[1],DataXYZ[2]);
 
+			printf("iter: %d\r\n",iter);
 
 
 			//printf("MENSAJE: %s\r\n",mensaje);
-			estado = osMessageQueuePut(print_queueHandle, &p_mensaje, 0, pdMS_TO_TICKS(500));
+			estado = osMessageQueuePut(publish_queueHandle, &p_mensaje, 0, pdMS_TO_TICKS(500));
 			/*if(estado == osOK){
 				printf("Enviada a la cola\r\n");
 			}
@@ -1454,11 +1455,11 @@ void sendMQTT_func(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	  estado = osMessageQueueGet(publish_queueHandle, &mensaje, NULL, pdMS_TO_TICKS(1000));
+	  estado = osMessageQueueGet(publish_queueHandle, &mensaje, NULL, pdMS_TO_TICKS(5000));
 
 	  if (estado == osOK)
 	  {
-		  printf("Publicamos: %s",(char*)mensaje);
+		  //printf("Publicamos: %s",(char*)mensaje);
 		  sprintf(payLoad,"%s",mensaje);
 		  prvMQTTPublishToTopic(&xMQTTContext,pcTempTopic,payLoad);
 	  }
