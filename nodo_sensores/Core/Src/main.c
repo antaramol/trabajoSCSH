@@ -917,7 +917,7 @@ int _write(int file, char *ptr, int len)
 
 
 
-static int wifi_start(void)
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 	uint32_t cola_q;
 	osStatus_t estado_cola;
