@@ -542,7 +542,7 @@ static void MX_RTC_Init(void)
   hrtc.Instance = RTC;
   hrtc.Init.HourFormat = RTC_HOURFORMAT_24;
   hrtc.Init.AsynchPrediv = 127;
-  hrtc.Init.SynchPrediv = 255;
+  hrtc.Init.SynchPrediv = 999;
   hrtc.Init.OutPut = RTC_OUTPUT_DISABLE;
   hrtc.Init.OutPutRemap = RTC_OUTPUT_REMAP_NONE;
   hrtc.Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
@@ -1147,7 +1147,7 @@ void RTC_set_func(void *argument)
 			}
 			if (recibido[j]==127){
 				printf("Ha pulsado borrar\r\n");
-				j--;
+				if (j>0) j--;
 			}else{
 				j++;
 			}
@@ -1239,7 +1239,7 @@ void RTC_set_func(void *argument)
 			}
 			if (recibido[j]==127){
 				printf("Ha pulsado borrar\r\n");
-				j--;
+				if (j>0) j--;
 			}else{
 				j++;
 			}
@@ -1273,7 +1273,7 @@ void RTC_set_func(void *argument)
 				}
 				if (recibido[j]==127){
 //					printf("Ha pulsado borrar\r\n");
-					j--;
+					if (j>0) j--;
 				}else{
 					j++;
 				}
@@ -1348,6 +1348,7 @@ void readAccel_func(void *argument)
 
 
 	uint8_t horas,minutos,segundos,dia,mes,anio = 0;
+	uint16_t milisegundos = 0;
 	uint32_t return_wait = 0U;
 
 	uint16_t iter; // Se usa para iterar en 64 o 1024 aceleraciones
@@ -1369,6 +1370,9 @@ void readAccel_func(void *argument)
 	else if(return_wait == 0x0001U)
 	  printf("Recibido notificacion\r\n");
 	  */
+	const char* msg_read_normal = "\r\nLectura en modo normal\r\n";
+	const char* msg_read_continuous = "\r\nLectura en modo continuo\r\n";
+
 
 
 	/* Infinite loop */
@@ -1384,9 +1388,11 @@ void readAccel_func(void *argument)
 
 		if (modo_continuo){
 			max_iter = MUESTRAS_CONTINUO;
+			osMessageQueuePut(print_queueHandle, &msg_read_continuous, 0, pdMS_TO_TICKS(500));
 			//osThreadFlagsSet(sendMQTTHandle,MODO_CONTINUO);
 		}else{
 			max_iter = MUESTRAS_NORMAL;
+			osMessageQueuePut(print_queueHandle, &msg_read_normal, 0, pdMS_TO_TICKS(500));
 			//osThreadFlagsSet(sendMQTTHandle,MODO_NORMAL);
 		}
 
@@ -1399,6 +1405,7 @@ void readAccel_func(void *argument)
 			horas = GetTime.Hours;
 			minutos = GetTime.Minutes;
 			segundos = GetTime.Seconds;
+			milisegundos = (uint16_t)1000*((float)(GetTime.SecondFraction-GetTime.SubSeconds)) / ((float)(GetTime.SecondFraction+1));
 
 			HAL_RTC_GetDate(&hrtc, &GetDate, RTC_FORMAT_BIN);
 			anio = GetDate.Year;
@@ -1409,7 +1416,7 @@ void readAccel_func(void *argument)
 			//printf("Anio: %d\r\n",anio);
 			//printf("Lectura fecha realizada\r\n");
 			//printf("fecha: %d/%d/%d hora: %d:%d:%d temp: %d.%02d grados\r\n",dia,mes,anio,horas,minutos,segundos,tmpInt1,tmpInt2);
-			snprintf(mensaje,100,"%d/%d/%d %d:%d:%d %d,%d,%d,%d",dia,mes,anio+2000,horas,minutos,segundos,DataXYZ[0],DataXYZ[1],DataXYZ[2],max_iter);
+			snprintf(mensaje,100,"%d/%d/%d %d:%d:%d:%d %d,%d,%d,%d",dia,mes,anio+2000,horas,minutos,segundos,milisegundos,DataXYZ[0],DataXYZ[1],DataXYZ[2],max_iter);
 //			snprintf(mensaje,100,"%d,%d,%d,%d,%d,%d,%d,%d,%d\r\n",dia,mes,anio+2000,horas,minutos,segundos,DataXYZ[0],DataXYZ[1],DataXYZ[2]);
 
 			printf("iter: %d\r\n",iter);
@@ -1565,7 +1572,7 @@ void sendMQTT_func(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	  estado = osMessageQueueGet(publish_queueHandle, &mensaje, NULL, pdMS_TO_TICKS(5000));
+	  estado = osMessageQueueGet(publish_queueHandle, &mensaje, NULL, pdMS_TO_TICKS(5000)); //Minimo la mitad de tiempo de lo que tarda en actualizar el valor el otro nodo
 
 	  if (estado == osOK)
 	  {
