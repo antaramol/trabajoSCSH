@@ -16,4 +16,4 @@ while True:
 
     #i = 1
     print("Mensaje publicado: ", str(i))
-    time.sleep(5)
+    time.sleep(15)
