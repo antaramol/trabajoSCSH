@@ -90,8 +90,8 @@ void Error_Handler(void);
 #define ARD_D4_GPIO_Port GPIOA
 #define ARD_D7_Pin GPIO_PIN_4
 #define ARD_D7_GPIO_Port GPIOA
-#define ARD_D13_Pin GPIO_PIN_5
-#define ARD_D13_GPIO_Port GPIOA
+#define LED1_Pin GPIO_PIN_5
+#define LED1_GPIO_Port GPIOA
 #define ARD_D12_Pin GPIO_PIN_6
 #define ARD_D12_GPIO_Port GPIOA
 #define ARD_D11_Pin GPIO_PIN_7
@@ -208,8 +208,6 @@ void Error_Handler(void);
 #define SYS_JTD0_SWO_GPIO_Port GPIOB
 #define ARD_D5_Pin GPIO_PIN_4
 #define ARD_D5_GPIO_Port GPIOB
-#define SPSGRF_915_SPI3_CSN_Pin GPIO_PIN_5
-#define SPSGRF_915_SPI3_CSN_GPIO_Port GPIOB
 #define ST_LINK_UART1_TX_Pin GPIO_PIN_6
 #define ST_LINK_UART1_TX_GPIO_Port GPIOB
 #define ST_LINK_UART1_RX_Pin GPIO_PIN_7
