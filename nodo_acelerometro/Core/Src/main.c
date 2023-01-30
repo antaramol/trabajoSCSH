@@ -89,10 +89,10 @@ UART_HandleTypeDef huart3;
 
 PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
-/* Definitions for RTC_set */
-osThreadId_t RTC_setHandle;
-const osThreadAttr_t RTC_set_attributes = {
-  .name = "RTC_set",
+/* Definitions for config_task */
+osThreadId_t config_taskHandle;
+const osThreadAttr_t config_task_attributes = {
+  .name = "config_task",
   .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
@@ -124,25 +124,11 @@ const osThreadAttr_t temporizador_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
-/* Definitions for sendMQTT */
-osThreadId_t sendMQTTHandle;
-const osThreadAttr_t sendMQTT_attributes = {
-  .name = "sendMQTT",
+/* Definitions for clientMQTT */
+osThreadId_t clientMQTTHandle;
+const osThreadAttr_t clientMQTT_attributes = {
+  .name = "clientMQTT",
   .stack_size = 512 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
-};
-/* Definitions for wifiStartTask */
-osThreadId_t wifiStartTaskHandle;
-const osThreadAttr_t wifiStartTask_attributes = {
-  .name = "wifiStartTask",
-  .stack_size = 256 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
-};
-/* Definitions for temp_sub */
-osThreadId_t temp_subHandle;
-const osThreadAttr_t temp_sub_attributes = {
-  .name = "temp_sub",
-  .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for print_queue */
@@ -185,14 +171,12 @@ static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 static void MX_TIM7_Init(void);
 static void MX_RTC_Init(void);
-void RTC_set_func(void *argument);
+void config_task_func(void *argument);
 void readAccel_func(void *argument);
 void printTask_func(void *argument);
 void tarea_UART_func(void *argument);
 void temporizador_func(void *argument);
-void sendMQTT_func(void *argument);
-void wifiStartTask_func(void *argument);
-void temp_sub_func(void *argument);
+void clientMQTT_func(void *argument);
 
 /* USER CODE BEGIN PFP */
 volatile unsigned long ulHighFrequencyTimerTicks;
@@ -289,8 +273,8 @@ int main(void)
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* creation of RTC_set */
-  RTC_setHandle = osThreadNew(RTC_set_func, NULL, &RTC_set_attributes);
+  /* creation of config_task */
+  config_taskHandle = osThreadNew(config_task_func, NULL, &config_task_attributes);
 
   /* creation of readAccel */
   readAccelHandle = osThreadNew(readAccel_func, NULL, &readAccel_attributes);
@@ -304,14 +288,8 @@ int main(void)
   /* creation of temporizador */
   temporizadorHandle = osThreadNew(temporizador_func, NULL, &temporizador_attributes);
 
-  /* creation of sendMQTT */
-  sendMQTTHandle = osThreadNew(sendMQTT_func, NULL, &sendMQTT_attributes);
-
-  /* creation of wifiStartTask */
-  wifiStartTaskHandle = osThreadNew(wifiStartTask_func, NULL, &wifiStartTask_attributes);
-
-  /* creation of temp_sub */
-  temp_subHandle = osThreadNew(temp_sub_func, NULL, &temp_sub_attributes);
+  /* creation of clientMQTT */
+  clientMQTTHandle = osThreadNew(clientMQTT_func, NULL, &clientMQTT_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -1101,14 +1079,14 @@ void SPI3_IRQHandler(void)
 
 /* USER CODE END 4 */
 
-/* USER CODE BEGIN Header_RTC_set_func */
+/* USER CODE BEGIN Header_config_task_func */
 /**
-  * @brief  Function implementing the RTC_set thread.
+  * @brief  Function implementing the config_task thread.
   * @param  argument: Not used
   * @retval None
   */
-/* USER CODE END Header_RTC_set_func */
-void RTC_set_func(void *argument)
+/* USER CODE END Header_config_task_func */
+void config_task_func(void *argument)
 {
   /* USER CODE BEGIN 5 */
 	uint8_t recibido[20];
@@ -1312,7 +1290,7 @@ void RTC_set_func(void *argument)
 	osMessageQueuePut(print_queueHandle, &msg_wifi_connect_success, 0, pdMS_TO_TICKS(500));
 
 
-	osThreadFlagsSet(sendMQTTHandle,0x0001U);
+	osThreadFlagsSet(clientMQTTHandle,0x0001U);
 	//osThreadFlagsSet(wifiStartTaskHandle,0x0001U);
 
 	//osThreadFlagsSet(readAccelHandle,0x0002U);
@@ -1521,22 +1499,22 @@ void temporizador_func(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(pdMS_TO_TICKS(1000000)); //Periodo en ms con el que se mandan las aceleraciones
+    osDelay(pdMS_TO_TICKS(1800000)); //Periodo en ms con el que se mandan las aceleraciones
     osThreadFlagsSet(readAccelHandle,0x0004U);
   }
   /* USER CODE END temporizador_func */
 }
 
-/* USER CODE BEGIN Header_sendMQTT_func */
+/* USER CODE BEGIN Header_clientMQTT_func */
 /**
-* @brief Function implementing the sendMQTT thread.
+* @brief Function implementing the clientMQTT thread.
 * @param argument: Not used
 * @retval None
 */
-/* USER CODE END Header_sendMQTT_func */
-void sendMQTT_func(void *argument)
+/* USER CODE END Header_clientMQTT_func */
+void clientMQTT_func(void *argument)
 {
-  /* USER CODE BEGIN sendMQTT_func */
+  /* USER CODE BEGIN clientMQTT_func */
 	uint32_t return_wait = 0U;
 	osStatus_t estado;
 	uintptr_t mensaje;
@@ -1570,119 +1548,28 @@ void sendMQTT_func(void *argument)
 
 
   /* Infinite loop */
-  for(;;)
-  {
-	  estado = osMessageQueueGet(publish_queueHandle, &mensaje, NULL, pdMS_TO_TICKS(5000)); //Minimo la mitad de tiempo de lo que tarda en actualizar el valor el otro nodo
+	for(;;)
+	{
+		estado = osMessageQueueGet(publish_queueHandle, &mensaje, NULL, pdMS_TO_TICKS(5000)); //Minimo la mitad de tiempo de lo que tarda en actualizar el valor el otro nodo
 
-	  if (estado == osOK)
-	  {
+		 if (estado == osOK)
+		 {
 		  //printf("Publicamos: %s",(char*)mensaje);
-		  sprintf(payLoad,"%s",mensaje);
-		  prvMQTTPublishToTopic(&xMQTTContext,pcTempTopic,payLoad);
-	  }
-	  else if (estado == osErrorTimeout)
-	  {
-		  printf("Procesamos subscripcion\r\n");
-		  MQTT_ProcessLoop(&xMQTTContext);
-	  }
-	  else
-	  {
-		  printf("Error en la tarea sendMQTT\r\n");
-	  }
+			 sprintf(payLoad,"%s",mensaje);
+			 prvMQTTPublishToTopic(&xMQTTContext,pcTempTopic,payLoad);
+		 }
+		 else if (estado == osErrorTimeout)
+		 {
+			 printf("Procesamos subscripcion\r\n");
+			 MQTT_ProcessLoop(&xMQTTContext);
+		 }
+		 else
+		 {
+			 printf("Error en la tarea sendMQTT\r\n");
+		 }
 
-
-	  /*
-	   *
-	   return_wait = osThreadFlagsWait(MODO_NORMAL | MODO_CONTINUO | TIMER_MQTT, osFlagsWaitAny, osWaitForever);
-
-	  if (return_wait == TIMER_MQTT){
-		  MQTT_ProcessLoop(&xMQTTContext);
-	  }else{
-		  if(return_wait == MODO_NORMAL){
-			  printf("Vamos a recibir 64 aceleraciones\r\n");
-			  max_iter = MUESTRAS_NORMAL;
-
-		  }
-		  else if(return_wait == MODO_CONTINUO){
-			  printf("Vamos a recibir 1024 aceleraciones\r\n");
-			  max_iter = MUESTRAS_CONTINUO;
-		  }
-		  for (iter=0;iter<max_iter;iter++){
-			  estado = osMessageQueueGet(print_queueHandle, &mensaje, NULL, osWaitForever);
-
-			  if (estado == osOK)
-			  {
-				  //printf("%s",(char*)mensaje);
-				  //HAL_UART_Transmit(&huart1, (uint8_t*)mensaje, strlen(mensaje),10);
-				  sprintf(payLoad,"%s",mensaje);
-				  prvMQTTPublishToTopic(&xMQTTContext,pcTempTopic,payLoad);
-			  }
-		  }
-
-		  //printf("Espacio en la cola: %d\r\n",osMessageQueueGetSpace(print_queueHandle));
-	  }
-	  *
-	  */
-
-  }
-  /* USER CODE END sendMQTT_func */
-}
-
-/* USER CODE BEGIN Header_wifiStartTask_func */
-/**
-* @brief Function implementing the wifiStartTask thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_wifiStartTask_func */
-void wifiStartTask_func(void *argument)
-{
-  /* USER CODE BEGIN wifiStartTask_func */
-	osThreadFlagsWait(0x0001U, osFlagsWaitAny, osWaitForever);
-
-
-
-	//wifi_connect();
-//	MQTT_context_Init();
-
-	//Terminamos las tarea de configuracion del RTC
-	//osThreadTerminate(RTC_setHandle);
-	//osThreadTerminate(printTaskHandle);
-	//osMessageQueueReset(print_queueHandle);
-	//osMessageQueueDelete(receive_queueHandle);
-
-//	osThreadFlagsSet(mqttSubscribeHandle,0x0001U);
-//	osThreadFlagsSet(sendMQTTHandle,0x0001U);
-//	osThreadFlagsSet(readAccelHandle,0x0002U);
-
-
-
-  /* Infinite loop */
-  for(;;)
-  {
-	  osDelay(pdMS_TO_TICKS(1));
-  }
-  /* USER CODE END wifiStartTask_func */
-}
-
-/* USER CODE BEGIN Header_temp_sub_func */
-/**
-* @brief Function implementing the temp_sub thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_temp_sub_func */
-void temp_sub_func(void *argument)
-{
-  /* USER CODE BEGIN temp_sub_func */
-	osThreadFlagsWait(0x0001U, osFlagsWaitAny, osWaitForever);
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(pdMS_TO_TICKS(15000));
-    osThreadFlagsSet(sendMQTTHandle, TIMER_MQTT);
-  }
-  /* USER CODE END temp_sub_func */
+	}
+  /* USER CODE END clientMQTT_func */
 }
 
 /**
