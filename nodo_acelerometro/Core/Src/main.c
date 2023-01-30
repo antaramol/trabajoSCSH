@@ -56,8 +56,10 @@
 #define MUESTRAS_NORMAL 64
 #define MUESTRAS_CONTINUO 1024
 
-#define SSID     "DIGIFIBRA-HAeH"
-#define PASSWORD "uxHXKubx5D"
+//#define SSID     "DIGIFIBRA-HAeH"
+//#define PASSWORD "uxHXKubx5D"
+#define SSID "Antonio"
+#define PASSWORD  "Antonio_psswrd"
 #define WIFISECURITY WIFI_ECN_WPA2_PSK
 //#define WIFISECURITY WIFI_ECN_OPEN
 #define SOCKET 0
@@ -149,6 +151,11 @@ const osMessageQueueAttr_t print_queue_attributes = {
 osMessageQueueId_t receive_queueHandle;
 const osMessageQueueAttr_t receive_queue_attributes = {
   .name = "receive_queue"
+};
+/* Definitions for publish_queue */
+osMessageQueueId_t publish_queueHandle;
+const osMessageQueueAttr_t publish_queue_attributes = {
+  .name = "publish_queue"
 };
 /* USER CODE BEGIN PV */
 RTC_DateTypeDef GetDate; //Estructura para fijar/leer fecha
@@ -266,10 +273,13 @@ int main(void)
 
   /* Create the queue(s) */
   /* creation of print_queue */
-  print_queueHandle = osMessageQueueNew (10, sizeof(uintptr_t), &print_queue_attributes);
+  print_queueHandle = osMessageQueueNew (2, sizeof(uintptr_t), &print_queue_attributes);
 
   /* creation of receive_queue */
   receive_queueHandle = osMessageQueueNew (3, sizeof(uint8_t), &receive_queue_attributes);
+
+  /* creation of publish_queue */
+  publish_queueHandle = osMessageQueueNew (5, sizeof(uintptr_t), &publish_queue_attributes);
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
@@ -1189,7 +1199,10 @@ void RTC_set_func(void *argument)
 
 	osMessageQueuePut(print_queueHandle, &msg_fecha_ok, 0, pdMS_TO_TICKS(500));
 
-	osThreadFlagsSet(wifiStartTaskHandle,0x0001U);
+	wifi_connect();
+
+	osThreadFlagsSet(sendMQTTHandle,0x0001U);
+	//osThreadFlagsSet(wifiStartTaskHandle,0x0001U);
 
 	//osThreadFlagsSet(readAccelHandle,0x0002U);
 
@@ -1435,13 +1448,34 @@ void sendMQTT_func(void *argument)
 	printf("Contexto mqtt inicializado\r\n");
 
 	osThreadFlagsSet(readAccelHandle,0x0008U);
-	osThreadFlagsSet(temp_subHandle, 0x0001U);
+	//osThreadFlagsSet(temp_subHandle, 0x0001U);
 
 
   /* Infinite loop */
   for(;;)
   {
-	  return_wait = osThreadFlagsWait(MODO_NORMAL | MODO_CONTINUO | TIMER_MQTT, osFlagsWaitAny, osWaitForever);
+	  estado = osMessageQueueGet(publish_queueHandle, &mensaje, NULL, pdMS_TO_TICKS(1000));
+
+	  if (estado == osOK)
+	  {
+		  printf("Publicamos: %s",(char*)mensaje);
+		  sprintf(payLoad,"%s",mensaje);
+		  prvMQTTPublishToTopic(&xMQTTContext,pcTempTopic,payLoad);
+	  }
+	  else if (estado == osErrorTimeout)
+	  {
+		  printf("Procesamos subscripcion\r\n");
+		  MQTT_ProcessLoop(&xMQTTContext);
+	  }
+	  else
+	  {
+		  printf("Error en la tarea sendMQTT\r\n");
+	  }
+
+
+	  /*
+	   *
+	   return_wait = osThreadFlagsWait(MODO_NORMAL | MODO_CONTINUO | TIMER_MQTT, osFlagsWaitAny, osWaitForever);
 
 	  if (return_wait == TIMER_MQTT){
 		  MQTT_ProcessLoop(&xMQTTContext);
@@ -1469,6 +1503,8 @@ void sendMQTT_func(void *argument)
 
 		  //printf("Espacio en la cola: %d\r\n",osMessageQueueGetSpace(print_queueHandle));
 	  }
+	  *
+	  */
 
   }
   /* USER CODE END sendMQTT_func */
@@ -1492,13 +1528,13 @@ void wifiStartTask_func(void *argument)
 //	MQTT_context_Init();
 
 	//Terminamos las tarea de configuracion del RTC
-	osThreadTerminate(RTC_setHandle);
-	osThreadTerminate(printTaskHandle);
-	osMessageQueueReset(print_queueHandle);
-	osMessageQueueDelete(receive_queueHandle);
+	//osThreadTerminate(RTC_setHandle);
+	//osThreadTerminate(printTaskHandle);
+	//osMessageQueueReset(print_queueHandle);
+	//osMessageQueueDelete(receive_queueHandle);
 
 //	osThreadFlagsSet(mqttSubscribeHandle,0x0001U);
-	osThreadFlagsSet(sendMQTTHandle,0x0001U);
+//	osThreadFlagsSet(sendMQTTHandle,0x0001U);
 //	osThreadFlagsSet(readAccelHandle,0x0002U);
 
 
