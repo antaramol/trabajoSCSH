@@ -1551,6 +1551,9 @@ void clientMQTT_func(void *argument)
 	osThreadFlagsSet(readAccelHandle,0x0008U);
 	//osThreadFlagsSet(temp_subHandle, 0x0001U);
 
+	const char* msg_modo_continuo = "Modo continuo\r\n";
+	const char* msg_modo_normal = "Modo normal\r\n";
+
 
   /* Infinite loop */
 	for(;;)
@@ -1567,6 +1570,10 @@ void clientMQTT_func(void *argument)
 		 {
 			 printf("Procesamos subscripcion\r\n");
 			 MQTT_ProcessLoop(&xMQTTContext);
+			 if (modo_continuo) osMessageQueuePut(print_queueHandle, &msg_modo_continuo, 0, pdMS_TO_TICKS(500));
+			 else osMessageQueuePut(print_queueHandle, &msg_modo_normal, 0, pdMS_TO_TICKS(500));
+
+
 		 }
 		 else
 		 {
