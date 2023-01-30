@@ -1409,7 +1409,7 @@ void readAccel_func(void *argument)
 			//printf("Anio: %d\r\n",anio);
 			//printf("Lectura fecha realizada\r\n");
 			//printf("fecha: %d/%d/%d hora: %d:%d:%d temp: %d.%02d grados\r\n",dia,mes,anio,horas,minutos,segundos,tmpInt1,tmpInt2);
-			snprintf(mensaje,100,"%d/%d/%d %d:%d:%d %d,%d,%d\r\n",dia,mes,anio+2000,horas,minutos,segundos,DataXYZ[0],DataXYZ[1],DataXYZ[2]);
+			snprintf(mensaje,100,"%d/%d/%d %d:%d:%d %d,%d,%d,%d",dia,mes,anio+2000,horas,minutos,segundos,DataXYZ[0],DataXYZ[1],DataXYZ[2],max_iter);
 //			snprintf(mensaje,100,"%d,%d,%d,%d,%d,%d,%d,%d,%d\r\n",dia,mes,anio+2000,horas,minutos,segundos,DataXYZ[0],DataXYZ[1],DataXYZ[2]);
 
 			printf("iter: %d\r\n",iter);
@@ -1427,7 +1427,6 @@ void readAccel_func(void *argument)
 		}
 
 		printf("Se han leido todas las aceleraciones, esperamos media hora o hasta que alguien pulse el boton\r\n");
-
 
 		//osDelay(pdMS_TO_TICKS(1000));
 
