@@ -56,10 +56,13 @@
 #define MUESTRAS_NORMAL 64
 #define MUESTRAS_CONTINUO 1024
 
+#define MAX_LEN_SSID 10
+#define MAX_LEN_PSSWRD 20
+
 //#define SSID     "DIGIFIBRA-HAeH"
 //#define PASSWORD "uxHXKubx5D"
-#define SSID "Antonio"
-#define PASSWORD  "Antonio_psswrd"
+//#define SSID "Antonio"
+//#define PASSWORD  "Antonio_psswrd"
 #define WIFISECURITY WIFI_ECN_WPA2_PSK
 //#define WIFISECURITY WIFI_ECN_OPEN
 #define SOCKET 0
@@ -1055,7 +1058,7 @@ static int wifi_start(void)
   return 0;
 }
 
-int wifi_connect(void)
+int wifi_connect(char* SSID, char* PASSWORD)
 {
 
   wifi_start();
@@ -1108,7 +1111,7 @@ void SPI3_IRQHandler(void)
 void RTC_set_func(void *argument)
 {
   /* USER CODE BEGIN 5 */
-	uint8_t recibido[3];
+	uint8_t recibido[20];
 	//uint32_t flag_rec;
 	osStatus_t estado;
 	uint32_t return_wait = 0U;
@@ -1127,19 +1130,26 @@ void RTC_set_func(void *argument)
 	uint8_t limit[6][2] = {{0,23},{0,59},{0,59},{1,31},{1,12},{0,99}};
 	//uint8_t *toChange[6] = {&GetTime.Hours, &GetTime.Minutes, &GetTime.Seconds, &GetDate.Date,&GetDate.Month, &GetDate.Year};
 
+
 	printf("Empieza el bucle\r\n");
 	estado = osMessageQueuePut(print_queueHandle, &msg_rtc1, 0, pdMS_TO_TICKS(500));
-	int i,j = 0;
+	int i,j,m = 0;
 	for (i=0;i<6;){
 		estado = osMessageQueuePut(print_queueHandle, &msg[i], 0, pdMS_TO_TICKS(500));
 		printf("Esperando a que ser reciba el dato\r\n");
 
-		for (j=0;j<3;j++){
+		for (j=0;j<3;){
 			estado = osMessageQueueGet(receive_queueHandle, &recibido[j], NULL, osWaitForever);
 			printf("De la cola: %c\r\n",recibido[j]);
 			if(recibido[j]==13){
 				printf("Ha pulsado intro\r\n");
 				break;
+			}
+			if (recibido[j]==127){
+				printf("Ha pulsado borrar\r\n");
+				j--;
+			}else{
+				j++;
 			}
 		}
 		printf("%d\r\n",j);
@@ -1199,7 +1209,108 @@ void RTC_set_func(void *argument)
 
 	osMessageQueuePut(print_queueHandle, &msg_fecha_ok, 0, pdMS_TO_TICKS(500));
 
-	wifi_connect();
+	const char* msg_wifi_conf_init = "\r\nInicio de configuración del WiFi\r\n";
+	const char* msg_wifi_connect_init = "\r\nConectando al WiFi\r\n";
+	const char* msg_wifi_connect_error = "No se ha podido conectar, vuelva a introducir los datos\r\n";
+	const char* msg_wifi_connect_success = "CONECTADO\r\n\r\n";
+	const char* msg_too_many_characters = "\r\nHas introducido demasiados caracteres, prueba de nuevo\r\n";
+	const char* msg_introduce_ssid = "Introduce el ssid: ";
+	const char* msg_introduce_psswrd = "\r\nIntroduce la contraseña: ";
+
+//	bool conectado = false;
+
+//	char ssid[MAX_LEN_SSID];
+//	char psswrd[MAX_LEN_PSSWRD];
+
+
+	osMessageQueuePut(print_queueHandle, &msg_wifi_conf_init, 0, pdMS_TO_TICKS(500));
+
+	//bucle de conexión
+	while (1){
+
+		//configuracion ssid
+		osMessageQueuePut(print_queueHandle, &msg_introduce_ssid, 0, pdMS_TO_TICKS(500));
+		for (j=0; j<MAX_LEN_SSID ; ){
+			estado = osMessageQueueGet(receive_queueHandle, &recibido[j], NULL, osWaitForever);
+			printf("De la cola: %c\r\n",recibido[j]);
+			if(recibido[j]==13){
+				printf("Ha pulsado intro\r\n");
+				break;
+			}
+			if (recibido[j]==127){
+				printf("Ha pulsado borrar\r\n");
+				j--;
+			}else{
+				j++;
+			}
+		}
+		if (j==MAX_LEN_SSID){
+			osMessageQueuePut(print_queueHandle, &msg_too_many_characters, 0, pdMS_TO_TICKS(500));
+		}else{
+//			printf("Guardamos el ssid\r\n");
+			char ssid[j];
+//			printf("j: %d\r\n",j);
+			for (m=0 ; m<j ; m++){
+//				printf("m: %d\r\n",m);
+//				printf("caracter: %c\r\n",recibido[m]);
+				ssid[m] = recibido[m];
+			}
+
+			//datos_wifi[i] = recibido[0];
+//			printf("ssid: %s\r\n",ssid);
+//			printf("longitud del ssid: %d\r\n",strlen(ssid));
+
+
+			//configuracion contraseña
+			osMessageQueuePut(print_queueHandle, &msg_introduce_psswrd, 0, pdMS_TO_TICKS(500));
+
+			for (j=0; j<MAX_LEN_PSSWRD ; ){
+				estado = osMessageQueueGet(receive_queueHandle, &recibido[j], NULL, osWaitForever);
+//				printf("De la cola: %c\r\n",recibido[j]);
+				if(recibido[j]==13){
+//					printf("Ha pulsado intro\r\n");
+					break;
+				}
+				if (recibido[j]==127){
+//					printf("Ha pulsado borrar\r\n");
+					j--;
+				}else{
+					j++;
+				}
+			}
+			if (j==MAX_LEN_PSSWRD){
+				osMessageQueuePut(print_queueHandle, &msg_too_many_characters, 0, pdMS_TO_TICKS(500));
+			}else{
+//				printf("Guardamos el psswrd\r\n");
+				char psswrd[j];
+//				printf("j: %d\r\n",j);
+				for (m=0 ; m<j ; m++){
+//					printf("m: %d\r\n",m);
+//					printf("caracter: %c\r\n",recibido[m]);
+					psswrd[m] = recibido[m];
+				}
+
+				//datos_wifi[i] = recibido[0];
+//				printf("psswrd: %s\r\n",psswrd);
+//				printf("longitud del psswrd: %d\r\n",strlen(psswrd));
+
+				osMessageQueuePut(print_queueHandle, &msg_wifi_connect_init, 0, pdMS_TO_TICKS(500));
+
+				if (wifi_connect(ssid,psswrd) != 0){
+					osMessageQueuePut(print_queueHandle, &msg_wifi_connect_error, 0, pdMS_TO_TICKS(500));
+				}
+				else{
+					break;
+				}
+
+			}
+		}
+
+
+	}
+
+	osMessageQueuePut(print_queueHandle, &msg_wifi_connect_success, 0, pdMS_TO_TICKS(500));
+
 
 	osThreadFlagsSet(sendMQTTHandle,0x0001U);
 	//osThreadFlagsSet(wifiStartTaskHandle,0x0001U);
@@ -1525,7 +1636,7 @@ void wifiStartTask_func(void *argument)
 
 
 
-	wifi_connect();
+	//wifi_connect();
 //	MQTT_context_Init();
 
 	//Terminamos las tarea de configuracion del RTC
