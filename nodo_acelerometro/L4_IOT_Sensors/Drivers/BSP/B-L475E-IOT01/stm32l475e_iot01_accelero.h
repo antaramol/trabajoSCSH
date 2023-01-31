@@ -61,7 +61,7 @@ ACCELERO_StatusTypeDef;
   * @{
   */
 /* Sensor Configuration Functions */
-ACCELERO_StatusTypeDef BSP_ACCELERO_Init(void);
+ACCELERO_StatusTypeDef BSP_ACCELERO_Init(uint8_t frec, uint8_t fs);
 void BSP_ACCELERO_DeInit(void);
 void BSP_ACCELERO_LowPower(uint16_t status); /* 0 Means Disable Low Power Mode, otherwise Low Power Mode is enabled */
 void BSP_ACCELERO_AccGetXYZ(int16_t *pDataXYZ);

@@ -153,6 +153,7 @@ RTC_TimeTypeDef GetTime; //Estructura para fijar/leer hora
 ACCELERO_StatusTypeDef status_acc;
 
 volatile bool modo_continuo;
+volatile frec_muestreo_actual = 52;
 
 extern  SPI_HandleTypeDef hspi;
 static  uint8_t  IP_Addr[4];
@@ -189,7 +190,7 @@ unsigned long getRunTimeCounterValue(void) {
 
 }
 
-ACCELERO_StatusTypeDef BSP_ACCELERO_Init_INT(void);
+ACCELERO_StatusTypeDef BSP_ACCELERO_Init_INT(uint8_t frec, uint8_t fs);
 
 /* USER CODE END PFP */
 
@@ -236,7 +237,7 @@ int main(void)
   MX_TIM7_Init();
   MX_RTC_Init();
   /* USER CODE BEGIN 2 */
-  status_acc = BSP_ACCELERO_Init_INT();
+  status_acc = BSP_ACCELERO_Init_INT(LSM6DSL_ODR_52Hz, LSM6DSL_ACC_FULLSCALE_2G);
   if (status_acc == ACCELERO_OK){
 	  printf("Acelerometro inicializado\r\n");
   }
@@ -266,7 +267,7 @@ int main(void)
   receive_queueHandle = osMessageQueueNew (3, sizeof(uint8_t), &receive_queue_attributes);
 
   /* creation of publish_queue */
-  publish_queueHandle = osMessageQueueNew (5, sizeof(uintptr_t), &publish_queue_attributes);
+  publish_queueHandle = osMessageQueueNew (50, sizeof(uintptr_t), &publish_queue_attributes);
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
@@ -936,10 +937,10 @@ int _write(int file, char *ptr, int len)
 	return len;
 }
 
-ACCELERO_StatusTypeDef BSP_ACCELERO_Init_INT(void)
+ACCELERO_StatusTypeDef BSP_ACCELERO_Init_INT(uint8_t frec, uint8_t fs)
 {
 	ACCELERO_StatusTypeDef ret;
-	ret = BSP_ACCELERO_Init();
+	ret = BSP_ACCELERO_Init(frec, fs);
 	if (ret == ACCELERO_OK)
 	{
 		/* Initialize interruption*/
@@ -1086,13 +1087,19 @@ void prvMQTTProcessIncomingPublish( MQTTPublishInfo_t *pxPublishInfo )
     const char * pTopicName;
     uint8_t i;
     uint8_t limit[6][2] = {{0,23},{0,59},{0,59},{1,31},{1,12},{0,99}};
-    uint16_t numero_usuario;
+    uint16_t numero_usuario,frec_muestreo, frec_muestreo_str;
+    uint8_t fondo_escala, fondo_escala_str;
     uint8_t to_change[6];
     bool dato_erroneo;
 	const char* msg_error = "\r\nERROR: Valor de configuracion no válido\r\n";
 	const char* msg_hora_ok = "\r\nHora cambiada correctamente\r\n";
 	const char* msg_fecha_ok = "Fecha cambiada correctamente\r\n";
 
+	uint8_t valores_frec_accel[3] = {52,104,208};
+	uint8_t valores_frec_accel_str[3] = {LSM6DSL_ODR_52Hz, LSM6DSL_ODR_104Hz, LSM6DSL_ODR_208Hz};
+	uint8_t valores_fs_accel[3] = {2,4,8};
+	uint8_t valores_fs_accel_str[3] = {LSM6DSL_ACC_SENSITIVITY_2G, LSM6DSL_ACC_SENSITIVITY_4G, LSM6DSL_ACC_SENSITIVITY_8G};
+	const char* msg_accelero_reconf = "ACELEROMETRO RECONFIGURADO\r\n";
 
 	// pPayload no termina en \0, hay que copiarlo en un buffer para imprimirlo. Lo mismo con pTopicName
 	memcpy(buffer1,pxPublishInfo->pPayload,min(127,pxPublishInfo->payloadLength));
@@ -1113,12 +1120,13 @@ void prvMQTTProcessIncomingPublish( MQTTPublishInfo_t *pxPublishInfo )
 		if(buffer1[0]=='1') modo_continuo = true;
 		if(buffer1[0]=='0') modo_continuo = false;
 	}
-	for(i=0;i<strlen(pcConfTopic);i++){
-		if(buffer2[i] != pcConfTopic[i]){
+
+	for(i=0;i<strlen(rtcConfTopic);i++){
+		if(buffer2[i] != rtcConfTopic[i]){
 			break;
 		}
 	}
-	if (i == strlen(pcConfTopic)){
+	if (i == strlen(rtcConfTopic)){
 		dato_erroneo = false;
 		for (i=0;i<6 && !dato_erroneo;){
 			numero_usuario = 10*(buffer1[3*i]-48) + buffer1[3*i+1]-48;
@@ -1162,6 +1170,43 @@ void prvMQTTProcessIncomingPublish( MQTTPublishInfo_t *pxPublishInfo )
 		}
 	}
 
+	for(i=0;i<strlen(accelConfTopic);i++){
+		if(buffer2[i] != accelConfTopic[i]){
+			break;
+		}
+	}
+	if (i == strlen(accelConfTopic)){
+		frec_muestreo = 100*(buffer1[0]-48) + 10*(buffer1[1]-48) + buffer1[2]-48;
+		fondo_escala = buffer1[4]-48;
+		for(i=0 ; i<strlen(valores_frec_accel) ; i++){
+			if (frec_muestreo == valores_frec_accel[i]){
+				frec_muestreo_str = valores_frec_accel_str[i];
+				break;
+			}
+		}
+		if (i == strlen(valores_frec_accel)){
+			osMessageQueuePut(print_queueHandle, &msg_error, 0, pdMS_TO_TICKS(500));
+		}else{
+			for(i=0 ; i<strlen(valores_fs_accel) ; i++){
+				if (fondo_escala == valores_fs_accel[i]){
+					fondo_escala_str = valores_fs_accel_str[i];
+					break;
+				}
+			}
+			if (i == strlen(valores_fs_accel)){
+				osMessageQueuePut(print_queueHandle, &msg_error, 0, pdMS_TO_TICKS(500));
+			}else{
+				//Intentamos configurar el acelerometro
+				status_acc = BSP_ACCELERO_Init_INT(frec_muestreo_str, fondo_escala_str);
+				if (status_acc == ACCELERO_OK){
+					frec_muestreo_actual = frec_muestreo;
+					osMessageQueuePut(print_queueHandle, &msg_accelero_reconf, 0, pdMS_TO_TICKS(500));
+				}
+			}
+		}
+
+
+	}
 
 	//if (buffer1 == "prueba")
 
@@ -1410,6 +1455,9 @@ void readAccel_func(void *argument)
 	char mensaje[100];
 	char *p_mensaje = mensaje;
 
+	char mensaje_params[100];
+	char* p_mensaje_params = mensaje_params;
+
 	//uint32_t nticks = 0;
 	int16_t DataXYZ[3];
 	int16_t *pDataXYZ = DataXYZ;
@@ -1441,9 +1489,6 @@ void readAccel_func(void *argument)
 	const char* msg_read_normal = "\r\nLectura en modo normal\r\n";
 	const char* msg_read_continuous = "\r\nLectura en modo continuo\r\n";
 
-	const char* msg_pub_normal = "Publicadas 64";
-	const char* msg_pub_continuous = "Publicadas 1024";
-
 
 	/* Infinite loop */
 	for(;;)
@@ -1466,7 +1511,10 @@ void readAccel_func(void *argument)
 			//osThreadFlagsSet(sendMQTTHandle,MODO_NORMAL);
 		}
 
+		snprintf(mensaje_params, 100, "Publicadas: %d muestras, frec_muestreo: %dHz",max_iter,frec_muestreo_actual);
+
 		for (iter=0 ; iter<max_iter ; iter++){
+			osThreadFlagsWait(0x0001U, osFlagsWaitAny, osWaitForever);
 			BSP_ACCELERO_AccGetXYZ(pDataXYZ);
 			//printf("Tick: %ld	Eje x: %d	Eje y: %d	Eje z: %d\r\n",nticks,DataXYZ[0],DataXYZ[1],DataXYZ[2]);
 
@@ -1503,9 +1551,11 @@ void readAccel_func(void *argument)
 
 		}
 
-		if (iter==MUESTRAS_NORMAL) osMessageQueuePut(publish_queueHandle, &msg_pub_normal, 0, pdMS_TO_TICKS(500));
-		else osMessageQueuePut(publish_queueHandle, &msg_pub_continuous, 0, pdMS_TO_TICKS(500));
 
+//		if (iter==MUESTRAS_NORMAL) osMessageQueuePut(publish_queueHandle, &msg_pub_normal, 0, pdMS_TO_TICKS(500));
+//		else osMessageQueuePut(publish_queueHandle, &msg_pub_continuous, 0, pdMS_TO_TICKS(500));
+
+		osMessageQueuePut(publish_queueHandle, &p_mensaje_params, 0, pdMS_TO_TICKS(500));
 		printf("Se han leido todas las aceleraciones, esperamos media hora o hasta que alguien pulse el boton\r\n");
 
 		//osDelay(pdMS_TO_TICKS(1000));
@@ -1636,7 +1686,9 @@ void clientMQTT_func(void *argument)
 	//LOG(("Trying to create an MQTT connection\n"));
 	prvCreateMQTTConnectionWithBroker( &xMQTTContext, &xNetworkContext );
 	prvMQTTSubscribeToTopic(&xMQTTContext,pcTempTopic2);
-	prvMQTTSubscribeToTopic(&xMQTTContext,pcConfTopic);
+	prvMQTTSubscribeToTopic(&xMQTTContext,rtcConfTopic);
+	prvMQTTSubscribeToTopic(&xMQTTContext,accelConfTopic);
+
 	printf("Contexto mqtt inicializado\r\n");
 
 	osThreadFlagsSet(readAccelHandle,0x0008U);

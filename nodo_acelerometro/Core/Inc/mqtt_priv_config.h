@@ -16,7 +16,8 @@ extern "C" {
 #define TOPIC_COUNT (1)
 #define pcTempTopic "SCF/trabajoFinal/Accel"
 #define pcTempTopic2 "SCF/trabajoFinal/TempSup"
-#define pcConfTopic "SCF/trabajoFinal/conf"
+#define rtcConfTopic "SCF/trabajoFinal/conf/RTC"
+#define accelConfTopic "SCF/trabajoFinal/conf/Accel"
 
 // Define strings for these parameters or set them to NULL. Do not use empty string ("")
 #define mqttUserName NULL

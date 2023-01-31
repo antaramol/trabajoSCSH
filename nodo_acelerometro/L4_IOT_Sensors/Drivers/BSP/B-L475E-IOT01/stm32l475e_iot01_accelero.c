@@ -46,7 +46,7 @@ static ACCELERO_DrvTypeDef *AccelerometerDrv;
   * @brief  Initialize the ACCELERO.
   * @retval ACCELERO_OK or ACCELERO_ERROR
   */
-ACCELERO_StatusTypeDef BSP_ACCELERO_Init(void)
+ACCELERO_StatusTypeDef BSP_ACCELERO_Init(uint8_t frec, uint8_t fs)
 {  
   ACCELERO_StatusTypeDef ret = ACCELERO_OK;
   uint16_t ctrl = 0x0000;
@@ -63,9 +63,9 @@ ACCELERO_StatusTypeDef BSP_ACCELERO_Init(void)
   
     /* MEMS configuration ------------------------------------------------------*/
     /* Fill the ACCELERO accelerometer structure */
-    LSM6DSL_InitStructure.AccOutput_DataRate = LSM6DSL_ODR_52Hz;
+    LSM6DSL_InitStructure.AccOutput_DataRate = frec;
     LSM6DSL_InitStructure.Axes_Enable = 0;
-    LSM6DSL_InitStructure.AccFull_Scale = LSM6DSL_ACC_FULLSCALE_2G;
+    LSM6DSL_InitStructure.AccFull_Scale = fs;
     LSM6DSL_InitStructure.BlockData_Update = LSM6DSL_BDU_BLOCK_UPDATE;
     LSM6DSL_InitStructure.High_Resolution = 0;
     LSM6DSL_InitStructure.Communication_Mode = 0;
