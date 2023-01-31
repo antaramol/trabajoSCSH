@@ -1351,6 +1351,8 @@ void readAccel_func(void *argument)
 	const char* msg_read_normal = "\r\nLectura en modo normal\r\n";
 	const char* msg_read_continuous = "\r\nLectura en modo continuo\r\n";
 
+	const char* msg_pub_normal = "Publicadas 64";
+	const char* msg_pub_continuous = "Publicadas 1024";
 
 
 	/* Infinite loop */
@@ -1394,7 +1396,7 @@ void readAccel_func(void *argument)
 			//printf("Anio: %d\r\n",anio);
 			//printf("Lectura fecha realizada\r\n");
 			//printf("fecha: %d/%d/%d hora: %d:%d:%d temp: %d.%02d grados\r\n",dia,mes,anio,horas,minutos,segundos,tmpInt1,tmpInt2);
-			snprintf(mensaje,100,"%d/%d/%d %d:%d:%d:%d %d,%d,%d,%d",dia,mes,anio+2000,horas,minutos,segundos,milisegundos,DataXYZ[0],DataXYZ[1],DataXYZ[2],max_iter);
+			snprintf(mensaje,100,"%d/%d/%d %d:%d:%d:%d %d,%d,%d",dia,mes,anio+2000,horas,minutos,segundos,milisegundos,DataXYZ[0],DataXYZ[1],DataXYZ[2]);
 //			snprintf(mensaje,100,"%d,%d,%d,%d,%d,%d,%d,%d,%d\r\n",dia,mes,anio+2000,horas,minutos,segundos,DataXYZ[0],DataXYZ[1],DataXYZ[2]);
 
 			printf("iter: %d\r\n",iter);
@@ -1410,6 +1412,9 @@ void readAccel_func(void *argument)
 			}*/
 
 		}
+
+		if (iter==MUESTRAS_NORMAL) osMessageQueuePut(publish_queueHandle, &msg_pub_normal, 0, pdMS_TO_TICKS(500));
+		else osMessageQueuePut(publish_queueHandle, &msg_pub_continuous, 0, pdMS_TO_TICKS(500));
 
 		printf("Se han leido todas las aceleraciones, esperamos media hora o hasta que alguien pulse el boton\r\n");
 
@@ -1546,6 +1551,9 @@ void clientMQTT_func(void *argument)
 	osThreadFlagsSet(readAccelHandle,0x0008U);
 	//osThreadFlagsSet(temp_subHandle, 0x0001U);
 
+	const char* msg_modo_continuo = "Modo continuo\r\n";
+	const char* msg_modo_normal = "Modo normal\r\n";
+
 
   /* Infinite loop */
 	for(;;)
@@ -1562,6 +1570,10 @@ void clientMQTT_func(void *argument)
 		 {
 			 printf("Procesamos subscripcion\r\n");
 			 MQTT_ProcessLoop(&xMQTTContext);
+			 if (modo_continuo) osMessageQueuePut(print_queueHandle, &msg_modo_continuo, 0, pdMS_TO_TICKS(500));
+			 else osMessageQueuePut(print_queueHandle, &msg_modo_normal, 0, pdMS_TO_TICKS(500));
+
+
 		 }
 		 else
 		 {
