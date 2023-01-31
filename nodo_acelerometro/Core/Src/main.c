@@ -152,7 +152,7 @@ RTC_TimeTypeDef GetTime; //Estructura para fijar/leer hora
 
 ACCELERO_StatusTypeDef status_acc;
 
-volatile extern bool modo_continuo;
+volatile bool modo_continuo;
 
 extern  SPI_HandleTypeDef hspi;
 static  uint8_t  IP_Addr[4];
@@ -947,9 +947,11 @@ ACCELERO_StatusTypeDef BSP_ACCELERO_Init_INT(void)
 		tmp = SENSOR_IO_Read(LSM6DSL_ACC_GYRO_I2C_ADDRESS_LOW, LSM6DSL_ACC_GYRO_DRDY_PULSE_CFG_G);
 		tmp |=0b10000000;
 		SENSOR_IO_Write(LSM6DSL_ACC_GYRO_I2C_ADDRESS_LOW, LSM6DSL_ACC_GYRO_DRDY_PULSE_CFG_G, tmp);
+
 		tmp = SENSOR_IO_Read(LSM6DSL_ACC_GYRO_I2C_ADDRESS_LOW, LSM6DSL_ACC_GYRO_INT1_CTRL);
 		tmp |=0b00000001;
 		SENSOR_IO_Write(LSM6DSL_ACC_GYRO_I2C_ADDRESS_LOW, LSM6DSL_ACC_GYRO_INT1_CTRL, tmp);
+
 		tmp = SENSOR_IO_Read(LSM6DSL_ACC_GYRO_I2C_ADDRESS_LOW, LSM6DSL_ACC_GYRO_MASTER_CONFIG);
 		tmp |=0b10000000;
 		SENSOR_IO_Write(LSM6DSL_ACC_GYRO_I2C_ADDRESS_LOW, LSM6DSL_ACC_GYRO_MASTER_CONFIG, tmp);
@@ -1075,6 +1077,94 @@ int wifi_connect(char* SSID, char* PASSWORD)
 void SPI3_IRQHandler(void)
 {
   HAL_SPI_IRQHandler(&hspi);
+}
+
+void prvMQTTProcessIncomingPublish( MQTTPublishInfo_t *pxPublishInfo )
+{
+	char buffer1[128];
+	char buffer2[128];
+    const char * pTopicName;
+    uint8_t i;
+    uint8_t limit[6][2] = {{0,23},{0,59},{0,59},{1,31},{1,12},{0,99}};
+    uint16_t numero_usuario;
+    uint8_t to_change[6];
+    bool dato_erroneo;
+	const char* msg_error = "\r\nERROR: Valor de configuracion no válido\r\n";
+	const char* msg_hora_ok = "\r\nHora cambiada correctamente\r\n";
+	const char* msg_fecha_ok = "Fecha cambiada correctamente\r\n";
+
+
+	// pPayload no termina en \0, hay que copiarlo en un buffer para imprimirlo. Lo mismo con pTopicName
+	memcpy(buffer1,pxPublishInfo->pPayload,min(127,pxPublishInfo->payloadLength));
+	buffer1[min(1023,pxPublishInfo->payloadLength)]='\0';
+	memcpy(buffer2,pxPublishInfo->pTopicName,min(127,pxPublishInfo->topicNameLength));
+	buffer2[min(1023,pxPublishInfo->topicNameLength)]='\0';
+
+	printf("Topic \"%s\": publicado \"%s\"\n",buffer2,buffer1);
+
+  // Actuar localmente sobre los LEDs o alguna otra cosa
+
+	for(i=0;i<strlen(pcTempTopic2);i++){
+		if(buffer2[i] != pcTempTopic2[i]){
+			break;
+		}
+	}
+	if (i == strlen(pcTempTopic2)){
+		if(buffer1[0]=='1') modo_continuo = true;
+		if(buffer1[0]=='0') modo_continuo = false;
+	}
+	for(i=0;i<strlen(pcConfTopic);i++){
+		if(buffer2[i] != pcConfTopic[i]){
+			break;
+		}
+	}
+	if (i == strlen(pcConfTopic)){
+		dato_erroneo = false;
+		for (i=0;i<6 && !dato_erroneo;){
+			numero_usuario = 10*(buffer1[3*i]-48) + buffer1[3*i+1]-48;
+			printf("Dato: %d\r\n",numero_usuario);
+			printf("Rango: %d-%d\r\n",limit[i][0],limit[i][1]);
+			if (numero_usuario<limit[i][0] || numero_usuario>limit[i][1]){
+				dato_erroneo = true;
+				osMessageQueuePut(print_queueHandle, &msg_error, 0, pdMS_TO_TICKS(500));
+
+			}else{
+				to_change[i]=numero_usuario;
+				i++;
+			}
+
+		}
+		if(i == 6){
+			RTC_TimeTypeDef sTime = {0};
+			RTC_DateTypeDef sDate = {0};
+
+			sTime.Hours = to_change[0];
+			sTime.Minutes = to_change[1];
+			sTime.Seconds = to_change[2];
+
+			if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
+			  {
+				Error_Handler();
+			  }
+
+			osMessageQueuePut(print_queueHandle, &msg_hora_ok, 0, pdMS_TO_TICKS(500));
+
+			sDate.Date = to_change[3];
+			sDate.Month = to_change[4];
+			sDate.Year = to_change[5];
+			printf("Anio: %d\r\n",to_change[5]);
+			if (HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BIN) != HAL_OK)
+			{
+				Error_Handler();
+			}
+
+			osMessageQueuePut(print_queueHandle, &msg_fecha_ok, 0, pdMS_TO_TICKS(500));
+		}
+	}
+
+
+	//if (buffer1 == "prueba")
+
 }
 
 /* USER CODE END 4 */
@@ -1546,6 +1636,7 @@ void clientMQTT_func(void *argument)
 	//LOG(("Trying to create an MQTT connection\n"));
 	prvCreateMQTTConnectionWithBroker( &xMQTTContext, &xNetworkContext );
 	prvMQTTSubscribeToTopic(&xMQTTContext,pcTempTopic2);
+	prvMQTTSubscribeToTopic(&xMQTTContext,pcConfTopic);
 	printf("Contexto mqtt inicializado\r\n");
 
 	osThreadFlagsSet(readAccelHandle,0x0008U);
