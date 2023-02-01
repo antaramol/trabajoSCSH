@@ -13,4 +13,4 @@ i = 0;
 client.publish("SCF/trabajoFinal/conf/RTC", "20:20:20,20/10/20")
 
 # Esta linea para cambiar el acelerometro
-client.publish("SCF/trabajoFinal/conf/Accel", "104,2")
+client.publish("SCF/trabajoFinal/conf/Accel", "104,4")
