@@ -12,7 +12,7 @@ def on_connect(client, userdata, flags, rc):
 
 def on_message(client, userdata, msg):
     # append a line to the file with the msg.payload
-    with open('data.txt', 'a') as f:
+    with open('accel_received.txt', 'a') as f:
         f.write(msg.payload.decode("utf-8") + '\n')
     print(msg.topic+" "+str(msg.payload))
 
