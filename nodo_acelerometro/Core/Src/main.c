@@ -85,10 +85,10 @@ UART_HandleTypeDef huart3;
 
 PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
-/* Definitions for config_task */
-osThreadId_t config_taskHandle;
-const osThreadAttr_t config_task_attributes = {
-  .name = "config_task",
+/* Definitions for conf_inicial */
+osThreadId_t conf_inicialHandle;
+const osThreadAttr_t conf_inicial_attributes = {
+  .name = "conf_inicial",
   .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
@@ -168,7 +168,7 @@ static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 static void MX_TIM7_Init(void);
 static void MX_RTC_Init(void);
-void config_task_func(void *argument);
+void conf_inicial_func(void *argument);
 void readAccel_func(void *argument);
 void printTask_func(void *argument);
 void tarea_UART_func(void *argument);
@@ -270,8 +270,8 @@ int main(void)
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* creation of config_task */
-  config_taskHandle = osThreadNew(config_task_func, NULL, &config_task_attributes);
+  /* creation of conf_inicial */
+  conf_inicialHandle = osThreadNew(conf_inicial_func, NULL, &conf_inicial_attributes);
 
   /* creation of readAccel */
   readAccelHandle = osThreadNew(readAccel_func, NULL, &readAccel_attributes);
@@ -1207,14 +1207,14 @@ void prvMQTTProcessIncomingPublish( MQTTPublishInfo_t *pxPublishInfo )
 
 /* USER CODE END 4 */
 
-/* USER CODE BEGIN Header_config_task_func */
+/* USER CODE BEGIN Header_conf_inicial_func */
 /**
-  * @brief  Function implementing the config_task thread.
+  * @brief  Function implementing the conf_inicial thread.
   * @param  argument: Not used
   * @retval None
   */
-/* USER CODE END Header_config_task_func */
-void config_task_func(void *argument)
+/* USER CODE END Header_conf_inicial_func */
+void conf_inicial_func(void *argument)
 {
   /* USER CODE BEGIN 5 */
 	uint8_t recibido[20];
