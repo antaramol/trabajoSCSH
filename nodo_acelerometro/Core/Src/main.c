@@ -59,10 +59,6 @@
 #define MAX_LEN_SSID 10
 #define MAX_LEN_PSSWRD 20
 
-//#define SSID     "DIGIFIBRA-HAeH"
-//#define PASSWORD "uxHXKubx5D"
-//#define SSID "Antonio"
-//#define PASSWORD  "Antonio_psswrd"
 #define WIFISECURITY WIFI_ECN_WPA2_PSK
 //#define WIFISECURITY WIFI_ECN_OPEN
 #define SOCKET 0
@@ -128,7 +124,7 @@ const osThreadAttr_t temporizador_attributes = {
 osThreadId_t clientMQTTHandle;
 const osThreadAttr_t clientMQTT_attributes = {
   .name = "clientMQTT",
-  .stack_size = 512 * 4,
+  .stack_size = 500 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for print_queue */
@@ -267,7 +263,7 @@ int main(void)
   receive_queueHandle = osMessageQueueNew (3, sizeof(uint8_t), &receive_queue_attributes);
 
   /* creation of publish_queue */
-  publish_queueHandle = osMessageQueueNew (50, sizeof(uintptr_t), &publish_queue_attributes);
+  publish_queueHandle = osMessageQueueNew (1024, sizeof(uintptr_t), &publish_queue_attributes);
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
@@ -969,12 +965,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 		HAL_UART_Receive_IT(&huart1,&rec_data,1);
 		printf("Recibido: %d\r\n",rec_data);
 		osThreadFlagsSet(tarea_UARTHandle,0x0002U);
-		/*estado = osMessageQueuePut(receive_queueHandle, &rec_data,0,pdMS_TO_TICKS(200));
-		if (estado == osOK)
-			printf("Estado: ok\r\n");
-		else
-			printf("Algo no va bien\r\n");
-			*/
 	}
 }
 
@@ -1012,7 +1002,6 @@ static int wifi_start(void)
  /*Initialize and use WIFI module */
   if(WIFI_Init() ==  WIFI_STATUS_OK)
   {
-	printf("xddddddd\r\n");
     printf(("ES-WIFI Initialized.\r\n"));
     if(WIFI_GetMAC_Address(MAC_Addr) == WIFI_STATUS_OK)
     {
@@ -1214,8 +1203,6 @@ void prvMQTTProcessIncomingPublish( MQTTPublishInfo_t *pxPublishInfo )
 
 	}
 
-	//if (buffer1 == "prueba")
-
 }
 
 /* USER CODE END 4 */
@@ -1247,7 +1234,6 @@ void config_task_func(void *argument)
 	"Hora (0-23): ", "\r\nMinuto (0-59): ","\r\nSegundo (0-59): ","\r\nDía (1-31): ","\r\nMes (1-12): ",
 	"\r\nAño (0-99): "};
 	uint8_t limit[6][2] = {{0,23},{0,59},{0,59},{1,31},{1,12},{0,99}};
-	//uint8_t *toChange[6] = {&GetTime.Hours, &GetTime.Minutes, &GetTime.Seconds, &GetDate.Date,&GetDate.Month, &GetDate.Year};
 
 
 	printf("Empieza el bucle\r\n");
@@ -1331,15 +1317,10 @@ void config_task_func(void *argument)
 	const char* msg_wifi_conf_init = "\r\nInicio de configuración del WiFi\r\n";
 	const char* msg_wifi_connect_init = "\r\nConectando al WiFi\r\n";
 	const char* msg_wifi_connect_error = "No se ha podido conectar, vuelva a introducir los datos\r\n";
-	const char* msg_wifi_connect_success = "CONECTADO\r\n\r\n";
+	const char* msg_wifi_connect_success = "\r\nCONECTADO\r\n";
 	const char* msg_too_many_characters = "\r\nHas introducido demasiados caracteres, prueba de nuevo\r\n";
 	const char* msg_introduce_ssid = "Introduce el ssid: ";
 	const char* msg_introduce_psswrd = "\r\nIntroduce la contraseña: ";
-
-//	bool conectado = false;
-
-//	char ssid[MAX_LEN_SSID];
-//	char psswrd[MAX_LEN_PSSWRD];
 
 
 	osMessageQueuePut(print_queueHandle, &msg_wifi_conf_init, 0, pdMS_TO_TICKS(500));
@@ -1375,11 +1356,6 @@ void config_task_func(void *argument)
 				ssid[m] = recibido[m];
 			}
 
-			//datos_wifi[i] = recibido[0];
-//			printf("ssid: %s\r\n",ssid);
-//			printf("longitud del ssid: %d\r\n",strlen(ssid));
-
-
 			//configuracion contraseña
 			osMessageQueuePut(print_queueHandle, &msg_introduce_psswrd, 0, pdMS_TO_TICKS(500));
 
@@ -1409,10 +1385,6 @@ void config_task_func(void *argument)
 					psswrd[m] = recibido[m];
 				}
 
-				//datos_wifi[i] = recibido[0];
-//				printf("psswrd: %s\r\n",psswrd);
-//				printf("longitud del psswrd: %d\r\n",strlen(psswrd));
-
 				osMessageQueuePut(print_queueHandle, &msg_wifi_connect_init, 0, pdMS_TO_TICKS(500));
 
 				if (wifi_connect(ssid,psswrd) != 0){
@@ -1432,9 +1404,6 @@ void config_task_func(void *argument)
 
 
 	osThreadFlagsSet(clientMQTTHandle,0x0001U);
-	//osThreadFlagsSet(wifiStartTaskHandle,0x0001U);
-
-	//osThreadFlagsSet(readAccelHandle,0x0002U);
 
 
   /* Infinite loop */
@@ -1457,14 +1426,13 @@ void readAccel_func(void *argument)
 {
   /* USER CODE BEGIN readAccel_func */
 	osStatus_t estado;
-  //char mensaje[]  = "Hola mundo\r\n";
+
 	char mensaje[100];
 	char *p_mensaje = mensaje;
 
 	char mensaje_params[100];
 	char* p_mensaje_params = mensaje_params;
 
-	//uint32_t nticks = 0;
 	int16_t DataXYZ[3];
 	int16_t *pDataXYZ = DataXYZ;
 
@@ -1486,12 +1454,6 @@ void readAccel_func(void *argument)
 
 	printf("ReadAccel task se inicia\r\n");
 
-	/*
-	if (return_wait == osFlagsErrorTimeout)
-	  printf("Tiempo agotadoM\r\n");
-	else if(return_wait == 0x0001U)
-	  printf("Recibido notificacion\r\n");
-	  */
 	const char* msg_read_normal = "\r\nLectura en modo normal\r\n";
 	const char* msg_read_continuous = "\r\nLectura en modo continuo\r\n";
 
@@ -1510,11 +1472,9 @@ void readAccel_func(void *argument)
 		if (modo_continuo){
 			max_iter = MUESTRAS_CONTINUO;
 			osMessageQueuePut(print_queueHandle, &msg_read_continuous, 0, pdMS_TO_TICKS(500));
-			//osThreadFlagsSet(sendMQTTHandle,MODO_CONTINUO);
 		}else{
 			max_iter = MUESTRAS_NORMAL;
 			osMessageQueuePut(print_queueHandle, &msg_read_normal, 0, pdMS_TO_TICKS(500));
-			//osThreadFlagsSet(sendMQTTHandle,MODO_NORMAL);
 		}
 
 		snprintf(mensaje_params, 100, "Publicadas: %d muestras, frec_muestreo: %dHz",max_iter,frec_muestreo_actual);
@@ -1522,9 +1482,7 @@ void readAccel_func(void *argument)
 		for (iter=0 ; iter<max_iter ; iter++){
 			osThreadFlagsWait(0x0001U, osFlagsWaitAny, osWaitForever);
 			BSP_ACCELERO_AccGetXYZ(pDataXYZ);
-			//printf("Tick: %ld	Eje x: %d	Eje y: %d	Eje z: %d\r\n",nticks,DataXYZ[0],DataXYZ[1],DataXYZ[2]);
 
-			//printf("Lectura accel realizada\r\n");
 			HAL_RTC_GetTime(&hrtc, &GetTime, RTC_FORMAT_BIN);
 			horas = GetTime.Hours;
 			minutos = GetTime.Minutes;
@@ -1537,34 +1495,19 @@ void readAccel_func(void *argument)
 			mes = GetDate.Month;
 
 
-			//printf("Anio: %d\r\n",anio);
-			//printf("Lectura fecha realizada\r\n");
-			//printf("fecha: %d/%d/%d hora: %d:%d:%d temp: %d.%02d grados\r\n",dia,mes,anio,horas,minutos,segundos,tmpInt1,tmpInt2);
 			snprintf(mensaje,100,"%d/%d/%d %d:%d:%d:%d %d,%d,%d",dia,mes,anio+2000,horas,minutos,segundos,milisegundos,DataXYZ[0],DataXYZ[1],DataXYZ[2]);
-//			snprintf(mensaje,100,"%d,%d,%d,%d,%d,%d,%d,%d,%d\r\n",dia,mes,anio+2000,horas,minutos,segundos,DataXYZ[0],DataXYZ[1],DataXYZ[2]);
 
 			printf("iter: %d\r\n",iter);
 
 
-			//printf("MENSAJE: %s\r\n",mensaje);
-			estado = osMessageQueuePut(publish_queueHandle, &p_mensaje, 0, pdMS_TO_TICKS(500));
-			/*if(estado == osOK){
-				printf("Enviada a la cola\r\n");
-			}
-			else if(estado == osErrorTimeout){
-				printf("Timeout agotado 1\r\n");
-			}*/
+			osMessageQueuePut(publish_queueHandle, &p_mensaje, 0, pdMS_TO_TICKS(500));
 
 		}
 
 
-//		if (iter==MUESTRAS_NORMAL) osMessageQueuePut(publish_queueHandle, &msg_pub_normal, 0, pdMS_TO_TICKS(500));
-//		else osMessageQueuePut(publish_queueHandle, &msg_pub_continuous, 0, pdMS_TO_TICKS(500));
-
 		osMessageQueuePut(publish_queueHandle, &p_mensaje_params, 0, pdMS_TO_TICKS(500));
 		printf("Se han leido todas las aceleraciones, esperamos media hora o hasta que alguien pulse el boton\r\n");
 
-		//osDelay(pdMS_TO_TICKS(1000));
 
 	}
   /* USER CODE END readAccel_func */
@@ -1586,9 +1529,7 @@ void printTask_func(void *argument)
   for(;;)
   {
 	  estado = osMessageQueueGet(print_queueHandle, &mensaje, NULL, osWaitForever);
-	  //printf("Se ha recibido algo en print task\r\n");
-	  //printf("Mensaje print task: %s\r\n",mensaje);
-	  //printf("Longitud: %d",strlen((char*)mensaje));
+
 	  if (estado == osOK)
 	  {
 		  //printf("%s",(char*)mensaje);
@@ -1602,8 +1543,6 @@ void printTask_func(void *argument)
 	  {
 		  printf("Error en la tarea print\r\n");
 	  }
-
-	  //osDelay(pdMS_TO_TICKS(3000));
 
   }
   /* USER CODE END printTask_func */
@@ -1675,6 +1614,7 @@ void clientMQTT_func(void *argument)
 
 	char payLoad[16];
 
+	const char* msg_mqtt_initialized = "\r\nMQTT INICIALIZADO\r\n\r\n";
 
 	osThreadFlagsWait(0x0001U, osFlagsWaitAny, osWaitForever);
 
@@ -1695,6 +1635,7 @@ void clientMQTT_func(void *argument)
 	prvMQTTSubscribeToTopic(&xMQTTContext,rtcConfTopic);
 	prvMQTTSubscribeToTopic(&xMQTTContext,accelConfTopic);
 
+	osMessageQueuePut(print_queueHandle, &msg_mqtt_initialized, 0, pdMS_TO_TICKS(500));
 	printf("Contexto mqtt inicializado\r\n");
 
 	osThreadFlagsSet(readAccelHandle,0x0008U);
