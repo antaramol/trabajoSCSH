@@ -1117,8 +1117,14 @@ void prvMQTTProcessIncomingPublish( MQTTPublishInfo_t *pxPublishInfo )
 		}
 	}
 	if (i == strlen(pcTempTopic2)){
-		if(buffer1[0]=='1') modo_continuo = true;
-		if(buffer1[0]=='0') modo_continuo = false;
+		if(buffer1[0]=='1'){
+			modo_continuo = true;
+			HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_SET);
+		}else if(buffer1[0]=='0'){
+			modo_continuo = false;
+			HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
+		}
+
 	}
 
 	for(i=0;i<strlen(rtcConfTopic);i++){
