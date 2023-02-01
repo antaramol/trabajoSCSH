@@ -14,9 +14,10 @@ extern "C" {
 #define MQTT_BROKER_PORT (1883)
 #define MQTTCLIENT_IDENTIFIER "adsfclvlahfdsbbhlkadfniqwef23"
 #define TOPIC_COUNT (1)
-#define pcTempTopic "SCF/sensores/Humd"
-#define pcTempTopic1 "SCF/sensores/Temp"
-#define pcTempSupTopic "SCF/trabajoFinal/TempSup"
+#define humdTopic "SCF/sensores/Humd"
+#define tempTopic "SCF/sensores/Temp"
+#define tempSupTopic "SCF/trabajoFinal/TempSup"
+#define rtcConfTopic "SCF/trabajoFinal/conf/RTC"
 //#define pcTempTopic2 "SistCiberFis_jacinto/SCF/LED"
 
 // Define strings for these parameters or set them to NULL. Do not use empty string ("")
