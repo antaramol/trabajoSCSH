@@ -7,7 +7,6 @@
 
 #include <stdbool.h>
 
-volatile bool modo_continuo = false;
 static uint8_t ucSharedBuffer[ NETWORK_BUFFER_SIZE ];
 /** @brief Static buffer used to hold MQTT messages being sent and received. */
 static MQTTFixedBuffer_t xBuffer =
@@ -24,7 +23,7 @@ typedef struct topicFilterContext
 
 static topicFilterContext_t xTopicFilterContext[ TOPIC_COUNT ] =
 {
-    { pcTempTopic, MQTTSubAckFailure }
+    { accelTopic, MQTTSubAckFailure }
 };
 static uint16_t usSubscribePacketIdentifier;
 /**
@@ -214,25 +213,45 @@ void prvMQTTSubscribeToTopic( MQTTContext_t * pxMQTTContext, char * topic )
     } while( xFailedSubscribeToTopic == true  );
 }
 
-void prvMQTTProcessIncomingPublish( MQTTPublishInfo_t *pxPublishInfo )
-{
-	char buffer1[128];
-	char buffer2[128];
-    const char * pTopicName;
-
-	// pPayload no termina en \0, hay que copiarlo en un buffer para imprimirlo. Lo mismo con pTopicName
-	memcpy(buffer1,pxPublishInfo->pPayload,min(127,pxPublishInfo->payloadLength));
-	buffer1[min(1023,pxPublishInfo->payloadLength)]='\0';
-	memcpy(buffer2,pxPublishInfo->pTopicName,min(127,pxPublishInfo->topicNameLength));
-	buffer2[min(1023,pxPublishInfo->topicNameLength)]='\0';
-
-	printf("Topic \"%s\": publicado \"%s\"\n",buffer2,buffer1);
-
-  // Actuar localmente sobre los LEDs o alguna otra cosa
-	if(buffer1[0]=='1') modo_continuo = true;
-	if(buffer1[0]=='0') modo_continuo = false;
-
-}
+//void prvMQTTProcessIncomingPublish( MQTTPublishInfo_t *pxPublishInfo )
+//{
+//	char buffer1[128];
+//	char buffer2[128];
+//    const char * pTopicName;
+//    uint8_t i;
+//
+//	// pPayload no termina en \0, hay que copiarlo en un buffer para imprimirlo. Lo mismo con pTopicName
+//	memcpy(buffer1,pxPublishInfo->pPayload,min(127,pxPublishInfo->payloadLength));
+//	buffer1[min(1023,pxPublishInfo->payloadLength)]='\0';
+//	memcpy(buffer2,pxPublishInfo->pTopicName,min(127,pxPublishInfo->topicNameLength));
+//	buffer2[min(1023,pxPublishInfo->topicNameLength)]='\0';
+//
+//	printf("Topic \"%s\": publicado \"%s\"\n",buffer2,buffer1);
+//
+//  // Actuar localmente sobre los LEDs o alguna otra cosa
+//
+//	for(i=0;i<strlen(pcTempTopic2);i++){
+//		if(buffer2[i] != pcTempTopic2[i]){
+//			break;
+//		}
+//	}
+//	if (i == strlen(pcTempTopic2)){
+//		if(buffer1[0]=='1') modo_continuo = true;
+//		if(buffer1[0]=='0') modo_continuo = false;
+//	}
+//	for(i=0;i<strlen(pcConfTopic);i++){
+//		if(buffer2[i] != pcConfTopic[i]){
+//			break;
+//		}
+//	}
+//	if (i == strlen(pcConfTopic)){
+//		printf("Alguien ha publicado en ConfTopic\r\n");
+//	}
+//
+//
+//	//if (buffer1 == "prueba")
+//
+//}
 
 uint32_t prvGetTimeMs( void )
 {

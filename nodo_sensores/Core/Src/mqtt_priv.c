@@ -21,7 +21,7 @@ typedef struct topicFilterContext
 
 static topicFilterContext_t xTopicFilterContext[ TOPIC_COUNT ] =
 {
-    { pcTempTopic, MQTTSubAckFailure }
+    { tempTopic, MQTTSubAckFailure }
 };
 static uint16_t usSubscribePacketIdentifier;
 /**
@@ -211,25 +211,25 @@ void prvMQTTSubscribeToTopic( MQTTContext_t * pxMQTTContext, char * topic )
     } while( xFailedSubscribeToTopic == true  );
 }
 
-void prvMQTTProcessIncomingPublish( MQTTPublishInfo_t *pxPublishInfo )
-{
-	char buffer1[128];
-	char buffer2[128];
-    const char * pTopicName;
-
-	// pPayload no termina en \0, hay que copiarlo en un buffer para imprimirlo. Lo mismo con pTopicName
-	memcpy(buffer1,pxPublishInfo->pPayload,min(127,pxPublishInfo->payloadLength));
-	buffer1[min(1023,pxPublishInfo->payloadLength)]='\0';
-	memcpy(buffer2,pxPublishInfo->pTopicName,min(127,pxPublishInfo->topicNameLength));
-	buffer2[min(1023,pxPublishInfo->topicNameLength)]='\0';
-
-	printf("Topic \"%s\": publicado \"%s\"\n",buffer2,buffer1);
-
-  // Actuar localmente sobre los LEDs o alguna otra cosa
-	if(buffer1[0]=='1') BSP_LED_On(LED2);
-	if(buffer1[0]=='0') BSP_LED_Off(LED2);
-
-}
+//void prvMQTTProcessIncomingPublish( MQTTPublishInfo_t *pxPublishInfo )
+//{
+//	char buffer1[128];
+//	char buffer2[128];
+//    const char * pTopicName;
+//
+//	// pPayload no termina en \0, hay que copiarlo en un buffer para imprimirlo. Lo mismo con pTopicName
+//	memcpy(buffer1,pxPublishInfo->pPayload,min(127,pxPublishInfo->payloadLength));
+//	buffer1[min(1023,pxPublishInfo->payloadLength)]='\0';
+//	memcpy(buffer2,pxPublishInfo->pTopicName,min(127,pxPublishInfo->topicNameLength));
+//	buffer2[min(1023,pxPublishInfo->topicNameLength)]='\0';
+//
+//	printf("Topic \"%s\": publicado \"%s\"\n",buffer2,buffer1);
+//
+//  // Actuar localmente sobre los LEDs o alguna otra cosa
+//	if(buffer1[0]=='1') BSP_LED_On(LED2);
+//	if(buffer1[0]=='0') BSP_LED_Off(LED2);
+//
+//}
 
 uint32_t prvGetTimeMs( void )
 {

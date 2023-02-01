@@ -8,13 +8,9 @@ client.connect("test.mosquitto.org", 1883, 60)
 
 i = 0;
 
-while True:
-    client.publish("SCF/trabajoFinal/TempSup", str(i))
-    # i = random number 1 or 0
-    i = random.randint(0, 1)
 
+# Esta linea para cambiar la hora
+client.publish("SCF/trabajoFinal/conf/RTC", "20:20:20,20/10/20")
 
-
-    #i = 1
-    print("Mensaje publicado: ", str(i))
-    time.sleep(15)
+# Esta linea para cambiar el acelerometro
+client.publish("SCF/trabajoFinal/conf/Accel", "104,4")
