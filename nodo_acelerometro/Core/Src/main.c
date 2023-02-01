@@ -124,7 +124,7 @@ const osThreadAttr_t temporizador_attributes = {
 osThreadId_t clientMQTTHandle;
 const osThreadAttr_t clientMQTT_attributes = {
   .name = "clientMQTT",
-  .stack_size = 500 * 4,
+  .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for print_queue */
@@ -260,7 +260,7 @@ int main(void)
   print_queueHandle = osMessageQueueNew (2, sizeof(uintptr_t), &print_queue_attributes);
 
   /* creation of receive_queue */
-  receive_queueHandle = osMessageQueueNew (3, sizeof(uint8_t), &receive_queue_attributes);
+  receive_queueHandle = osMessageQueueNew (1, sizeof(uint8_t), &receive_queue_attributes);
 
   /* creation of publish_queue */
   publish_queueHandle = osMessageQueueNew (1024, sizeof(uintptr_t), &publish_queue_attributes);
@@ -1648,7 +1648,7 @@ void clientMQTT_func(void *argument)
   /* Infinite loop */
 	for(;;)
 	{
-		estado = osMessageQueueGet(publish_queueHandle, &mensaje, NULL, pdMS_TO_TICKS(5000)); //Minimo la mitad de tiempo de lo que tarda en actualizar el valor el otro nodo
+		estado = osMessageQueueGet(publish_queueHandle, &mensaje, NULL, pdMS_TO_TICKS(3000)); //Minimo la mitad de tiempo de lo que tarda en actualizar el valor el otro nodo
 
 		 if (estado == osOK)
 		 {

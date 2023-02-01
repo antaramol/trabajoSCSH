@@ -37,13 +37,13 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  16 .debug_macro  000098f8  00000000  00000000  000765f0  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   00034c48  00000000  00000000  0007fee8  2**0
+ 17 .debug_line   00034c4c  00000000  00000000  0007fee8  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    00117ee0  00000000  00000000  000b4b30  2**0
+ 18 .debug_str    00117ee3  00000000  00000000  000b4b34  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000050  00000000  00000000  001cca10  2**0
+ 19 .comment      00000050  00000000  00000000  001cca17  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  0000dffc  00000000  00000000  001cca60  2**2
+ 20 .debug_frame  0000dffc  00000000  00000000  001cca68  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -1383,10 +1383,10 @@ int main(void)
  8000f94:	6013      	str	r3, [r2, #0]
 
   /* creation of receive_queue */
-  receive_queueHandle = osMessageQueueNew (3, sizeof(uint8_t), &receive_queue_attributes);
+  receive_queueHandle = osMessageQueueNew (1, sizeof(uint8_t), &receive_queue_attributes);
  8000f96:	4a28      	ldr	r2, [pc, #160]	; (8001038 <main+0x108>)
  8000f98:	2101      	movs	r1, #1
- 8000f9a:	2003      	movs	r0, #3
+ 8000f9a:	2001      	movs	r0, #1
  8000f9c:	f00f fa30 	bl	8010400 <osMessageQueueNew>
  8000fa0:	4603      	mov	r3, r0
  8000fa2:	4a26      	ldr	r2, [pc, #152]	; (800103c <main+0x10c>)
@@ -1405,8 +1405,8 @@ int main(void)
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* creation of config_task */
-  config_taskHandle = osThreadNew(config_task_func, NULL, &config_task_attributes);
+  /* creation of conf_inicial */
+  conf_inicialHandle = osThreadNew(conf_inicial_func, NULL, &conf_inicial_attributes);
  8000fb8:	4a23      	ldr	r2, [pc, #140]	; (8001048 <main+0x118>)
  8000fba:	2100      	movs	r1, #0
  8000fbc:	4823      	ldr	r0, [pc, #140]	; (800104c <main+0x11c>)
@@ -1486,29 +1486,29 @@ int main(void)
   while (1)
  8001026:	e7fe      	b.n	8001026 <main+0xf6>
  8001028:	2000092c 	.word	0x2000092c
- 800102c:	080167d0 	.word	0x080167d0
- 8001030:	080181d0 	.word	0x080181d0
+ 800102c:	080167d4 	.word	0x080167d4
+ 8001030:	080181d4 	.word	0x080181d4
  8001034:	20000908 	.word	0x20000908
- 8001038:	080181e8 	.word	0x080181e8
+ 8001038:	080181ec 	.word	0x080181ec
  800103c:	2000090c 	.word	0x2000090c
- 8001040:	08018200 	.word	0x08018200
+ 8001040:	08018204 	.word	0x08018204
  8001044:	20000910 	.word	0x20000910
- 8001048:	080180f8 	.word	0x080180f8
+ 8001048:	080180fc 	.word	0x080180fc
  800104c:	08002181 	.word	0x08002181
  8001050:	200008f0 	.word	0x200008f0
- 8001054:	0801811c 	.word	0x0801811c
+ 8001054:	08018120 	.word	0x08018120
  8001058:	08002855 	.word	0x08002855
  800105c:	200008f4 	.word	0x200008f4
- 8001060:	08018140 	.word	0x08018140
+ 8001060:	08018144 	.word	0x08018144
  8001064:	08002acd 	.word	0x08002acd
  8001068:	200008f8 	.word	0x200008f8
- 800106c:	08018164 	.word	0x08018164
+ 800106c:	08018168 	.word	0x08018168
  8001070:	08002b35 	.word	0x08002b35
  8001074:	200008fc 	.word	0x200008fc
- 8001078:	08018188 	.word	0x08018188
+ 8001078:	0801818c 	.word	0x0801818c
  800107c:	08002b85 	.word	0x08002b85
  8001080:	20000900 	.word	0x20000900
- 8001084:	080181ac 	.word	0x080181ac
+ 8001084:	080181b0 	.word	0x080181b0
  8001088:	08002bc1 	.word	0x08002bc1
  800108c:	20000904 	.word	0x20000904
  8001090:	20000938 	.word	0x20000938
@@ -3136,7 +3136,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
  800199e:	bf00      	nop
  80019a0:	200003e0 	.word	0x200003e0
  80019a4:	20000938 	.word	0x20000938
- 80019a8:	080167ec 	.word	0x080167ec
+ 80019a8:	080167f0 	.word	0x080167f0
  80019ac:	200008fc 	.word	0x200008fc
 
 080019b0 <HAL_GPIO_EXTI_Callback>:
@@ -3203,7 +3203,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
  8001a00:	46bd      	mov	sp, r7
  8001a02:	bd80      	pop	{r7, pc}
  8001a04:	200008f4 	.word	0x200008f4
- 8001a08:	080167fc 	.word	0x080167fc
+ 8001a08:	08016800 	.word	0x08016800
 
 08001a0c <wifi_start>:
 
@@ -3290,12 +3290,12 @@ static int wifi_start(void)
  8001a7e:	46bd      	mov	sp, r7
  8001a80:	bdb0      	pop	{r4, r5, r7, pc}
  8001a82:	bf00      	nop
- 8001a84:	08016814 	.word	0x08016814
- 8001a88:	08016820 	.word	0x08016820
- 8001a8c:	08016838 	.word	0x08016838
- 8001a90:	08016848 	.word	0x08016848
- 8001a94:	08016888 	.word	0x08016888
- 8001a98:	080168ac 	.word	0x080168ac
+ 8001a84:	08016818 	.word	0x08016818
+ 8001a88:	08016824 	.word	0x08016824
+ 8001a8c:	0801683c 	.word	0x0801683c
+ 8001a90:	0801684c 	.word	0x0801684c
+ 8001a94:	0801688c 	.word	0x0801688c
+ 8001a98:	080168b0 	.word	0x080168b0
 
 08001a9c <wifi_connect>:
 
@@ -3378,11 +3378,11 @@ int wifi_connect(char* SSID, char* PASSWORD)
  8001b0a:	3708      	adds	r7, #8
  8001b0c:	46bd      	mov	sp, r7
  8001b0e:	bd80      	pop	{r7, pc}
- 8001b10:	080168b8 	.word	0x080168b8
+ 8001b10:	080168bc 	.word	0x080168bc
  8001b14:	20000930 	.word	0x20000930
- 8001b18:	080168cc 	.word	0x080168cc
- 8001b1c:	08016908 	.word	0x08016908
- 8001b20:	08016938 	.word	0x08016938
+ 8001b18:	080168d0 	.word	0x080168d0
+ 8001b1c:	0801690c 	.word	0x0801690c
+ 8001b20:	0801693c 	.word	0x0801693c
 
 08001b24 <SPI3_IRQHandler>:
   * @brief  SPI3 line detection callback.
@@ -3736,22 +3736,22 @@ void prvMQTTProcessIncomingPublish( MQTTPublishInfo_t *pxPublishInfo )
  8001e18:	2200      	movs	r2, #0
  8001e1a:	f00e fb65 	bl	80104e8 <osMessageQueuePut>
  8001e1e:	e030      	b.n	8001e82 <prvMQTTProcessIncomingPublish+0x34a>
- 8001e20:	08016a34 	.word	0x08016a34
- 8001e24:	08016960 	.word	0x08016960
- 8001e28:	08016990 	.word	0x08016990
- 8001e2c:	080169b0 	.word	0x080169b0
- 8001e30:	08016a40 	.word	0x08016a40
- 8001e34:	08016a44 	.word	0x08016a44
- 8001e38:	08016a48 	.word	0x08016a48
- 8001e3c:	08016a4c 	.word	0x08016a4c
- 8001e40:	080169d0 	.word	0x080169d0
- 8001e44:	080169f0 	.word	0x080169f0
- 8001e48:	08016a50 	.word	0x08016a50
+ 8001e20:	08016a38 	.word	0x08016a38
+ 8001e24:	08016964 	.word	0x08016964
+ 8001e28:	08016994 	.word	0x08016994
+ 8001e2c:	080169b4 	.word	0x080169b4
+ 8001e30:	08016a44 	.word	0x08016a44
+ 8001e34:	08016a48 	.word	0x08016a48
+ 8001e38:	08016a4c 	.word	0x08016a4c
+ 8001e3c:	08016a50 	.word	0x08016a50
+ 8001e40:	080169d4 	.word	0x080169d4
+ 8001e44:	080169f4 	.word	0x080169f4
+ 8001e48:	08016a54 	.word	0x08016a54
  8001e4c:	2000092d 	.word	0x2000092d
  8001e50:	48000400 	.word	0x48000400
- 8001e54:	08016a6c 	.word	0x08016a6c
- 8001e58:	08016a0c 	.word	0x08016a0c
- 8001e5c:	08016a18 	.word	0x08016a18
+ 8001e54:	08016a70 	.word	0x08016a70
+ 8001e58:	08016a10 	.word	0x08016a10
+ 8001e5c:	08016a1c 	.word	0x08016a1c
  8001e60:	20000908 	.word	0x20000908
 
 			}else{
@@ -4096,17 +4096,17 @@ void prvMQTTProcessIncomingPublish( MQTTPublishInfo_t *pxPublishInfo )
  8002166:	bd90      	pop	{r4, r7, pc}
  8002168:	2000030c 	.word	0x2000030c
  800216c:	20000908 	.word	0x20000908
- 8002170:	08016a28 	.word	0x08016a28
- 8002174:	08016a88 	.word	0x08016a88
+ 8002170:	08016a2c 	.word	0x08016a2c
+ 8002174:	08016a8c 	.word	0x08016a8c
  8002178:	2000092c 	.word	0x2000092c
  800217c:	20000000 	.word	0x20000000
 
-08002180 <config_task_func>:
+08002180 <conf_inicial_func>:
   * @param  argument: Not used
   * @retval None
   */
-/* USER CODE END Header_config_task_func */
-void config_task_func(void *argument)
+/* USER CODE END Header_conf_inicial_func */
+void conf_inicial_func(void *argument)
 {
  8002180:	e92d 4fb0 	stmdb	sp!, {r4, r5, r7, r8, r9, sl, fp, lr}
  8002184:	b0b2      	sub	sp, #200	; 0xc8
@@ -4123,21 +4123,21 @@ void config_task_func(void *argument)
 	uint16_t num_usuario;
 	uint8_t to_change[6];
 	const char* msg_hora_ok = "\r\nHora cambiada correctamente\r\n";
- 8002190:	4b94      	ldr	r3, [pc, #592]	; (80023e4 <config_task_func+0x264>)
+ 8002190:	4b94      	ldr	r3, [pc, #592]	; (80023e4 <conf_inicial_func+0x264>)
  8002192:	f8c7 3080 	str.w	r3, [r7, #128]	; 0x80
 	const char* msg_fecha_ok = "Fecha cambiada correctamente\r\n";
- 8002196:	4b94      	ldr	r3, [pc, #592]	; (80023e8 <config_task_func+0x268>)
+ 8002196:	4b94      	ldr	r3, [pc, #592]	; (80023e8 <conf_inicial_func+0x268>)
  8002198:	67fb      	str	r3, [r7, #124]	; 0x7c
 	const char* msg_error = "\r\nERROR: Valor no válido\r\n";
- 800219a:	4b94      	ldr	r3, [pc, #592]	; (80023ec <config_task_func+0x26c>)
+ 800219a:	4b94      	ldr	r3, [pc, #592]	; (80023ec <conf_inicial_func+0x26c>)
  800219c:	67bb      	str	r3, [r7, #120]	; 0x78
 	const char* msg_rtc1 = "\r\n\r\n========================\r\n"
- 800219e:	4b94      	ldr	r3, [pc, #592]	; (80023f0 <config_task_func+0x270>)
+ 800219e:	4b94      	ldr	r3, [pc, #592]	; (80023f0 <conf_inicial_func+0x270>)
  80021a0:	677b      	str	r3, [r7, #116]	; 0x74
 	"| Configurar rtc |\r\n"
 	"========================\r\n\r\n";
 	const char* msg[6] = {
- 80021a2:	4b94      	ldr	r3, [pc, #592]	; (80023f4 <config_task_func+0x274>)
+ 80021a2:	4b94      	ldr	r3, [pc, #592]	; (80023f4 <conf_inicial_func+0x274>)
  80021a4:	f107 045c 	add.w	r4, r7, #92	; 0x5c
  80021a8:	461d      	mov	r5, r3
  80021aa:	cd0f      	ldmia	r5!, {r0, r1, r2, r3}
@@ -4147,17 +4147,17 @@ void config_task_func(void *argument)
 	"Hora (0-23): ", "\r\nMinuto (0-59): ","\r\nSegundo (0-59): ","\r\nDía (1-31): ","\r\nMes (1-12): ",
 	"\r\nAño (0-99): "};
 	uint8_t limit[6][2] = {{0,23},{0,59},{0,59},{1,31},{1,12},{0,99}};
- 80021b6:	4a90      	ldr	r2, [pc, #576]	; (80023f8 <config_task_func+0x278>)
+ 80021b6:	4a90      	ldr	r2, [pc, #576]	; (80023f8 <conf_inicial_func+0x278>)
  80021b8:	f107 0350 	add.w	r3, r7, #80	; 0x50
  80021bc:	ca07      	ldmia	r2, {r0, r1, r2}
  80021be:	e883 0007 	stmia.w	r3, {r0, r1, r2}
 
 
 	printf("Empieza el bucle\r\n");
- 80021c2:	488e      	ldr	r0, [pc, #568]	; (80023fc <config_task_func+0x27c>)
+ 80021c2:	488e      	ldr	r0, [pc, #568]	; (80023fc <conf_inicial_func+0x27c>)
  80021c4:	f012 fa24 	bl	8014610 <puts>
 	estado = osMessageQueuePut(print_queueHandle, &msg_rtc1, 0, pdMS_TO_TICKS(500));
- 80021c8:	4b8d      	ldr	r3, [pc, #564]	; (8002400 <config_task_func+0x280>)
+ 80021c8:	4b8d      	ldr	r3, [pc, #564]	; (8002400 <conf_inicial_func+0x280>)
  80021ca:	6818      	ldr	r0, [r3, #0]
  80021cc:	f107 0174 	add.w	r1, r7, #116	; 0x74
  80021d0:	f44f 73fa 	mov.w	r3, #500	; 0x1f4
@@ -4170,9 +4170,9 @@ void config_task_func(void *argument)
 	for (i=0;i<6;){
  80021e4:	2300      	movs	r3, #0
  80021e6:	f8c7 30bc 	str.w	r3, [r7, #188]	; 0xbc
- 80021ea:	e12e      	b.n	800244a <config_task_func+0x2ca>
+ 80021ea:	e12e      	b.n	800244a <conf_inicial_func+0x2ca>
 		estado = osMessageQueuePut(print_queueHandle, &msg[i], 0, pdMS_TO_TICKS(500));
- 80021ec:	4b84      	ldr	r3, [pc, #528]	; (8002400 <config_task_func+0x280>)
+ 80021ec:	4b84      	ldr	r3, [pc, #528]	; (8002400 <conf_inicial_func+0x280>)
  80021ee:	6818      	ldr	r0, [r3, #0]
  80021f0:	f107 025c 	add.w	r2, r7, #92	; 0x5c
  80021f4:	f8d7 30bc 	ldr.w	r3, [r7, #188]	; 0xbc
@@ -4183,15 +4183,15 @@ void config_task_func(void *argument)
  8002202:	f00e f971 	bl	80104e8 <osMessageQueuePut>
  8002206:	f8c7 00b0 	str.w	r0, [r7, #176]	; 0xb0
 		printf("Esperando a que ser reciba el dato\r\n");
- 800220a:	487e      	ldr	r0, [pc, #504]	; (8002404 <config_task_func+0x284>)
+ 800220a:	487e      	ldr	r0, [pc, #504]	; (8002404 <conf_inicial_func+0x284>)
  800220c:	f012 fa00 	bl	8014610 <puts>
 
 		for (j=0;j<3;){
  8002210:	2300      	movs	r3, #0
  8002212:	f8c7 30c0 	str.w	r3, [r7, #192]	; 0xc0
- 8002216:	e03d      	b.n	8002294 <config_task_func+0x114>
+ 8002216:	e03d      	b.n	8002294 <conf_inicial_func+0x114>
 			estado = osMessageQueueGet(receive_queueHandle, &recibido[j], NULL, osWaitForever);
- 8002218:	4b7b      	ldr	r3, [pc, #492]	; (8002408 <config_task_func+0x288>)
+ 8002218:	4b7b      	ldr	r3, [pc, #492]	; (8002408 <conf_inicial_func+0x288>)
  800221a:	6818      	ldr	r0, [r3, #0]
  800221c:	f107 028c 	add.w	r2, r7, #140	; 0x8c
  8002220:	f8d7 30c0 	ldr.w	r3, [r7, #192]	; 0xc0
@@ -4206,7 +4206,7 @@ void config_task_func(void *argument)
  800223c:	4413      	add	r3, r2
  800223e:	781b      	ldrb	r3, [r3, #0]
  8002240:	4619      	mov	r1, r3
- 8002242:	4872      	ldr	r0, [pc, #456]	; (800240c <config_task_func+0x28c>)
+ 8002242:	4872      	ldr	r0, [pc, #456]	; (800240c <conf_inicial_func+0x28c>)
  8002244:	f012 f95e 	bl	8014504 <iprintf>
 			if(recibido[j]==13){
  8002248:	f107 028c 	add.w	r2, r7, #140	; 0x8c
@@ -4214,12 +4214,12 @@ void config_task_func(void *argument)
  8002250:	4413      	add	r3, r2
  8002252:	781b      	ldrb	r3, [r3, #0]
  8002254:	2b0d      	cmp	r3, #13
- 8002256:	d103      	bne.n	8002260 <config_task_func+0xe0>
+ 8002256:	d103      	bne.n	8002260 <conf_inicial_func+0xe0>
 				printf("Ha pulsado intro\r\n");
- 8002258:	486d      	ldr	r0, [pc, #436]	; (8002410 <config_task_func+0x290>)
+ 8002258:	486d      	ldr	r0, [pc, #436]	; (8002410 <conf_inicial_func+0x290>)
  800225a:	f012 f9d9 	bl	8014610 <puts>
 				break;
- 800225e:	e01d      	b.n	800229c <config_task_func+0x11c>
+ 800225e:	e01d      	b.n	800229c <conf_inicial_func+0x11c>
 			}
 			if (recibido[j]==127){
  8002260:	f107 028c 	add.w	r2, r7, #140	; 0x8c
@@ -4227,18 +4227,18 @@ void config_task_func(void *argument)
  8002268:	4413      	add	r3, r2
  800226a:	781b      	ldrb	r3, [r3, #0]
  800226c:	2b7f      	cmp	r3, #127	; 0x7f
- 800226e:	d10c      	bne.n	800228a <config_task_func+0x10a>
+ 800226e:	d10c      	bne.n	800228a <conf_inicial_func+0x10a>
 				printf("Ha pulsado borrar\r\n");
- 8002270:	4868      	ldr	r0, [pc, #416]	; (8002414 <config_task_func+0x294>)
+ 8002270:	4868      	ldr	r0, [pc, #416]	; (8002414 <conf_inicial_func+0x294>)
  8002272:	f012 f9cd 	bl	8014610 <puts>
 				if (j>0) j--;
  8002276:	f8d7 30c0 	ldr.w	r3, [r7, #192]	; 0xc0
  800227a:	2b00      	cmp	r3, #0
- 800227c:	dd0a      	ble.n	8002294 <config_task_func+0x114>
+ 800227c:	dd0a      	ble.n	8002294 <conf_inicial_func+0x114>
  800227e:	f8d7 30c0 	ldr.w	r3, [r7, #192]	; 0xc0
  8002282:	3b01      	subs	r3, #1
  8002284:	f8c7 30c0 	str.w	r3, [r7, #192]	; 0xc0
- 8002288:	e004      	b.n	8002294 <config_task_func+0x114>
+ 8002288:	e004      	b.n	8002294 <conf_inicial_func+0x114>
 			}else{
 				j++;
  800228a:	f8d7 30c0 	ldr.w	r3, [r7, #192]	; 0xc0
@@ -4247,18 +4247,18 @@ void config_task_func(void *argument)
 		for (j=0;j<3;){
  8002294:	f8d7 30c0 	ldr.w	r3, [r7, #192]	; 0xc0
  8002298:	2b02      	cmp	r3, #2
- 800229a:	ddbd      	ble.n	8002218 <config_task_func+0x98>
+ 800229a:	ddbd      	ble.n	8002218 <conf_inicial_func+0x98>
 			}
 		}
 		printf("%d\r\n",j);
  800229c:	f8d7 10c0 	ldr.w	r1, [r7, #192]	; 0xc0
- 80022a0:	485d      	ldr	r0, [pc, #372]	; (8002418 <config_task_func+0x298>)
+ 80022a0:	485d      	ldr	r0, [pc, #372]	; (8002418 <conf_inicial_func+0x298>)
  80022a2:	f012 f92f 	bl	8014504 <iprintf>
 		switch(j){
  80022a6:	f8d7 30c0 	ldr.w	r3, [r7, #192]	; 0xc0
  80022aa:	2b03      	cmp	r3, #3
- 80022ac:	d849      	bhi.n	8002342 <config_task_func+0x1c2>
- 80022ae:	a201      	add	r2, pc, #4	; (adr r2, 80022b4 <config_task_func+0x134>)
+ 80022ac:	d849      	bhi.n	8002342 <conf_inicial_func+0x1c2>
+ 80022ae:	a201      	add	r2, pc, #4	; (adr r2, 80022b4 <conf_inicial_func+0x134>)
  80022b0:	f852 f023 	ldr.w	pc, [r2, r3, lsl #2]
  80022b4:	080022c5 	.word	0x080022c5
  80022b8:	080022cd 	.word	0x080022cd
@@ -4269,7 +4269,7 @@ void config_task_func(void *argument)
  80022c4:	2300      	movs	r3, #0
  80022c6:	f8a7 30ba 	strh.w	r3, [r7, #186]	; 0xba
 			break;
- 80022ca:	e03a      	b.n	8002342 <config_task_func+0x1c2>
+ 80022ca:	e03a      	b.n	8002342 <conf_inicial_func+0x1c2>
 		case 1:
 			num_usuario = recibido[0]-48;
  80022cc:	f897 308c 	ldrb.w	r3, [r7, #140]	; 0x8c
@@ -4278,7 +4278,7 @@ void config_task_func(void *argument)
  80022d4:	f8a7 30ba 	strh.w	r3, [r7, #186]	; 0xba
 			//i++;
 			break;
- 80022d8:	e033      	b.n	8002342 <config_task_func+0x1c2>
+ 80022d8:	e033      	b.n	8002342 <conf_inicial_func+0x1c2>
 		case 2:
 			num_usuario = 10*(recibido[0]-48)+recibido[1]-48;
  80022da:	f897 308c 	ldrb.w	r3, [r7, #140]	; 0x8c
@@ -4297,7 +4297,7 @@ void config_task_func(void *argument)
  80022f8:	f8a7 30ba 	strh.w	r3, [r7, #186]	; 0xba
 			//i++;
 			break;
- 80022fc:	e021      	b.n	8002342 <config_task_func+0x1c2>
+ 80022fc:	e021      	b.n	8002342 <conf_inicial_func+0x1c2>
 		case 3:
 			num_usuario = 100*(recibido[0]-48)+10*(recibido[1]-48)+recibido[2]-48;
  80022fe:	f897 308c 	ldrb.w	r3, [r7, #140]	; 0x8c
@@ -4335,7 +4335,7 @@ void config_task_func(void *argument)
 		printf("Numero: %d\r\n",num_usuario);
  8002342:	f8b7 30ba 	ldrh.w	r3, [r7, #186]	; 0xba
  8002346:	4619      	mov	r1, r3
- 8002348:	4834      	ldr	r0, [pc, #208]	; (800241c <config_task_func+0x29c>)
+ 8002348:	4834      	ldr	r0, [pc, #208]	; (800241c <conf_inicial_func+0x29c>)
  800234a:	f012 f8db 	bl	8014504 <iprintf>
 		printf("Rango: %d-%d\r\n",limit[i][0],limit[i][1]);
  800234e:	f8d7 30bc 	ldr.w	r3, [r7, #188]	; 0xbc
@@ -4352,7 +4352,7 @@ void config_task_func(void *argument)
  800236e:	4413      	add	r3, r2
  8002370:	f813 3c77 	ldrb.w	r3, [r3, #-119]
  8002374:	461a      	mov	r2, r3
- 8002376:	482a      	ldr	r0, [pc, #168]	; (8002420 <config_task_func+0x2a0>)
+ 8002376:	482a      	ldr	r0, [pc, #168]	; (8002420 <conf_inicial_func+0x2a0>)
  8002378:	f012 f8c4 	bl	8014504 <iprintf>
 		if (num_usuario<limit[i][0] || num_usuario>limit[i][1]){
  800237c:	f8d7 30bc 	ldr.w	r3, [r7, #188]	; 0xbc
@@ -4364,7 +4364,7 @@ void config_task_func(void *argument)
  800238e:	b29b      	uxth	r3, r3
  8002390:	f8b7 20ba 	ldrh.w	r2, [r7, #186]	; 0xba
  8002394:	429a      	cmp	r2, r3
- 8002396:	d30d      	bcc.n	80023b4 <config_task_func+0x234>
+ 8002396:	d30d      	bcc.n	80023b4 <conf_inicial_func+0x234>
  8002398:	f8d7 30bc 	ldr.w	r3, [r7, #188]	; 0xbc
  800239c:	005b      	lsls	r3, r3, #1
  800239e:	33b8      	adds	r3, #184	; 0xb8
@@ -4374,9 +4374,9 @@ void config_task_func(void *argument)
  80023aa:	b29b      	uxth	r3, r3
  80023ac:	f8b7 20ba 	ldrh.w	r2, [r7, #186]	; 0xba
  80023b0:	429a      	cmp	r2, r3
- 80023b2:	d93b      	bls.n	800242c <config_task_func+0x2ac>
+ 80023b2:	d93b      	bls.n	800242c <conf_inicial_func+0x2ac>
 			estado = osMessageQueuePut(print_queueHandle, &msg_error, 0, pdMS_TO_TICKS(500));
- 80023b4:	4b12      	ldr	r3, [pc, #72]	; (8002400 <config_task_func+0x280>)
+ 80023b4:	4b12      	ldr	r3, [pc, #72]	; (8002400 <conf_inicial_func+0x280>)
  80023b6:	6818      	ldr	r0, [r3, #0]
  80023b8:	f107 0178 	add.w	r1, r7, #120	; 0x78
  80023bc:	f44f 73fa 	mov.w	r3, #500	; 0x1f4
@@ -4386,36 +4386,36 @@ void config_task_func(void *argument)
 			if (estado == osOK)
  80023ca:	f8d7 30b0 	ldr.w	r3, [r7, #176]	; 0xb0
  80023ce:	2b00      	cmp	r3, #0
- 80023d0:	d103      	bne.n	80023da <config_task_func+0x25a>
+ 80023d0:	d103      	bne.n	80023da <conf_inicial_func+0x25a>
 				printf("Enviado valor erroneo\r\n");
- 80023d2:	4814      	ldr	r0, [pc, #80]	; (8002424 <config_task_func+0x2a4>)
+ 80023d2:	4814      	ldr	r0, [pc, #80]	; (8002424 <conf_inicial_func+0x2a4>)
  80023d4:	f012 f91c 	bl	8014610 <puts>
- 80023d8:	e037      	b.n	800244a <config_task_func+0x2ca>
+ 80023d8:	e037      	b.n	800244a <conf_inicial_func+0x2ca>
 			else
 				printf("Algo no va bien\r\n");
- 80023da:	4813      	ldr	r0, [pc, #76]	; (8002428 <config_task_func+0x2a8>)
+ 80023da:	4813      	ldr	r0, [pc, #76]	; (8002428 <conf_inicial_func+0x2a8>)
  80023dc:	f012 f918 	bl	8014610 <puts>
 			if (estado == osOK)
- 80023e0:	e033      	b.n	800244a <config_task_func+0x2ca>
+ 80023e0:	e033      	b.n	800244a <conf_inicial_func+0x2ca>
  80023e2:	bf00      	nop
- 80023e4:	08016990 	.word	0x08016990
- 80023e8:	080169b0 	.word	0x080169b0
- 80023ec:	08016aa4 	.word	0x08016aa4
- 80023f0:	08016ac0 	.word	0x08016ac0
- 80023f4:	08016cc4 	.word	0x08016cc4
- 80023f8:	08016a34 	.word	0x08016a34
- 80023fc:	08016b10 	.word	0x08016b10
+ 80023e4:	08016994 	.word	0x08016994
+ 80023e8:	080169b4 	.word	0x080169b4
+ 80023ec:	08016aa8 	.word	0x08016aa8
+ 80023f0:	08016ac4 	.word	0x08016ac4
+ 80023f4:	08016cc8 	.word	0x08016cc8
+ 80023f8:	08016a38 	.word	0x08016a38
+ 80023fc:	08016b14 	.word	0x08016b14
  8002400:	20000908 	.word	0x20000908
- 8002404:	08016b24 	.word	0x08016b24
+ 8002404:	08016b28 	.word	0x08016b28
  8002408:	2000090c 	.word	0x2000090c
- 800240c:	08016b48 	.word	0x08016b48
- 8002410:	08016b5c 	.word	0x08016b5c
- 8002414:	08016b70 	.word	0x08016b70
- 8002418:	08016b84 	.word	0x08016b84
- 800241c:	08016b8c 	.word	0x08016b8c
- 8002420:	08016a18 	.word	0x08016a18
- 8002424:	08016b9c 	.word	0x08016b9c
- 8002428:	08016bb4 	.word	0x08016bb4
+ 800240c:	08016b4c 	.word	0x08016b4c
+ 8002410:	08016b60 	.word	0x08016b60
+ 8002414:	08016b74 	.word	0x08016b74
+ 8002418:	08016b88 	.word	0x08016b88
+ 800241c:	08016b90 	.word	0x08016b90
+ 8002420:	08016a1c 	.word	0x08016a1c
+ 8002424:	08016ba0 	.word	0x08016ba0
+ 8002428:	08016bb8 	.word	0x08016bb8
 		}else{
 			to_change[i]=num_usuario;
  800242c:	f8b7 30ba 	ldrh.w	r3, [r7, #186]	; 0xba
@@ -4432,7 +4432,7 @@ void config_task_func(void *argument)
 	for (i=0;i<6;){
  800244a:	f8d7 30bc 	ldr.w	r3, [r7, #188]	; 0xbc
  800244e:	2b05      	cmp	r3, #5
- 8002450:	f77f aecc 	ble.w	80021ec <config_task_func+0x6c>
+ 8002450:	f77f aecc 	ble.w	80021ec <conf_inicial_func+0x6c>
 		}
 
 	}
@@ -4463,18 +4463,18 @@ void config_task_func(void *argument)
  8002480:	f107 033c 	add.w	r3, r7, #60	; 0x3c
  8002484:	2200      	movs	r2, #0
  8002486:	4619      	mov	r1, r3
- 8002488:	48ba      	ldr	r0, [pc, #744]	; (8002774 <config_task_func+0x5f4>)
+ 8002488:	48ba      	ldr	r0, [pc, #744]	; (8002774 <conf_inicial_func+0x5f4>)
  800248a:	f004 fc98 	bl	8006dbe <HAL_RTC_SetTime>
  800248e:	4603      	mov	r3, r0
  8002490:	2b00      	cmp	r3, #0
- 8002492:	d001      	beq.n	8002498 <config_task_func+0x318>
+ 8002492:	d001      	beq.n	8002498 <conf_inicial_func+0x318>
 	  {
 	    Error_Handler();
  8002494:	f000 fc74 	bl	8002d80 <Error_Handler>
 	  }
 
 	osMessageQueuePut(print_queueHandle, &msg_hora_ok, 0, pdMS_TO_TICKS(500));
- 8002498:	4bb7      	ldr	r3, [pc, #732]	; (8002778 <config_task_func+0x5f8>)
+ 8002498:	4bb7      	ldr	r3, [pc, #732]	; (8002778 <conf_inicial_func+0x5f8>)
  800249a:	6818      	ldr	r0, [r3, #0]
  800249c:	f107 0180 	add.w	r1, r7, #128	; 0x80
  80024a0:	f44f 73fa 	mov.w	r3, #500	; 0x1f4
@@ -4493,24 +4493,24 @@ void config_task_func(void *argument)
 	printf("Anio: %d\r\n",to_change[5]);
  80024c2:	f897 3089 	ldrb.w	r3, [r7, #137]	; 0x89
  80024c6:	4619      	mov	r1, r3
- 80024c8:	48ac      	ldr	r0, [pc, #688]	; (800277c <config_task_func+0x5fc>)
+ 80024c8:	48ac      	ldr	r0, [pc, #688]	; (800277c <conf_inicial_func+0x5fc>)
  80024ca:	f012 f81b 	bl	8014504 <iprintf>
 	if (HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BIN) != HAL_OK)
  80024ce:	f107 0338 	add.w	r3, r7, #56	; 0x38
  80024d2:	2200      	movs	r2, #0
  80024d4:	4619      	mov	r1, r3
- 80024d6:	48a7      	ldr	r0, [pc, #668]	; (8002774 <config_task_func+0x5f4>)
+ 80024d6:	48a7      	ldr	r0, [pc, #668]	; (8002774 <conf_inicial_func+0x5f4>)
  80024d8:	f004 fd6a 	bl	8006fb0 <HAL_RTC_SetDate>
  80024dc:	4603      	mov	r3, r0
  80024de:	2b00      	cmp	r3, #0
- 80024e0:	d001      	beq.n	80024e6 <config_task_func+0x366>
+ 80024e0:	d001      	beq.n	80024e6 <conf_inicial_func+0x366>
 	{
 		Error_Handler();
  80024e2:	f000 fc4d 	bl	8002d80 <Error_Handler>
 	}
 
 	osMessageQueuePut(print_queueHandle, &msg_fecha_ok, 0, pdMS_TO_TICKS(500));
- 80024e6:	4ba4      	ldr	r3, [pc, #656]	; (8002778 <config_task_func+0x5f8>)
+ 80024e6:	4ba4      	ldr	r3, [pc, #656]	; (8002778 <conf_inicial_func+0x5f8>)
  80024e8:	6818      	ldr	r0, [r3, #0]
  80024ea:	f107 017c 	add.w	r1, r7, #124	; 0x7c
  80024ee:	f44f 73fa 	mov.w	r3, #500	; 0x1f4
@@ -4518,30 +4518,30 @@ void config_task_func(void *argument)
  80024f4:	f00d fff8 	bl	80104e8 <osMessageQueuePut>
 
 	const char* msg_wifi_conf_init = "\r\nInicio de configuración del WiFi\r\n";
- 80024f8:	4ba1      	ldr	r3, [pc, #644]	; (8002780 <config_task_func+0x600>)
+ 80024f8:	4ba1      	ldr	r3, [pc, #644]	; (8002780 <conf_inicial_func+0x600>)
  80024fa:	637b      	str	r3, [r7, #52]	; 0x34
 	const char* msg_wifi_connect_init = "\r\nConectando al WiFi\r\n";
- 80024fc:	4ba1      	ldr	r3, [pc, #644]	; (8002784 <config_task_func+0x604>)
+ 80024fc:	4ba1      	ldr	r3, [pc, #644]	; (8002784 <conf_inicial_func+0x604>)
  80024fe:	633b      	str	r3, [r7, #48]	; 0x30
 	const char* msg_wifi_connect_error = "No se ha podido conectar, vuelva a introducir los datos\r\n";
- 8002500:	4ba1      	ldr	r3, [pc, #644]	; (8002788 <config_task_func+0x608>)
+ 8002500:	4ba1      	ldr	r3, [pc, #644]	; (8002788 <conf_inicial_func+0x608>)
  8002502:	62fb      	str	r3, [r7, #44]	; 0x2c
 	const char* msg_wifi_connect_success = "\r\nCONECTADO\r\n";
- 8002504:	4ba1      	ldr	r3, [pc, #644]	; (800278c <config_task_func+0x60c>)
+ 8002504:	4ba1      	ldr	r3, [pc, #644]	; (800278c <conf_inicial_func+0x60c>)
  8002506:	62bb      	str	r3, [r7, #40]	; 0x28
 	const char* msg_too_many_characters = "\r\nHas introducido demasiados caracteres, prueba de nuevo\r\n";
- 8002508:	4ba1      	ldr	r3, [pc, #644]	; (8002790 <config_task_func+0x610>)
+ 8002508:	4ba1      	ldr	r3, [pc, #644]	; (8002790 <conf_inicial_func+0x610>)
  800250a:	627b      	str	r3, [r7, #36]	; 0x24
 	const char* msg_introduce_ssid = "Introduce el ssid: ";
- 800250c:	4ba1      	ldr	r3, [pc, #644]	; (8002794 <config_task_func+0x614>)
+ 800250c:	4ba1      	ldr	r3, [pc, #644]	; (8002794 <conf_inicial_func+0x614>)
  800250e:	623b      	str	r3, [r7, #32]
 	const char* msg_introduce_psswrd = "\r\nIntroduce la contraseña: ";
- 8002510:	4ba1      	ldr	r3, [pc, #644]	; (8002798 <config_task_func+0x618>)
+ 8002510:	4ba1      	ldr	r3, [pc, #644]	; (8002798 <conf_inicial_func+0x618>)
  8002512:	61fb      	str	r3, [r7, #28]
 
 
 	osMessageQueuePut(print_queueHandle, &msg_wifi_conf_init, 0, pdMS_TO_TICKS(500));
- 8002514:	4b98      	ldr	r3, [pc, #608]	; (8002778 <config_task_func+0x5f8>)
+ 8002514:	4b98      	ldr	r3, [pc, #608]	; (8002778 <conf_inicial_func+0x5f8>)
  8002516:	6818      	ldr	r0, [r3, #0]
  8002518:	f107 0134 	add.w	r1, r7, #52	; 0x34
  800251c:	f44f 73fa 	mov.w	r3, #500	; 0x1f4
@@ -4553,7 +4553,7 @@ void config_task_func(void *argument)
 
 		//configuracion ssid
 		osMessageQueuePut(print_queueHandle, &msg_introduce_ssid, 0, pdMS_TO_TICKS(500));
- 8002526:	4b94      	ldr	r3, [pc, #592]	; (8002778 <config_task_func+0x5f8>)
+ 8002526:	4b94      	ldr	r3, [pc, #592]	; (8002778 <conf_inicial_func+0x5f8>)
  8002528:	6818      	ldr	r0, [r3, #0]
  800252a:	f107 0120 	add.w	r1, r7, #32
  800252e:	f44f 73fa 	mov.w	r3, #500	; 0x1f4
@@ -4562,9 +4562,9 @@ void config_task_func(void *argument)
 		for (j=0; j<MAX_LEN_SSID ; ){
  8002538:	2300      	movs	r3, #0
  800253a:	f8c7 30c0 	str.w	r3, [r7, #192]	; 0xc0
- 800253e:	e03d      	b.n	80025bc <config_task_func+0x43c>
+ 800253e:	e03d      	b.n	80025bc <conf_inicial_func+0x43c>
 			estado = osMessageQueueGet(receive_queueHandle, &recibido[j], NULL, osWaitForever);
- 8002540:	4b96      	ldr	r3, [pc, #600]	; (800279c <config_task_func+0x61c>)
+ 8002540:	4b96      	ldr	r3, [pc, #600]	; (800279c <conf_inicial_func+0x61c>)
  8002542:	6818      	ldr	r0, [r3, #0]
  8002544:	f107 028c 	add.w	r2, r7, #140	; 0x8c
  8002548:	f8d7 30c0 	ldr.w	r3, [r7, #192]	; 0xc0
@@ -4579,7 +4579,7 @@ void config_task_func(void *argument)
  8002564:	4413      	add	r3, r2
  8002566:	781b      	ldrb	r3, [r3, #0]
  8002568:	4619      	mov	r1, r3
- 800256a:	488d      	ldr	r0, [pc, #564]	; (80027a0 <config_task_func+0x620>)
+ 800256a:	488d      	ldr	r0, [pc, #564]	; (80027a0 <conf_inicial_func+0x620>)
  800256c:	f011 ffca 	bl	8014504 <iprintf>
 			if(recibido[j]==13){
  8002570:	f107 028c 	add.w	r2, r7, #140	; 0x8c
@@ -4587,12 +4587,12 @@ void config_task_func(void *argument)
  8002578:	4413      	add	r3, r2
  800257a:	781b      	ldrb	r3, [r3, #0]
  800257c:	2b0d      	cmp	r3, #13
- 800257e:	d103      	bne.n	8002588 <config_task_func+0x408>
+ 800257e:	d103      	bne.n	8002588 <conf_inicial_func+0x408>
 				printf("Ha pulsado intro\r\n");
- 8002580:	4888      	ldr	r0, [pc, #544]	; (80027a4 <config_task_func+0x624>)
+ 8002580:	4888      	ldr	r0, [pc, #544]	; (80027a4 <conf_inicial_func+0x624>)
  8002582:	f012 f845 	bl	8014610 <puts>
 				break;
- 8002586:	e01d      	b.n	80025c4 <config_task_func+0x444>
+ 8002586:	e01d      	b.n	80025c4 <conf_inicial_func+0x444>
 			}
 			if (recibido[j]==127){
  8002588:	f107 028c 	add.w	r2, r7, #140	; 0x8c
@@ -4600,18 +4600,18 @@ void config_task_func(void *argument)
  8002590:	4413      	add	r3, r2
  8002592:	781b      	ldrb	r3, [r3, #0]
  8002594:	2b7f      	cmp	r3, #127	; 0x7f
- 8002596:	d10c      	bne.n	80025b2 <config_task_func+0x432>
+ 8002596:	d10c      	bne.n	80025b2 <conf_inicial_func+0x432>
 				printf("Ha pulsado borrar\r\n");
- 8002598:	4883      	ldr	r0, [pc, #524]	; (80027a8 <config_task_func+0x628>)
+ 8002598:	4883      	ldr	r0, [pc, #524]	; (80027a8 <conf_inicial_func+0x628>)
  800259a:	f012 f839 	bl	8014610 <puts>
 				if (j>0) j--;
  800259e:	f8d7 30c0 	ldr.w	r3, [r7, #192]	; 0xc0
  80025a2:	2b00      	cmp	r3, #0
- 80025a4:	dd0a      	ble.n	80025bc <config_task_func+0x43c>
+ 80025a4:	dd0a      	ble.n	80025bc <conf_inicial_func+0x43c>
  80025a6:	f8d7 30c0 	ldr.w	r3, [r7, #192]	; 0xc0
  80025aa:	3b01      	subs	r3, #1
  80025ac:	f8c7 30c0 	str.w	r3, [r7, #192]	; 0xc0
- 80025b0:	e004      	b.n	80025bc <config_task_func+0x43c>
+ 80025b0:	e004      	b.n	80025bc <conf_inicial_func+0x43c>
 			}else{
 				j++;
  80025b2:	f8d7 30c0 	ldr.w	r3, [r7, #192]	; 0xc0
@@ -4620,21 +4620,21 @@ void config_task_func(void *argument)
 		for (j=0; j<MAX_LEN_SSID ; ){
  80025bc:	f8d7 30c0 	ldr.w	r3, [r7, #192]	; 0xc0
  80025c0:	2b09      	cmp	r3, #9
- 80025c2:	ddbd      	ble.n	8002540 <config_task_func+0x3c0>
+ 80025c2:	ddbd      	ble.n	8002540 <conf_inicial_func+0x3c0>
 			}
 		}
 		if (j==MAX_LEN_SSID){
  80025c4:	f8d7 30c0 	ldr.w	r3, [r7, #192]	; 0xc0
  80025c8:	2b0a      	cmp	r3, #10
- 80025ca:	d109      	bne.n	80025e0 <config_task_func+0x460>
+ 80025ca:	d109      	bne.n	80025e0 <conf_inicial_func+0x460>
 			osMessageQueuePut(print_queueHandle, &msg_too_many_characters, 0, pdMS_TO_TICKS(500));
- 80025cc:	4b6a      	ldr	r3, [pc, #424]	; (8002778 <config_task_func+0x5f8>)
+ 80025cc:	4b6a      	ldr	r3, [pc, #424]	; (8002778 <conf_inicial_func+0x5f8>)
  80025ce:	6818      	ldr	r0, [r3, #0]
  80025d0:	f107 0124 	add.w	r1, r7, #36	; 0x24
  80025d4:	f44f 73fa 	mov.w	r3, #500	; 0x1f4
  80025d8:	2200      	movs	r2, #0
  80025da:	f00d ff85 	bl	80104e8 <osMessageQueuePut>
- 80025de:	e7a2      	b.n	8002526 <config_task_func+0x3a6>
+ 80025de:	e7a2      	b.n	8002526 <conf_inicial_func+0x3a6>
 		}else{
  80025e0:	466b      	mov	r3, sp
  80025e2:	461d      	mov	r5, r3
@@ -4673,7 +4673,7 @@ void config_task_func(void *argument)
 			for (m=0 ; m<j ; m++){
  800263a:	2300      	movs	r3, #0
  800263c:	f8c7 30c4 	str.w	r3, [r7, #196]	; 0xc4
- 8002640:	e011      	b.n	8002666 <config_task_func+0x4e6>
+ 8002640:	e011      	b.n	8002666 <conf_inicial_func+0x4e6>
 //				printf("m: %d\r\n",m);
 //				printf("caracter: %c\r\n",recibido[m]);
 				ssid[m] = recibido[m];
@@ -4693,12 +4693,12 @@ void config_task_func(void *argument)
  8002666:	f8d7 20c4 	ldr.w	r2, [r7, #196]	; 0xc4
  800266a:	f8d7 30c0 	ldr.w	r3, [r7, #192]	; 0xc0
  800266e:	429a      	cmp	r2, r3
- 8002670:	dbe7      	blt.n	8002642 <config_task_func+0x4c2>
+ 8002670:	dbe7      	blt.n	8002642 <conf_inicial_func+0x4c2>
 			}
 
 			//configuracion contraseña
 			osMessageQueuePut(print_queueHandle, &msg_introduce_psswrd, 0, pdMS_TO_TICKS(500));
- 8002672:	4b41      	ldr	r3, [pc, #260]	; (8002778 <config_task_func+0x5f8>)
+ 8002672:	4b41      	ldr	r3, [pc, #260]	; (8002778 <conf_inicial_func+0x5f8>)
  8002674:	6818      	ldr	r0, [r3, #0]
  8002676:	f107 011c 	add.w	r1, r7, #28
  800267a:	f44f 73fa 	mov.w	r3, #500	; 0x1f4
@@ -4708,9 +4708,9 @@ void config_task_func(void *argument)
 			for (j=0; j<MAX_LEN_PSSWRD ; ){
  8002684:	2300      	movs	r3, #0
  8002686:	f8c7 30c0 	str.w	r3, [r7, #192]	; 0xc0
- 800268a:	e02c      	b.n	80026e6 <config_task_func+0x566>
+ 800268a:	e02c      	b.n	80026e6 <conf_inicial_func+0x566>
 				estado = osMessageQueueGet(receive_queueHandle, &recibido[j], NULL, osWaitForever);
- 800268c:	4b43      	ldr	r3, [pc, #268]	; (800279c <config_task_func+0x61c>)
+ 800268c:	4b43      	ldr	r3, [pc, #268]	; (800279c <conf_inicial_func+0x61c>)
  800268e:	6818      	ldr	r0, [r3, #0]
  8002690:	f107 028c 	add.w	r2, r7, #140	; 0x8c
  8002694:	f8d7 30c0 	ldr.w	r3, [r7, #192]	; 0xc0
@@ -4726,7 +4726,7 @@ void config_task_func(void *argument)
  80026b0:	4413      	add	r3, r2
  80026b2:	781b      	ldrb	r3, [r3, #0]
  80026b4:	2b0d      	cmp	r3, #13
- 80026b6:	d01b      	beq.n	80026f0 <config_task_func+0x570>
+ 80026b6:	d01b      	beq.n	80026f0 <conf_inicial_func+0x570>
 //					printf("Ha pulsado intro\r\n");
 					break;
 				}
@@ -4736,16 +4736,16 @@ void config_task_func(void *argument)
  80026c0:	4413      	add	r3, r2
  80026c2:	781b      	ldrb	r3, [r3, #0]
  80026c4:	2b7f      	cmp	r3, #127	; 0x7f
- 80026c6:	d109      	bne.n	80026dc <config_task_func+0x55c>
+ 80026c6:	d109      	bne.n	80026dc <conf_inicial_func+0x55c>
 //					printf("Ha pulsado borrar\r\n");
 					if (j>0) j--;
  80026c8:	f8d7 30c0 	ldr.w	r3, [r7, #192]	; 0xc0
  80026cc:	2b00      	cmp	r3, #0
- 80026ce:	dd0a      	ble.n	80026e6 <config_task_func+0x566>
+ 80026ce:	dd0a      	ble.n	80026e6 <conf_inicial_func+0x566>
  80026d0:	f8d7 30c0 	ldr.w	r3, [r7, #192]	; 0xc0
  80026d4:	3b01      	subs	r3, #1
  80026d6:	f8c7 30c0 	str.w	r3, [r7, #192]	; 0xc0
- 80026da:	e004      	b.n	80026e6 <config_task_func+0x566>
+ 80026da:	e004      	b.n	80026e6 <conf_inicial_func+0x566>
 				}else{
 					j++;
  80026dc:	f8d7 30c0 	ldr.w	r3, [r7, #192]	; 0xc0
@@ -4754,8 +4754,8 @@ void config_task_func(void *argument)
 			for (j=0; j<MAX_LEN_PSSWRD ; ){
  80026e6:	f8d7 30c0 	ldr.w	r3, [r7, #192]	; 0xc0
  80026ea:	2b13      	cmp	r3, #19
- 80026ec:	ddce      	ble.n	800268c <config_task_func+0x50c>
- 80026ee:	e000      	b.n	80026f2 <config_task_func+0x572>
+ 80026ec:	ddce      	ble.n	800268c <conf_inicial_func+0x50c>
+ 80026ee:	e000      	b.n	80026f2 <conf_inicial_func+0x572>
 					break;
  80026f0:	bf00      	nop
 				}
@@ -4763,15 +4763,15 @@ void config_task_func(void *argument)
 			if (j==MAX_LEN_PSSWRD){
  80026f2:	f8d7 30c0 	ldr.w	r3, [r7, #192]	; 0xc0
  80026f6:	2b14      	cmp	r3, #20
- 80026f8:	d109      	bne.n	800270e <config_task_func+0x58e>
+ 80026f8:	d109      	bne.n	800270e <conf_inicial_func+0x58e>
 				osMessageQueuePut(print_queueHandle, &msg_too_many_characters, 0, pdMS_TO_TICKS(500));
- 80026fa:	4b1f      	ldr	r3, [pc, #124]	; (8002778 <config_task_func+0x5f8>)
+ 80026fa:	4b1f      	ldr	r3, [pc, #124]	; (8002778 <conf_inicial_func+0x5f8>)
  80026fc:	6818      	ldr	r0, [r3, #0]
  80026fe:	f107 0124 	add.w	r1, r7, #36	; 0x24
  8002702:	f44f 73fa 	mov.w	r3, #500	; 0x1f4
  8002706:	2200      	movs	r2, #0
  8002708:	f00d feee 	bl	80104e8 <osMessageQueuePut>
- 800270c:	e096      	b.n	800283c <config_task_func+0x6bc>
+ 800270c:	e096      	b.n	800283c <conf_inicial_func+0x6bc>
 			}else{
  800270e:	466b      	mov	r3, sp
  8002710:	461c      	mov	r4, r3
@@ -4816,21 +4816,21 @@ void config_task_func(void *argument)
 				for (m=0 ; m<j ; m++){
  800276c:	2300      	movs	r3, #0
  800276e:	f8c7 30c4 	str.w	r3, [r7, #196]	; 0xc4
- 8002772:	e02d      	b.n	80027d0 <config_task_func+0x650>
+ 8002772:	e02d      	b.n	80027d0 <conf_inicial_func+0x650>
  8002774:	2000030c 	.word	0x2000030c
  8002778:	20000908 	.word	0x20000908
- 800277c:	08016a28 	.word	0x08016a28
- 8002780:	08016bc8 	.word	0x08016bc8
- 8002784:	08016bf0 	.word	0x08016bf0
- 8002788:	08016c08 	.word	0x08016c08
- 800278c:	08016c44 	.word	0x08016c44
- 8002790:	08016c54 	.word	0x08016c54
- 8002794:	08016c90 	.word	0x08016c90
- 8002798:	08016ca4 	.word	0x08016ca4
+ 800277c:	08016a2c 	.word	0x08016a2c
+ 8002780:	08016bcc 	.word	0x08016bcc
+ 8002784:	08016bf4 	.word	0x08016bf4
+ 8002788:	08016c0c 	.word	0x08016c0c
+ 800278c:	08016c48 	.word	0x08016c48
+ 8002790:	08016c58 	.word	0x08016c58
+ 8002794:	08016c94 	.word	0x08016c94
+ 8002798:	08016ca8 	.word	0x08016ca8
  800279c:	2000090c 	.word	0x2000090c
- 80027a0:	08016b48 	.word	0x08016b48
- 80027a4:	08016b5c 	.word	0x08016b5c
- 80027a8:	08016b70 	.word	0x08016b70
+ 80027a0:	08016b4c 	.word	0x08016b4c
+ 80027a4:	08016b60 	.word	0x08016b60
+ 80027a8:	08016b74 	.word	0x08016b74
 //					printf("m: %d\r\n",m);
 //					printf("caracter: %c\r\n",recibido[m]);
 					psswrd[m] = recibido[m];
@@ -4850,11 +4850,11 @@ void config_task_func(void *argument)
  80027d0:	f8d7 20c4 	ldr.w	r2, [r7, #196]	; 0xc4
  80027d4:	f8d7 30c0 	ldr.w	r3, [r7, #192]	; 0xc0
  80027d8:	429a      	cmp	r2, r3
- 80027da:	dbe7      	blt.n	80027ac <config_task_func+0x62c>
+ 80027da:	dbe7      	blt.n	80027ac <conf_inicial_func+0x62c>
 				}
 
 				osMessageQueuePut(print_queueHandle, &msg_wifi_connect_init, 0, pdMS_TO_TICKS(500));
- 80027dc:	4b1b      	ldr	r3, [pc, #108]	; (800284c <config_task_func+0x6cc>)
+ 80027dc:	4b1b      	ldr	r3, [pc, #108]	; (800284c <conf_inicial_func+0x6cc>)
  80027de:	6818      	ldr	r0, [r3, #0]
  80027e0:	f107 0130 	add.w	r1, r7, #48	; 0x30
  80027e4:	f44f 73fa 	mov.w	r3, #500	; 0x1f4
@@ -4867,16 +4867,16 @@ void config_task_func(void *argument)
  80027f6:	f7ff f951 	bl	8001a9c <wifi_connect>
  80027fa:	4603      	mov	r3, r0
  80027fc:	2b00      	cmp	r3, #0
- 80027fe:	d00a      	beq.n	8002816 <config_task_func+0x696>
+ 80027fe:	d00a      	beq.n	8002816 <conf_inicial_func+0x696>
 					osMessageQueuePut(print_queueHandle, &msg_wifi_connect_error, 0, pdMS_TO_TICKS(500));
- 8002800:	4b12      	ldr	r3, [pc, #72]	; (800284c <config_task_func+0x6cc>)
+ 8002800:	4b12      	ldr	r3, [pc, #72]	; (800284c <conf_inicial_func+0x6cc>)
  8002802:	6818      	ldr	r0, [r3, #0]
  8002804:	f107 012c 	add.w	r1, r7, #44	; 0x2c
  8002808:	f44f 73fa 	mov.w	r3, #500	; 0x1f4
  800280c:	2200      	movs	r2, #0
  800280e:	f00d fe6b 	bl	80104e8 <osMessageQueuePut>
  8002812:	46a5      	mov	sp, r4
- 8002814:	e012      	b.n	800283c <config_task_func+0x6bc>
+ 8002814:	e012      	b.n	800283c <conf_inicial_func+0x6bc>
 				}
 				else{
 					break;
@@ -4889,7 +4889,7 @@ void config_task_func(void *argument)
 	}
 
 	osMessageQueuePut(print_queueHandle, &msg_wifi_connect_success, 0, pdMS_TO_TICKS(500));
- 800281c:	4b0b      	ldr	r3, [pc, #44]	; (800284c <config_task_func+0x6cc>)
+ 800281c:	4b0b      	ldr	r3, [pc, #44]	; (800284c <conf_inicial_func+0x6cc>)
  800281e:	6818      	ldr	r0, [r3, #0]
  8002820:	f107 0128 	add.w	r1, r7, #40	; 0x28
  8002824:	f44f 73fa 	mov.w	r3, #500	; 0x1f4
@@ -4898,15 +4898,15 @@ void config_task_func(void *argument)
 
 
 	osThreadFlagsSet(clientMQTTHandle,0x0001U);
- 800282e:	4b08      	ldr	r3, [pc, #32]	; (8002850 <config_task_func+0x6d0>)
+ 800282e:	4b08      	ldr	r3, [pc, #32]	; (8002850 <conf_inicial_func+0x6d0>)
  8002830:	681b      	ldr	r3, [r3, #0]
  8002832:	2101      	movs	r1, #1
  8002834:	4618      	mov	r0, r3
  8002836:	f00d fcf9 	bl	801022c <osThreadFlagsSet>
- 800283a:	e001      	b.n	8002840 <config_task_func+0x6c0>
+ 800283a:	e001      	b.n	8002840 <conf_inicial_func+0x6c0>
  800283c:	46ad      	mov	sp, r5
 		osMessageQueuePut(print_queueHandle, &msg_introduce_ssid, 0, pdMS_TO_TICKS(500));
- 800283e:	e672      	b.n	8002526 <config_task_func+0x3a6>
+ 800283e:	e672      	b.n	8002526 <conf_inicial_func+0x3a6>
 
   /* Infinite loop */
   for(;;)
@@ -4915,7 +4915,7 @@ void config_task_func(void *argument)
 	  osDelay(pdMS_TO_TICKS(1000));
  8002840:	f44f 707a 	mov.w	r0, #1000	; 0x3e8
  8002844:	f00d fdc1 	bl	80103ca <osDelay>
- 8002848:	e7fa      	b.n	8002840 <config_task_func+0x6c0>
+ 8002848:	e7fa      	b.n	8002840 <conf_inicial_func+0x6c0>
  800284a:	bf00      	nop
  800284c:	20000908 	.word	0x20000908
  8002850:	20000904 	.word	0x20000904
@@ -5207,25 +5207,25 @@ void readAccel_func(void *argument)
 		return_wait = osThreadFlagsWait(0x0006U, osFlagsWaitAny, osWaitForever); //espera media hora o que alguien pulse el boton
  8002a7c:	e71a      	b.n	80028b4 <readAccel_func+0x60>
  8002a7e:	bf00      	nop
- 8002a80:	08016cdc 	.word	0x08016cdc
+ 8002a80:	08016ce0 	.word	0x08016ce0
  8002a84:	20000900 	.word	0x20000900
- 8002a88:	08016cf8 	.word	0x08016cf8
- 8002a8c:	08016d14 	.word	0x08016d14
- 8002a90:	08016d30 	.word	0x08016d30
- 8002a94:	08016d50 	.word	0x08016d50
+ 8002a88:	08016cfc 	.word	0x08016cfc
+ 8002a8c:	08016d18 	.word	0x08016d18
+ 8002a90:	08016d34 	.word	0x08016d34
+ 8002a94:	08016d54 	.word	0x08016d54
  8002a98:	2000092d 	.word	0x2000092d
- 8002a9c:	08016d68 	.word	0x08016d68
+ 8002a9c:	08016d6c 	.word	0x08016d6c
  8002aa0:	20000908 	.word	0x20000908
  8002aa4:	20000000 	.word	0x20000000
- 8002aa8:	08016da8 	.word	0x08016da8
+ 8002aa8:	08016dac 	.word	0x08016dac
  8002aac:	20000918 	.word	0x20000918
  8002ab0:	2000030c 	.word	0x2000030c
  8002ab4:	447a0000 	.word	0x447a0000
  8002ab8:	20000914 	.word	0x20000914
- 8002abc:	08016dd8 	.word	0x08016dd8
- 8002ac0:	08016df8 	.word	0x08016df8
+ 8002abc:	08016ddc 	.word	0x08016ddc
+ 8002ac0:	08016dfc 	.word	0x08016dfc
  8002ac4:	20000910 	.word	0x20000910
- 8002ac8:	08016e04 	.word	0x08016e04
+ 8002ac8:	08016e08 	.word	0x08016e08
 
 08002acc <printTask_func>:
 * @param argument: Not used
@@ -5292,8 +5292,8 @@ void printTask_func(void *argument)
  8002b22:	bf00      	nop
  8002b24:	20000908 	.word	0x20000908
  8002b28:	200003e0 	.word	0x200003e0
- 8002b2c:	08016e64 	.word	0x08016e64
- 8002b30:	08016e78 	.word	0x08016e78
+ 8002b2c:	08016e68 	.word	0x08016e68
+ 8002b30:	08016e7c 	.word	0x08016e7c
 
 08002b34 <tarea_UART_func>:
 * @param argument: Not used
@@ -5344,8 +5344,8 @@ void tarea_UART_func(void *argument)
  8002b72:	e7e5      	b.n	8002b40 <tarea_UART_func+0xc>
  8002b74:	2000090c 	.word	0x2000090c
  8002b78:	20000938 	.word	0x20000938
- 8002b7c:	08016e94 	.word	0x08016e94
- 8002b80:	08016bb4 	.word	0x08016bb4
+ 8002b7c:	08016e98 	.word	0x08016e98
+ 8002b80:	08016bb8 	.word	0x08016bb8
 
 08002b84 <temporizador_func>:
 * @param argument: Not used
@@ -5382,7 +5382,7 @@ void temporizador_func(void *argument)
     osDelay(pdMS_TO_TICKS(1800000)); //Periodo en ms con el que se mandan las aceleraciones
  8002bb0:	e7f5      	b.n	8002b9e <temporizador_func+0x1a>
  8002bb2:	bf00      	nop
- 8002bb4:	08016ea0 	.word	0x08016ea0
+ 8002bb4:	08016ea4 	.word	0x08016ea4
  8002bb8:	001b7740 	.word	0x001b7740
  8002bbc:	200008f4 	.word	0x200008f4
 
@@ -5515,11 +5515,11 @@ uint32_t ulNewBASEPRI;
   /* Infinite loop */
 	for(;;)
 	{
-		estado = osMessageQueueGet(publish_queueHandle, &mensaje, NULL, pdMS_TO_TICKS(5000)); //Minimo la mitad de tiempo de lo que tarda en actualizar el valor el otro nodo
+		estado = osMessageQueueGet(publish_queueHandle, &mensaje, NULL, pdMS_TO_TICKS(3000)); //Minimo la mitad de tiempo de lo que tarda en actualizar el valor el otro nodo
  8002c86:	4b2f      	ldr	r3, [pc, #188]	; (8002d44 <clientMQTT_func+0x184>)
  8002c88:	6818      	ldr	r0, [r3, #0]
  8002c8a:	f107 0180 	add.w	r1, r7, #128	; 0x80
- 8002c8e:	f241 3388 	movw	r3, #5000	; 0x1388
+ 8002c8e:	f640 33b8 	movw	r3, #3000	; 0xbb8
  8002c92:	2200      	movs	r2, #0
  8002c94:	f00d fc88 	bl	80105a8 <osMessageQueueGet>
  8002c98:	f8c7 0088 	str.w	r0, [r7, #136]	; 0x88
@@ -5585,25 +5585,25 @@ uint32_t ulNewBASEPRI;
 			 printf("Error en la tarea sendMQTT\r\n");
  8002d12:	4811      	ldr	r0, [pc, #68]	; (8002d58 <clientMQTT_func+0x198>)
  8002d14:	f011 fc7c 	bl	8014610 <puts>
-		estado = osMessageQueueGet(publish_queueHandle, &mensaje, NULL, pdMS_TO_TICKS(5000)); //Minimo la mitad de tiempo de lo que tarda en actualizar el valor el otro nodo
+		estado = osMessageQueueGet(publish_queueHandle, &mensaje, NULL, pdMS_TO_TICKS(3000)); //Minimo la mitad de tiempo de lo que tarda en actualizar el valor el otro nodo
  8002d18:	e7b5      	b.n	8002c86 <clientMQTT_func+0xc6>
  8002d1a:	bf00      	nop
- 8002d1c:	08016eb8 	.word	0x08016eb8
- 8002d20:	08016ed0 	.word	0x08016ed0
- 8002d24:	08016a50 	.word	0x08016a50
- 8002d28:	08016a6c 	.word	0x08016a6c
- 8002d2c:	08016a88 	.word	0x08016a88
+ 8002d1c:	08016ebc 	.word	0x08016ebc
+ 8002d20:	08016ed4 	.word	0x08016ed4
+ 8002d24:	08016a54 	.word	0x08016a54
+ 8002d28:	08016a70 	.word	0x08016a70
+ 8002d2c:	08016a8c 	.word	0x08016a8c
  8002d30:	20000908 	.word	0x20000908
- 8002d34:	08016ef0 	.word	0x08016ef0
+ 8002d34:	08016ef4 	.word	0x08016ef4
  8002d38:	200008f4 	.word	0x200008f4
- 8002d3c:	08016f0c 	.word	0x08016f0c
- 8002d40:	08016f1c 	.word	0x08016f1c
+ 8002d3c:	08016f10 	.word	0x08016f10
+ 8002d40:	08016f20 	.word	0x08016f20
  8002d44:	20000910 	.word	0x20000910
- 8002d48:	08016f2c 	.word	0x08016f2c
- 8002d4c:	08016f30 	.word	0x08016f30
- 8002d50:	08016f48 	.word	0x08016f48
+ 8002d48:	08016f30 	.word	0x08016f30
+ 8002d4c:	08016f34 	.word	0x08016f34
+ 8002d50:	08016f4c 	.word	0x08016f4c
  8002d54:	2000092d 	.word	0x2000092d
- 8002d58:	08016f64 	.word	0x08016f64
+ 8002d58:	08016f68 	.word	0x08016f68
 
 08002d5c <HAL_TIM_PeriodElapsedCallback>:
   * a global variable "uwTick" used as application time base.
@@ -5757,10 +5757,10 @@ TransportStatus_t prvConnectToServer( NetworkContext_t * pxNetworkContext, uint8
  8002e0c:	bd80      	pop	{r7, pc}
  8002e0e:	bf00      	nop
  8002e10:	5e5d795b 	.word	0x5e5d795b
- 8002e14:	08016f98 	.word	0x08016f98
- 8002e18:	08016fac 	.word	0x08016fac
- 8002e1c:	08016fd0 	.word	0x08016fd0
- 8002e20:	08016fd8 	.word	0x08016fd8
+ 8002e14:	08016f9c 	.word	0x08016f9c
+ 8002e18:	08016fb0 	.word	0x08016fb0
+ 8002e1c:	08016fd4 	.word	0x08016fd4
+ 8002e20:	08016fdc 	.word	0x08016fdc
 
 08002e24 <prvCreateMQTTConnectionWithBroker>:
 
@@ -5914,9 +5914,9 @@ void prvCreateMQTTConnectionWithBroker( MQTTContext_t * pxMQTTContext,
  8002f04:	20000004 	.word	0x20000004
  8002f08:	0800305d 	.word	0x0800305d
  8002f0c:	0800302d 	.word	0x0800302d
- 8002f10:	08017000 	.word	0x08017000
- 8002f14:	08017014 	.word	0x08017014
- 8002f18:	08017024 	.word	0x08017024
+ 8002f10:	08017004 	.word	0x08017004
+ 8002f14:	08017018 	.word	0x08017018
+ 8002f18:	08017028 	.word	0x08017028
 
 08002f1c <prvMQTTPublishToTopic>:
 
@@ -6109,8 +6109,8 @@ void prvMQTTSubscribeToTopic( MQTTContext_t * pxMQTTContext, char * topic )
  8003018:	bd80      	pop	{r7, pc}
  800301a:	bf00      	nop
  800301c:	20000d24 	.word	0x20000d24
- 8003020:	08017040 	.word	0x08017040
- 8003024:	0801706c 	.word	0x0801706c
+ 8003020:	08017044 	.word	0x08017044
+ 8003024:	08017070 	.word	0x08017070
  8003028:	2000000c 	.word	0x2000000c
 
 0800302c <prvGetTimeMs>:
@@ -13478,7 +13478,7 @@ HAL_StatusTypeDef HAL_RCC_OscConfig(RCC_OscInitTypeDef  *RCC_OscInitStruct)
  800595c:	e014      	b.n	8005988 <HAL_RCC_OscConfig+0x298>
  800595e:	bf00      	nop
  8005960:	40021000 	.word	0x40021000
- 8005964:	08018218 	.word	0x08018218
+ 8005964:	0801821c 	.word	0x0801821c
  8005968:	20000014 	.word	0x20000014
  800596c:	20000018 	.word	0x20000018
  8005970:	4ba0      	ldr	r3, [pc, #640]	; (8005bf4 <HAL_RCC_OscConfig+0x504>)
@@ -14763,7 +14763,7 @@ HAL_StatusTypeDef HAL_RCC_ClockConfig(RCC_ClkInitTypeDef  *RCC_ClkInitStruct, ui
  800606e:	bf00      	nop
  8006070:	40022000 	.word	0x40022000
  8006074:	40021000 	.word	0x40021000
- 8006078:	08018218 	.word	0x08018218
+ 8006078:	0801821c 	.word	0x0801821c
  800607c:	20000014 	.word	0x20000014
  8006080:	20000018 	.word	0x20000018
 
@@ -14968,7 +14968,7 @@ uint32_t HAL_RCC_GetSysClockFreq(void)
  8006188:	4770      	bx	lr
  800618a:	bf00      	nop
  800618c:	40021000 	.word	0x40021000
- 8006190:	08018230 	.word	0x08018230
+ 8006190:	08018234 	.word	0x08018234
  8006194:	00f42400 	.word	0x00f42400
  8006198:	007a1200 	.word	0x007a1200
 
@@ -15017,7 +15017,7 @@ uint32_t HAL_RCC_GetPCLK1Freq(void)
  80061d4:	4618      	mov	r0, r3
  80061d6:	bd80      	pop	{r7, pc}
  80061d8:	40021000 	.word	0x40021000
- 80061dc:	08018228 	.word	0x08018228
+ 80061dc:	0801822c 	.word	0x0801822c
 
 080061e0 <HAL_RCC_GetPCLK2Freq>:
   * @note   Each time PCLK2 changes, this function must be called to update the
@@ -15044,7 +15044,7 @@ uint32_t HAL_RCC_GetPCLK2Freq(void)
  8006200:	4618      	mov	r0, r3
  8006202:	bd80      	pop	{r7, pc}
  8006204:	40021000 	.word	0x40021000
- 8006208:	08018228 	.word	0x08018228
+ 8006208:	0801822c 	.word	0x0801822c
 
 0800620c <HAL_RCC_GetClockConfig>:
   *         will be configured.
@@ -28939,8 +28939,8 @@ static void AT_ParseInfo(ES_WIFIObject_t *Obj,uint8_t *pdata)
  800af9a:	3710      	adds	r7, #16
  800af9c:	46bd      	mov	sp, r7
  800af9e:	bd80      	pop	{r7, pc}
- 800afa0:	08017180 	.word	0x08017180
- 800afa4:	08017184 	.word	0x08017184
+ 800afa0:	08017184 	.word	0x08017184
+ 800afa4:	08017188 	.word	0x08017188
 
 0800afa8 <AT_ParseConnSettings>:
   * @param  NetSettings: settings
@@ -29156,7 +29156,7 @@ static void AT_ParseConnSettings(char *pdata, ES_WIFI_Network_t *NetSettings)
  800b0fe:	3710      	adds	r7, #16
  800b100:	46bd      	mov	sp, r7
  800b102:	bd80      	pop	{r7, pc}
- 800b104:	08017180 	.word	0x08017180
+ 800b104:	08017184 	.word	0x08017184
 
 0800b108 <AT_ParseIsConnected>:
   * @param  pdata: pointer to data
@@ -29314,8 +29314,8 @@ static ES_WIFI_Status_t AT_ExecuteCommand(ES_WIFIObject_t *Obj, uint8_t* cmd, ui
  800b1f2:	46bd      	mov	sp, r7
  800b1f4:	bd90      	pop	{r4, r7, pc}
  800b1f6:	bf00      	nop
- 800b1f8:	08017194 	.word	0x08017194
- 800b1fc:	080171a0 	.word	0x080171a0
+ 800b1f8:	08017198 	.word	0x08017198
+ 800b1fc:	080171a4 	.word	0x080171a4
 
 0800b200 <AT_RequestSendData>:
   * @param  pdata: pointer to returned data
@@ -29473,8 +29473,8 @@ static ES_WIFI_Status_t AT_RequestSendData(ES_WIFIObject_t *Obj, uint8_t* cmd, u
  800b2de:	46bd      	mov	sp, r7
  800b2e0:	bd80      	pop	{r7, pc}
  800b2e2:	bf00      	nop
- 800b2e4:	08017194 	.word	0x08017194
- 800b2e8:	080171a0 	.word	0x080171a0
+ 800b2e4:	08017198 	.word	0x08017198
+ 800b2e8:	080171a4 	.word	0x080171a4
 
 0800b2ec <AT_RequestReceiveData>:
   * @param  Reqlen : requested Data length.
@@ -29667,8 +29667,8 @@ static ES_WIFI_Status_t AT_RequestReceiveData(ES_WIFIObject_t *Obj, uint8_t* cmd
  800b40a:	46bd      	mov	sp, r7
  800b40c:	bd90      	pop	{r4, r7, pc}
  800b40e:	bf00      	nop
- 800b410:	08017194 	.word	0x08017194
- 800b414:	080171a8 	.word	0x080171a8
+ 800b410:	08017198 	.word	0x08017198
+ 800b414:	080171ac 	.word	0x080171ac
 
 0800b418 <ES_WIFI_Init>:
   * @brief  Initialize WIFI module.
@@ -29732,7 +29732,7 @@ ES_WIFI_Status_t  ES_WIFI_Init(ES_WIFIObject_t *Obj)
  800b46a:	3710      	adds	r7, #16
  800b46c:	46bd      	mov	sp, r7
  800b46e:	bd80      	pop	{r7, pc}
- 800b470:	080171b0 	.word	0x080171b0
+ 800b470:	080171b4 	.word	0x080171b4
 
 0800b474 <ES_WIFI_RegisterBusIO>:
 ES_WIFI_Status_t  ES_WIFI_RegisterBusIO(ES_WIFIObject_t *Obj, IO_Init_Func IO_Init,
@@ -29928,10 +29928,10 @@ ES_WIFI_Status_t ES_WIFI_Connect(ES_WIFIObject_t *Obj, const char* SSID,
  800b5b6:	46bd      	mov	sp, r7
  800b5b8:	bd80      	pop	{r7, pc}
  800b5ba:	bf00      	nop
- 800b5bc:	080171c8 	.word	0x080171c8
- 800b5c0:	080171d0 	.word	0x080171d0
- 800b5c4:	080171d8 	.word	0x080171d8
- 800b5c8:	080171e0 	.word	0x080171e0
+ 800b5bc:	080171cc 	.word	0x080171cc
+ 800b5c0:	080171d4 	.word	0x080171d4
+ 800b5c4:	080171dc 	.word	0x080171dc
+ 800b5c8:	080171e4 	.word	0x080171e4
 
 0800b5cc <ES_WIFI_IsConnected>:
 /**
@@ -29986,7 +29986,7 @@ uint8_t ES_WIFI_IsConnected(ES_WIFIObject_t *Obj)
  800b61a:	3710      	adds	r7, #16
  800b61c:	46bd      	mov	sp, r7
  800b61e:	bd80      	pop	{r7, pc}
- 800b620:	080171e4 	.word	0x080171e4
+ 800b620:	080171e8 	.word	0x080171e8
 
 0800b624 <ES_WIFI_GetNetworkSettings>:
   * @param  Obj: pointer to module handle
@@ -30042,7 +30042,7 @@ ES_WIFI_Status_t ES_WIFI_GetNetworkSettings(ES_WIFIObject_t *Obj)
  800b66e:	3710      	adds	r7, #16
  800b670:	46bd      	mov	sp, r7
  800b672:	bd80      	pop	{r7, pc}
- 800b674:	080171ec 	.word	0x080171ec
+ 800b674:	080171f0 	.word	0x080171f0
 
 0800b678 <ES_WIFI_GetMACAddress>:
   * @param  Obj: pointer to module handle
@@ -30103,8 +30103,8 @@ ES_WIFI_Status_t ES_WIFI_GetMACAddress(ES_WIFIObject_t *Obj, uint8_t *mac)
  800b6ce:	46bd      	mov	sp, r7
  800b6d0:	bd80      	pop	{r7, pc}
  800b6d2:	bf00      	nop
- 800b6d4:	0801723c 	.word	0x0801723c
- 800b6d8:	08017240 	.word	0x08017240
+ 800b6d4:	08017240 	.word	0x08017240
+ 800b6d8:	08017244 	.word	0x08017244
 
 0800b6dc <ES_WIFI_StartClientConnection>:
   * @param  Obj: pointer to module handle
@@ -30350,13 +30350,13 @@ ES_WIFI_Status_t ES_WIFI_StartClientConnection(ES_WIFIObject_t *Obj, ES_WIFI_Con
  800b88e:	46bd      	mov	sp, r7
  800b890:	bd90      	pop	{r4, r7, pc}
  800b892:	bf00      	nop
- 800b894:	080172a4 	.word	0x080172a4
- 800b898:	080172ac 	.word	0x080172ac
- 800b89c:	080172b4 	.word	0x080172b4
- 800b8a0:	080172bc 	.word	0x080172bc
- 800b8a4:	080172c4 	.word	0x080172c4
- 800b8a8:	080172d4 	.word	0x080172d4
- 800b8ac:	080172dc 	.word	0x080172dc
+ 800b894:	080172a8 	.word	0x080172a8
+ 800b898:	080172b0 	.word	0x080172b0
+ 800b89c:	080172b8 	.word	0x080172b8
+ 800b8a0:	080172c0 	.word	0x080172c0
+ 800b8a4:	080172c8 	.word	0x080172c8
+ 800b8a8:	080172d8 	.word	0x080172d8
+ 800b8ac:	080172e0 	.word	0x080172e0
 
 0800b8b0 <ES_WIFI_SendData>:
   * @param  pdata: pointer to data
@@ -30560,16 +30560,16 @@ ES_WIFI_Status_t ES_WIFI_SendData(ES_WIFIObject_t *Obj, uint8_t Socket, uint8_t 
  800b9fa:	3718      	adds	r7, #24
  800b9fc:	46bd      	mov	sp, r7
  800b9fe:	bd80      	pop	{r7, pc}
- 800ba00:	080172a4 	.word	0x080172a4
- 800ba04:	08017468 	.word	0x08017468
- 800ba08:	08017470 	.word	0x08017470
- 800ba0c:	0801747c 	.word	0x0801747c
- 800ba10:	08017334 	.word	0x08017334
- 800ba14:	0801735c 	.word	0x0801735c
- 800ba18:	08017484 	.word	0x08017484
- 800ba1c:	080174a0 	.word	0x080174a0
- 800ba20:	080174bc 	.word	0x080174bc
- 800ba24:	080174d0 	.word	0x080174d0
+ 800ba00:	080172a8 	.word	0x080172a8
+ 800ba04:	0801746c 	.word	0x0801746c
+ 800ba08:	08017474 	.word	0x08017474
+ 800ba0c:	08017480 	.word	0x08017480
+ 800ba10:	08017338 	.word	0x08017338
+ 800ba14:	08017360 	.word	0x08017360
+ 800ba18:	08017488 	.word	0x08017488
+ 800ba1c:	080174a4 	.word	0x080174a4
+ 800ba20:	080174c0 	.word	0x080174c0
+ 800ba24:	080174d4 	.word	0x080174d4
 
 0800ba28 <ES_WIFI_ReceiveData>:
   * @param  pdata: pointer to data
@@ -30772,16 +30772,16 @@ ES_WIFI_Status_t ES_WIFI_ReceiveData(ES_WIFIObject_t *Obj, uint8_t Socket, uint8
  800bb76:	46bd      	mov	sp, r7
  800bb78:	bd80      	pop	{r7, pc}
  800bb7a:	bf00      	nop
- 800bb7c:	080172a4 	.word	0x080172a4
- 800bb80:	080174f4 	.word	0x080174f4
- 800bb84:	080174fc 	.word	0x080174fc
- 800bb88:	08017504 	.word	0x08017504
- 800bb8c:	08017334 	.word	0x08017334
- 800bb90:	0801735c 	.word	0x0801735c
- 800bb94:	08017508 	.word	0x08017508
- 800bb98:	08017528 	.word	0x08017528
- 800bb9c:	08017540 	.word	0x08017540
- 800bba0:	08017560 	.word	0x08017560
+ 800bb7c:	080172a8 	.word	0x080172a8
+ 800bb80:	080174f8 	.word	0x080174f8
+ 800bb84:	08017500 	.word	0x08017500
+ 800bb88:	08017508 	.word	0x08017508
+ 800bb8c:	08017338 	.word	0x08017338
+ 800bb90:	08017360 	.word	0x08017360
+ 800bb94:	0801750c 	.word	0x0801750c
+ 800bb98:	0801752c 	.word	0x0801752c
+ 800bb9c:	08017544 	.word	0x08017544
+ 800bba0:	08017564 	.word	0x08017564
  800bba4:	20000df8 	.word	0x20000df8
 
 0800bba8 <SPI_WIFI_MspInit>:
@@ -32565,13 +32565,13 @@ static int32_t sendMessageVector( MQTTContext_t * pContext,
  800c5ee:	3728      	adds	r7, #40	; 0x28
  800c5f0:	46bd      	mov	sp, r7
  800c5f2:	bd80      	pop	{r7, pc}
- 800c5f4:	08017708 	.word	0x08017708
- 800c5f8:	08018260 	.word	0x08018260
- 800c5fc:	0801762c 	.word	0x0801762c
- 800c600:	0801771c 	.word	0x0801771c
- 800c604:	0801772c 	.word	0x0801772c
- 800c608:	08017748 	.word	0x08017748
- 800c60c:	08017774 	.word	0x08017774
+ 800c5f4:	0801770c 	.word	0x0801770c
+ 800c5f8:	08018264 	.word	0x08018264
+ 800c5fc:	08017630 	.word	0x08017630
+ 800c600:	08017720 	.word	0x08017720
+ 800c604:	08017730 	.word	0x08017730
+ 800c608:	0801774c 	.word	0x0801774c
+ 800c60c:	08017778 	.word	0x08017778
 
 0800c610 <sendBuffer>:
 
@@ -32750,13 +32750,13 @@ static int32_t sendBuffer( MQTTContext_t * pContext,
  800c70a:	3720      	adds	r7, #32
  800c70c:	46bd      	mov	sp, r7
  800c70e:	bd80      	pop	{r7, pc}
- 800c710:	08017708 	.word	0x08017708
- 800c714:	08018274 	.word	0x08018274
- 800c718:	0801762c 	.word	0x0801762c
- 800c71c:	0801772c 	.word	0x0801772c
- 800c720:	08017748 	.word	0x08017748
- 800c724:	080177b4 	.word	0x080177b4
- 800c728:	08017774 	.word	0x08017774
+ 800c710:	0801770c 	.word	0x0801770c
+ 800c714:	08018278 	.word	0x08018278
+ 800c718:	08017630 	.word	0x08017630
+ 800c71c:	08017730 	.word	0x08017730
+ 800c720:	0801774c 	.word	0x0801774c
+ 800c724:	080177b8 	.word	0x080177b8
+ 800c728:	08017778 	.word	0x08017778
 
 0800c72c <calculateElapsedTime>:
 
@@ -32856,9 +32856,9 @@ static MQTTPubAckType_t getAckFromPacketType( uint8_t packetType )
  800c79a:	3710      	adds	r7, #16
  800c79c:	46bd      	mov	sp, r7
  800c79e:	bd80      	pop	{r7, pc}
- 800c7a0:	080177c4 	.word	0x080177c4
- 800c7a4:	08018280 	.word	0x08018280
- 800c7a8:	0801762c 	.word	0x0801762c
+ 800c7a0:	080177c8 	.word	0x080177c8
+ 800c7a4:	08018284 	.word	0x08018284
+ 800c7a8:	08017630 	.word	0x08017630
 
 0800c7ac <recvExact>:
 
@@ -33083,14 +33083,14 @@ static int32_t recvExact( const MQTTContext_t * pContext,
  800c8ea:	46bd      	mov	sp, r7
  800c8ec:	bd80      	pop	{r7, pc}
  800c8ee:	bf00      	nop
- 800c8f0:	08017708 	.word	0x08017708
- 800c8f4:	08018298 	.word	0x08018298
- 800c8f8:	0801762c 	.word	0x0801762c
- 800c8fc:	080177ec 	.word	0x080177ec
- 800c900:	0801772c 	.word	0x0801772c
- 800c904:	08017818 	.word	0x08017818
- 800c908:	08017844 	.word	0x08017844
- 800c90c:	0801786c 	.word	0x0801786c
+ 800c8f0:	0801770c 	.word	0x0801770c
+ 800c8f4:	0801829c 	.word	0x0801829c
+ 800c8f8:	08017630 	.word	0x08017630
+ 800c8fc:	080177f0 	.word	0x080177f0
+ 800c900:	08017730 	.word	0x08017730
+ 800c904:	0801781c 	.word	0x0801781c
+ 800c908:	08017848 	.word	0x08017848
+ 800c90c:	08017870 	.word	0x08017870
 
 0800c910 <discardPacket>:
 /*-----------------------------------------------------------*/
@@ -33267,10 +33267,10 @@ static MQTTStatus_t discardPacket( const MQTTContext_t * pContext,
  800c9fe:	46bd      	mov	sp, r7
  800ca00:	bd80      	pop	{r7, pc}
  800ca02:	bf00      	nop
- 800ca04:	08017708 	.word	0x08017708
- 800ca08:	080182a4 	.word	0x080182a4
- 800ca0c:	0801762c 	.word	0x0801762c
- 800ca10:	0801772c 	.word	0x0801772c
+ 800ca04:	0801770c 	.word	0x0801770c
+ 800ca08:	080182a8 	.word	0x080182a8
+ 800ca0c:	08017630 	.word	0x08017630
+ 800ca10:	08017730 	.word	0x08017730
 
 0800ca14 <discardStoredPacket>:
 
@@ -33458,11 +33458,11 @@ static MQTTStatus_t discardStoredPacket( MQTTContext_t * pContext,
  800cb0a:	46bd      	mov	sp, r7
  800cb0c:	bd80      	pop	{r7, pc}
  800cb0e:	bf00      	nop
- 800cb10:	08017708 	.word	0x08017708
- 800cb14:	080182b4 	.word	0x080182b4
- 800cb18:	0801762c 	.word	0x0801762c
- 800cb1c:	08017894 	.word	0x08017894
- 800cb20:	080178a8 	.word	0x080178a8
+ 800cb10:	0801770c 	.word	0x0801770c
+ 800cb14:	080182b8 	.word	0x080182b8
+ 800cb18:	08017630 	.word	0x08017630
+ 800cb1c:	08017898 	.word	0x08017898
+ 800cb20:	080178ac 	.word	0x080178ac
 
 0800cb24 <receivePacket>:
 /*-----------------------------------------------------------*/
@@ -33568,10 +33568,10 @@ static MQTTStatus_t receivePacket( const MQTTContext_t * pContext,
  800cbae:	b004      	add	sp, #16
  800cbb0:	4770      	bx	lr
  800cbb2:	bf00      	nop
- 800cbb4:	08017708 	.word	0x08017708
- 800cbb8:	080182c8 	.word	0x080182c8
- 800cbbc:	0801762c 	.word	0x0801762c
- 800cbc0:	08017844 	.word	0x08017844
+ 800cbb4:	0801770c 	.word	0x0801770c
+ 800cbb8:	080182cc 	.word	0x080182cc
+ 800cbbc:	08017630 	.word	0x08017630
+ 800cbc0:	08017848 	.word	0x08017848
 
 0800cbc4 <getAckTypeToSend>:
 
@@ -33787,9 +33787,9 @@ static MQTTStatus_t sendPublishAcks( MQTTContext_t * pContext,
  800ccca:	46bd      	mov	sp, r7
  800cccc:	bd80      	pop	{r7, pc}
  800ccce:	bf00      	nop
- 800ccd0:	08017708 	.word	0x08017708
- 800ccd4:	080182d8 	.word	0x080182d8
- 800ccd8:	0801762c 	.word	0x0801762c
+ 800ccd0:	0801770c 	.word	0x0801770c
+ 800ccd4:	080182dc 	.word	0x080182dc
+ 800ccd8:	08017630 	.word	0x08017630
 
 0800ccdc <handleKeepAlive>:
 
@@ -33941,10 +33941,10 @@ static MQTTStatus_t handleKeepAlive( MQTTContext_t * pContext )
  800cdbe:	46bd      	mov	sp, r7
  800cdc0:	bd80      	pop	{r7, pc}
  800cdc2:	bf00      	nop
- 800cdc4:	08017708 	.word	0x08017708
- 800cdc8:	080182e8 	.word	0x080182e8
- 800cdcc:	0801762c 	.word	0x0801762c
- 800cdd0:	0801772c 	.word	0x0801772c
+ 800cdc4:	0801770c 	.word	0x0801770c
+ 800cdc8:	080182ec 	.word	0x080182ec
+ 800cdcc:	08017630 	.word	0x08017630
+ 800cdd0:	08017730 	.word	0x08017730
 
 0800cdd4 <handleIncomingPublish>:
 
@@ -34155,11 +34155,11 @@ static MQTTStatus_t handleIncomingPublish( MQTTContext_t * pContext,
  800cf02:	46bd      	mov	sp, r7
  800cf04:	bd80      	pop	{r7, pc}
  800cf06:	bf00      	nop
- 800cf08:	08017708 	.word	0x08017708
- 800cf0c:	080182f8 	.word	0x080182f8
- 800cf10:	0801762c 	.word	0x0801762c
- 800cf14:	080178d8 	.word	0x080178d8
- 800cf18:	080178f0 	.word	0x080178f0
+ 800cf08:	0801770c 	.word	0x0801770c
+ 800cf0c:	080182fc 	.word	0x080182fc
+ 800cf10:	08017630 	.word	0x08017630
+ 800cf14:	080178dc 	.word	0x080178dc
+ 800cf18:	080178f4 	.word	0x080178f4
 
 0800cf1c <handlePublishAcks>:
 
@@ -34304,11 +34304,11 @@ static MQTTStatus_t handlePublishAcks( MQTTContext_t * pContext,
  800cfe2:	46bd      	mov	sp, r7
  800cfe4:	bd80      	pop	{r7, pc}
  800cfe6:	bf00      	nop
- 800cfe8:	08017708 	.word	0x08017708
- 800cfec:	08018310 	.word	0x08018310
- 800cff0:	0801762c 	.word	0x0801762c
- 800cff4:	080178d8 	.word	0x080178d8
- 800cff8:	080178f0 	.word	0x080178f0
+ 800cfe8:	0801770c 	.word	0x0801770c
+ 800cfec:	08018314 	.word	0x08018314
+ 800cff0:	08017630 	.word	0x08017630
+ 800cff4:	080178dc 	.word	0x080178dc
+ 800cff8:	080178f4 	.word	0x080178f4
 
 0800cffc <handleIncomingAck>:
 /*-----------------------------------------------------------*/
@@ -34540,11 +34540,11 @@ static MQTTStatus_t handleIncomingAck( MQTTContext_t * pContext,
  800d172:	46bd      	mov	sp, r7
  800d174:	bd80      	pop	{r7, pc}
  800d176:	bf00      	nop
- 800d178:	08017708 	.word	0x08017708
- 800d17c:	08018324 	.word	0x08018324
- 800d180:	0801762c 	.word	0x0801762c
- 800d184:	080178d8 	.word	0x080178d8
- 800d188:	080178f0 	.word	0x080178f0
+ 800d178:	0801770c 	.word	0x0801770c
+ 800d17c:	08018328 	.word	0x08018328
+ 800d180:	08017630 	.word	0x08017630
+ 800d184:	080178dc 	.word	0x080178dc
+ 800d188:	080178f4 	.word	0x080178f4
 
 0800d18c <receiveSingleIteration>:
 /*-----------------------------------------------------------*/
@@ -34871,10 +34871,10 @@ static MQTTStatus_t receiveSingleIteration( MQTTContext_t * pContext,
  800d34e:	46bd      	mov	sp, r7
  800d350:	bd90      	pop	{r4, r7, pc}
  800d352:	bf00      	nop
- 800d354:	08017708 	.word	0x08017708
- 800d358:	08018338 	.word	0x08018338
- 800d35c:	0801762c 	.word	0x0801762c
- 800d360:	08017844 	.word	0x08017844
+ 800d354:	0801770c 	.word	0x0801770c
+ 800d358:	0801833c 	.word	0x0801833c
+ 800d35c:	08017630 	.word	0x08017630
+ 800d360:	08017848 	.word	0x08017848
 
 0800d364 <validateSubscribeUnsubscribeParams>:
 
@@ -35117,9 +35117,9 @@ static size_t addEncodedStringToVector( uint8_t serailizedLength[ 2 ],
  800d48e:	46bd      	mov	sp, r7
  800d490:	bd80      	pop	{r7, pc}
  800d492:	bf00      	nop
- 800d494:	08017910 	.word	0x08017910
- 800d498:	08018350 	.word	0x08018350
- 800d49c:	0801762c 	.word	0x0801762c
+ 800d494:	08017914 	.word	0x08017914
+ 800d498:	08018354 	.word	0x08018354
+ 800d49c:	08017630 	.word	0x08017630
 
 0800d4a0 <sendSubscribeWithoutCopy>:
 static MQTTStatus_t sendSubscribeWithoutCopy( MQTTContext_t * pContext,
@@ -35386,9 +35386,9 @@ static MQTTStatus_t sendSubscribeWithoutCopy( MQTTContext_t * pContext,
  800d602:	3768      	adds	r7, #104	; 0x68
  800d604:	46bd      	mov	sp, r7
  800d606:	bd80      	pop	{r7, pc}
- 800d608:	08017938 	.word	0x08017938
- 800d60c:	0801836c 	.word	0x0801836c
- 800d610:	0801762c 	.word	0x0801762c
+ 800d608:	0801793c 	.word	0x0801793c
+ 800d60c:	08018370 	.word	0x08018370
+ 800d610:	08017630 	.word	0x08017630
 
 0800d614 <sendPublishWithoutCopy>:
 static MQTTStatus_t sendPublishWithoutCopy( MQTTContext_t * pContext,
@@ -35864,9 +35864,9 @@ static MQTTStatus_t sendConnectWithoutCopy( MQTTContext_t * pContext,
  800d926:	37a8      	adds	r7, #168	; 0xa8
  800d928:	46bd      	mov	sp, r7
  800d92a:	bd80      	pop	{r7, pc}
- 800d92c:	080179b0 	.word	0x080179b0
- 800d930:	08018388 	.word	0x08018388
- 800d934:	0801762c 	.word	0x0801762c
+ 800d92c:	080179b4 	.word	0x080179b4
+ 800d930:	0801838c 	.word	0x0801838c
+ 800d934:	08017630 	.word	0x08017630
 
 0800d938 <receiveConnack>:
 static MQTTStatus_t receiveConnack( const MQTTContext_t * pContext,
@@ -36126,11 +36126,11 @@ static MQTTStatus_t receiveConnack( const MQTTContext_t * pContext,
  800daa2:	3728      	adds	r7, #40	; 0x28
  800daa4:	46bd      	mov	sp, r7
  800daa6:	bd80      	pop	{r7, pc}
- 800daa8:	08017708 	.word	0x08017708
- 800daac:	080183a0 	.word	0x080183a0
- 800dab0:	0801762c 	.word	0x0801762c
- 800dab4:	080178d8 	.word	0x080178d8
- 800dab8:	0801772c 	.word	0x0801772c
+ 800daa8:	0801770c 	.word	0x0801770c
+ 800daac:	080183a4 	.word	0x080183a4
+ 800dab0:	08017630 	.word	0x08017630
+ 800dab4:	080178dc 	.word	0x080178dc
+ 800dab8:	08017730 	.word	0x08017730
 
 0800dabc <handleSessionResumption>:
 
@@ -36281,9 +36281,9 @@ static MQTTStatus_t handleSessionResumption( MQTTContext_t * pContext,
  800db8a:	46bd      	mov	sp, r7
  800db8c:	bd80      	pop	{r7, pc}
  800db8e:	bf00      	nop
- 800db90:	08017708 	.word	0x08017708
- 800db94:	080183b0 	.word	0x080183b0
- 800db98:	0801762c 	.word	0x0801762c
+ 800db90:	0801770c 	.word	0x0801770c
+ 800db94:	080183b4 	.word	0x080183b4
+ 800db98:	08017630 	.word	0x08017630
 
 0800db9c <validatePublishParams>:
 
@@ -37363,9 +37363,9 @@ static uint8_t * encodeRemainingLength( uint8_t * pDestination,
  800e0ce:	3718      	adds	r7, #24
  800e0d0:	46bd      	mov	sp, r7
  800e0d2:	bd80      	pop	{r7, pc}
- 800e0d4:	08017bb0 	.word	0x08017bb0
- 800e0d8:	080183c8 	.word	0x080183c8
- 800e0dc:	08017bc8 	.word	0x08017bc8
+ 800e0d4:	08017bb4 	.word	0x08017bb4
+ 800e0d8:	080183cc 	.word	0x080183cc
+ 800e0dc:	08017bcc 	.word	0x08017bcc
 
 0800e0e0 <encodeString>:
 /*-----------------------------------------------------------*/
@@ -37458,9 +37458,9 @@ static uint8_t * encodeString( uint8_t * pDestination,
  800e14e:	46bd      	mov	sp, r7
  800e150:	bd80      	pop	{r7, pc}
  800e152:	bf00      	nop
- 800e154:	08017bb0 	.word	0x08017bb0
- 800e158:	080183e0 	.word	0x080183e0
- 800e15c:	08017bc8 	.word	0x08017bc8
+ 800e154:	08017bb4 	.word	0x08017bb4
+ 800e158:	080183e4 	.word	0x080183e4
+ 800e15c:	08017bcc 	.word	0x08017bcc
 
 0800e160 <calculatePublishPacketSize>:
 /*-----------------------------------------------------------*/
@@ -37636,11 +37636,11 @@ static bool calculatePublishPacketSize( const MQTTPublishInfo_t * pPublishInfo,
  800e232:	46bd      	mov	sp, r7
  800e234:	bd80      	pop	{r7, pc}
  800e236:	bf00      	nop
- 800e238:	08017bfc 	.word	0x08017bfc
- 800e23c:	080183f0 	.word	0x080183f0
- 800e240:	08017bc8 	.word	0x08017bc8
- 800e244:	08017c14 	.word	0x08017c14
- 800e248:	08017c30 	.word	0x08017c30
+ 800e238:	08017c00 	.word	0x08017c00
+ 800e23c:	080183f4 	.word	0x080183f4
+ 800e240:	08017bcc 	.word	0x08017bcc
+ 800e244:	08017c18 	.word	0x08017c18
+ 800e248:	08017c34 	.word	0x08017c34
  800e24c:	0ffffffe 	.word	0x0ffffffe
 
 0800e250 <MQTT_SerializePublishHeaderWithoutTopic>:
@@ -38372,9 +38372,9 @@ static MQTTStatus_t processPublishFlags( uint8_t publishFlags,
  800e5ba:	46bd      	mov	sp, r7
  800e5bc:	bd80      	pop	{r7, pc}
  800e5be:	bf00      	nop
- 800e5c0:	08017bfc 	.word	0x08017bfc
- 800e5c4:	0801840c 	.word	0x0801840c
- 800e5c8:	08017bc8 	.word	0x08017bc8
+ 800e5c0:	08017c00 	.word	0x08017c00
+ 800e5c4:	08018410 	.word	0x08018410
+ 800e5c8:	08017bcc 	.word	0x08017bcc
 
 0800e5cc <logConnackResponse>:
 
@@ -38420,10 +38420,10 @@ static void logConnackResponse( uint8_t responseCode )
  800e602:	46bd      	mov	sp, r7
  800e604:	bdb0      	pop	{r4, r5, r7, pc}
  800e606:	bf00      	nop
- 800e608:	08017d5c 	.word	0x08017d5c
- 800e60c:	08017d48 	.word	0x08017d48
- 800e610:	08018420 	.word	0x08018420
- 800e614:	08017bc8 	.word	0x08017bc8
+ 800e608:	08017d60 	.word	0x08017d60
+ 800e60c:	08017d4c 	.word	0x08017d4c
+ 800e610:	08018424 	.word	0x08018424
+ 800e614:	08017bcc 	.word	0x08017bcc
 
 0800e618 <deserializeConnack>:
 
@@ -38600,10 +38600,10 @@ static MQTTStatus_t deserializeConnack( const MQTTPacketInfo_t * pConnack,
  800e6d6:	3710      	adds	r7, #16
  800e6d8:	46bd      	mov	sp, r7
  800e6da:	bd80      	pop	{r7, pc}
- 800e6dc:	08017d74 	.word	0x08017d74
- 800e6e0:	08018434 	.word	0x08018434
- 800e6e4:	08017bc8 	.word	0x08017bc8
- 800e6e8:	08017d88 	.word	0x08017d88
+ 800e6dc:	08017d78 	.word	0x08017d78
+ 800e6e0:	08018438 	.word	0x08018438
+ 800e6e4:	08017bcc 	.word	0x08017bcc
+ 800e6e8:	08017d8c 	.word	0x08017d8c
 
 0800e6ec <calculateSubscriptionPacketSize>:
 static MQTTStatus_t calculateSubscriptionPacketSize( const MQTTSubscribeInfo_t * pSubscriptionList,
@@ -38806,12 +38806,12 @@ static MQTTStatus_t calculateSubscriptionPacketSize( const MQTTSubscribeInfo_t *
  800e7fe:	46bd      	mov	sp, r7
  800e800:	bd80      	pop	{r7, pc}
  800e802:	bf00      	nop
- 800e804:	08017da0 	.word	0x08017da0
- 800e808:	08018448 	.word	0x08018448
- 800e80c:	08017bc8 	.word	0x08017bc8
- 800e810:	08017dbc 	.word	0x08017dbc
- 800e814:	08017c14 	.word	0x08017c14
- 800e818:	08017c30 	.word	0x08017c30
+ 800e804:	08017da4 	.word	0x08017da4
+ 800e808:	0801844c 	.word	0x0801844c
+ 800e80c:	08017bcc 	.word	0x08017bcc
+ 800e810:	08017dc0 	.word	0x08017dc0
+ 800e814:	08017c18 	.word	0x08017c18
+ 800e818:	08017c34 	.word	0x08017c34
 
 0800e81c <readSubackStatus>:
 
@@ -38923,9 +38923,9 @@ static MQTTStatus_t readSubackStatus( size_t statusCount,
  800e892:	46bd      	mov	sp, r7
  800e894:	bd80      	pop	{r7, pc}
  800e896:	bf00      	nop
- 800e898:	08017dd4 	.word	0x08017dd4
- 800e89c:	08018468 	.word	0x08018468
- 800e8a0:	08017bc8 	.word	0x08017bc8
+ 800e898:	08017dd8 	.word	0x08017dd8
+ 800e89c:	0801846c 	.word	0x0801846c
+ 800e8a0:	08017bcc 	.word	0x08017bcc
 
 0800e8a4 <deserializeSuback>:
 
@@ -39043,10 +39043,10 @@ static MQTTStatus_t deserializeSuback( const MQTTPacketInfo_t * pSuback,
  800e936:	3718      	adds	r7, #24
  800e938:	46bd      	mov	sp, r7
  800e93a:	bd80      	pop	{r7, pc}
- 800e93c:	08017dec 	.word	0x08017dec
- 800e940:	0801847c 	.word	0x0801847c
- 800e944:	08017bc8 	.word	0x08017bc8
- 800e948:	08017dfc 	.word	0x08017dfc
+ 800e93c:	08017df0 	.word	0x08017df0
+ 800e940:	08018480 	.word	0x08018480
+ 800e944:	08017bcc 	.word	0x08017bcc
+ 800e948:	08017e00 	.word	0x08017e00
 
 0800e94c <deserializePublish>:
 /*-----------------------------------------------------------*/
@@ -39310,12 +39310,12 @@ static MQTTStatus_t deserializePublish( const MQTTPacketInfo_t * pIncomingPacket
  800eaae:	46bd      	mov	sp, r7
  800eab0:	bd80      	pop	{r7, pc}
  800eab2:	bf00      	nop
- 800eab4:	08017e18 	.word	0x08017e18
- 800eab8:	08018490 	.word	0x08018490
- 800eabc:	08017bc8 	.word	0x08017bc8
- 800eac0:	08017e30 	.word	0x08017e30
- 800eac4:	08017bfc 	.word	0x08017bfc
- 800eac8:	08017e44 	.word	0x08017e44
+ 800eab4:	08017e1c 	.word	0x08017e1c
+ 800eab8:	08018494 	.word	0x08018494
+ 800eabc:	08017bcc 	.word	0x08017bcc
+ 800eac0:	08017e34 	.word	0x08017e34
+ 800eac4:	08017c00 	.word	0x08017c00
+ 800eac8:	08017e48 	.word	0x08017e48
 
 0800eacc <deserializeSimpleAck>:
 
@@ -39411,10 +39411,10 @@ static MQTTStatus_t deserializeSimpleAck( const MQTTPacketInfo_t * pAck,
  800eb3e:	3710      	adds	r7, #16
  800eb40:	46bd      	mov	sp, r7
  800eb42:	bd80      	pop	{r7, pc}
- 800eb44:	08017e6c 	.word	0x08017e6c
- 800eb48:	080184a4 	.word	0x080184a4
- 800eb4c:	08017bc8 	.word	0x08017bc8
- 800eb50:	08017dfc 	.word	0x08017dfc
+ 800eb44:	08017e70 	.word	0x08017e70
+ 800eb48:	080184a8 	.word	0x080184a8
+ 800eb4c:	08017bcc 	.word	0x08017bcc
+ 800eb50:	08017e00 	.word	0x08017e00
 
 0800eb54 <deserializePingresp>:
 
@@ -39463,9 +39463,9 @@ static MQTTStatus_t deserializePingresp( const MQTTPacketInfo_t * pPingresp )
  800eb86:	46bd      	mov	sp, r7
  800eb88:	bd80      	pop	{r7, pc}
  800eb8a:	bf00      	nop
- 800eb8c:	08017e7c 	.word	0x08017e7c
- 800eb90:	080184bc 	.word	0x080184bc
- 800eb94:	08017bc8 	.word	0x08017bc8
+ 800eb8c:	08017e80 	.word	0x08017e80
+ 800eb90:	080184c0 	.word	0x080184c0
+ 800eb94:	08017bcc 	.word	0x08017bcc
 
 0800eb98 <MQTT_SerializeConnectFixedHeader>:
 
@@ -39654,7 +39654,7 @@ uint8_t * MQTT_SerializeConnectFixedHeader( uint8_t * pIndex,
  800ec7e:	46bd      	mov	sp, r7
  800ec80:	bd80      	pop	{r7, pc}
  800ec82:	bf00      	nop
- 800ec84:	08017e90 	.word	0x08017e90
+ 800ec84:	08017e94 	.word	0x08017e94
 
 0800ec88 <MQTT_GetConnectPacketSize>:
 
@@ -41363,9 +41363,9 @@ static size_t findInRecord( const MQTTPubAckInfo_t * records,
  800f476:	3718      	adds	r7, #24
  800f478:	46bd      	mov	sp, r7
  800f47a:	bd80      	pop	{r7, pc}
- 800f47c:	08017eb0 	.word	0x08017eb0
- 800f480:	080184d0 	.word	0x080184d0
- 800f484:	08017ed4 	.word	0x08017ed4
+ 800f47c:	08017eb4 	.word	0x08017eb4
+ 800f480:	080184d4 	.word	0x080184d4
+ 800f484:	08017ed8 	.word	0x08017ed8
 
 0800f488 <compactRecords>:
 
@@ -41513,9 +41513,9 @@ static void compactRecords( MQTTPubAckInfo_t * records,
  800f552:	46bd      	mov	sp, r7
  800f554:	bd80      	pop	{r7, pc}
  800f556:	bf00      	nop
- 800f558:	08017f04 	.word	0x08017f04
- 800f55c:	080184e0 	.word	0x080184e0
- 800f560:	08017ed4 	.word	0x08017ed4
+ 800f558:	08017f08 	.word	0x08017f08
+ 800f55c:	080184e4 	.word	0x080184e4
+ 800f560:	08017ed8 	.word	0x08017ed8
 
 0800f564 <addRecord>:
 static MQTTStatus_t addRecord( MQTTPubAckInfo_t * records,
@@ -41697,10 +41697,10 @@ static MQTTStatus_t addRecord( MQTTPubAckInfo_t * records,
  800f656:	3720      	adds	r7, #32
  800f658:	46bd      	mov	sp, r7
  800f65a:	bd80      	pop	{r7, pc}
- 800f65c:	08017eb0 	.word	0x08017eb0
- 800f660:	080184f0 	.word	0x080184f0
- 800f664:	08017ed4 	.word	0x08017ed4
- 800f668:	08017f14 	.word	0x08017f14
+ 800f65c:	08017eb4 	.word	0x08017eb4
+ 800f660:	080184f4 	.word	0x080184f4
+ 800f664:	08017ed8 	.word	0x08017ed8
+ 800f668:	08017f18 	.word	0x08017f18
 
 0800f66c <updateRecord>:
 
@@ -41777,9 +41777,9 @@ static void updateRecord( MQTTPubAckInfo_t * records,
  800f6d2:	46bd      	mov	sp, r7
  800f6d4:	bd80      	pop	{r7, pc}
  800f6d6:	bf00      	nop
- 800f6d8:	08017f04 	.word	0x08017f04
- 800f6dc:	080184fc 	.word	0x080184fc
- 800f6e0:	08017ed4 	.word	0x08017ed4
+ 800f6d8:	08017f08 	.word	0x08017f08
+ 800f6dc:	08018500 	.word	0x08018500
+ 800f6e0:	08017ed8 	.word	0x08017ed8
 
 0800f6e4 <stateSelect>:
 /*-----------------------------------------------------------*/
@@ -41969,13 +41969,13 @@ static uint16_t stateSelect( const MQTTContext_t * pMqttContext,
  800f812:	3720      	adds	r7, #32
  800f814:	46bd      	mov	sp, r7
  800f816:	bd80      	pop	{r7, pc}
- 800f818:	08017f24 	.word	0x08017f24
- 800f81c:	0801850c 	.word	0x0801850c
- 800f820:	08017ed4 	.word	0x08017ed4
- 800f824:	08017f3c 	.word	0x08017f3c
- 800f828:	08017f50 	.word	0x08017f50
- 800f82c:	08017f60 	.word	0x08017f60
- 800f830:	08017f88 	.word	0x08017f88
+ 800f818:	08017f28 	.word	0x08017f28
+ 800f81c:	08018510 	.word	0x08018510
+ 800f820:	08017ed8 	.word	0x08017ed8
+ 800f824:	08017f40 	.word	0x08017f40
+ 800f828:	08017f54 	.word	0x08017f54
+ 800f82c:	08017f64 	.word	0x08017f64
+ 800f830:	08017f8c 	.word	0x08017f8c
 
 0800f834 <MQTT_CalculateStateAck>:
 /*-----------------------------------------------------------*/
@@ -42213,9 +42213,9 @@ MQTTPublishState_t MQTT_CalculateStateAck( MQTTPubAckType_t packetType,
  800f972:	3718      	adds	r7, #24
  800f974:	46bd      	mov	sp, r7
  800f976:	bd80      	pop	{r7, pc}
- 800f978:	08017f04 	.word	0x08017f04
- 800f97c:	08018518 	.word	0x08018518
- 800f980:	08017ed4 	.word	0x08017ed4
+ 800f978:	08017f08 	.word	0x08017f08
+ 800f97c:	0801851c 	.word	0x0801851c
+ 800f980:	08017ed8 	.word	0x08017ed8
 
 0800f984 <updateStatePublish>:
                                         uint16_t packetId,
@@ -42347,11 +42347,11 @@ MQTTPublishState_t MQTT_CalculateStateAck( MQTTPubAckType_t packetType,
  800fa4a:	46bd      	mov	sp, r7
  800fa4c:	bd90      	pop	{r4, r7, pc}
  800fa4e:	bf00      	nop
- 800fa50:	08017f24 	.word	0x08017f24
- 800fa54:	08018528 	.word	0x08018528
- 800fa58:	08017ed4 	.word	0x08017ed4
- 800fa5c:	08017eb0 	.word	0x08017eb0
- 800fa60:	08017f14 	.word	0x08017f14
+ 800fa50:	08017f28 	.word	0x08017f28
+ 800fa54:	0801852c 	.word	0x0801852c
+ 800fa58:	08017ed8 	.word	0x08017ed8
+ 800fa5c:	08017eb4 	.word	0x08017eb4
+ 800fa60:	08017f18 	.word	0x08017f18
 
 0800fa64 <MQTT_ReserveState>:
 /*-----------------------------------------------------------*/
@@ -43245,7 +43245,7 @@ int32_t transport_send( NetworkContext_t * pNetworkContext,
  800ff94:	bd80      	pop	{r7, pc}
  800ff96:	bf00      	nop
  800ff98:	20000e70 	.word	0x20000e70
- 800ff9c:	08018088 	.word	0x08018088
+ 800ff9c:	0801808c 	.word	0x0801808c
 
 0800ffa0 <init_transport_from_socket>:
 
@@ -47560,9 +47560,9 @@ BaseType_t xReturn;
  8011606:	46bd      	mov	sp, r7
  8011608:	bd80      	pop	{r7, pc}
  801160a:	bf00      	nop
- 801160c:	08018598 	.word	0x08018598
- 8011610:	080185b8 	.word	0x080185b8
- 8011614:	08018578 	.word	0x08018578
+ 801160c:	0801859c 	.word	0x0801859c
+ 8011610:	080185bc 	.word	0x080185bc
+ 8011614:	0801857c 	.word	0x0801857c
 
 08011618 <prvAddNewTaskToReadyList>:
 /*-----------------------------------------------------------*/
@@ -47972,7 +47972,7 @@ BaseType_t xReturn;
  801181e:	46bd      	mov	sp, r7
  8011820:	bd80      	pop	{r7, pc}
  8011822:	bf00      	nop
- 8011824:	080180b8 	.word	0x080180b8
+ 8011824:	080180bc 	.word	0x080180bc
  8011828:	08011ea1 	.word	0x08011ea1
  801182c:	2000242c 	.word	0x2000242c
  8011830:	20001f34 	.word	0x20001f34
@@ -50599,7 +50599,7 @@ BaseType_t xReturn = pdFAIL;
  8012694:	46bd      	mov	sp, r7
  8012696:	bd80      	pop	{r7, pc}
  8012698:	2000246c 	.word	0x2000246c
- 801269c:	080180e8 	.word	0x080180e8
+ 801269c:	080180ec 	.word	0x080180ec
  80126a0:	080127dd 	.word	0x080127dd
  80126a4:	20002470 	.word	0x20002470
 
@@ -51699,7 +51699,7 @@ static void prvCheckForValidListAndQueue( void )
  8012ca4:	20002468 	.word	0x20002468
  8012ca8:	20002518 	.word	0x20002518
  8012cac:	20002478 	.word	0x20002478
- 8012cb0:	080180f0 	.word	0x080180f0
+ 8012cb0:	080180f4 	.word	0x080180f4
 
 08012cb4 <pxPortInitialiseStack>:
 
@@ -53231,9 +53231,9 @@ uint8_t *puc;
  8013554:	e7f3      	b.n	801353e <__assert_func+0x12>
  8013556:	bf00      	nop
  8013558:	20000058 	.word	0x20000058
- 801355c:	0801853b 	.word	0x0801853b
- 8013560:	08018548 	.word	0x08018548
- 8013564:	08018576 	.word	0x08018576
+ 801355c:	0801853f 	.word	0x0801853f
+ 8013560:	0801854c 	.word	0x0801854c
+ 8013564:	0801857a 	.word	0x0801857a
 
 08013568 <__errno>:
  8013568:	4b01      	ldr	r3, [pc, #4]	; (8013570 <__errno+0x8>)
@@ -53365,7 +53365,7 @@ uint8_t *puc;
  8013686:	61a3      	str	r3, [r4, #24]
  8013688:	e7d2      	b.n	8013630 <__sinit+0xc>
  801368a:	bf00      	nop
- 801368c:	080185d8 	.word	0x080185d8
+ 801368c:	080185dc 	.word	0x080185dc
  8013690:	080135bd 	.word	0x080135bd
 
 08013694 <__sfp>:
@@ -53420,7 +53420,7 @@ uint8_t *puc;
  8013712:	603b      	str	r3, [r7, #0]
  8013714:	e7ee      	b.n	80136f4 <__sfp+0x60>
  8013716:	bf00      	nop
- 8013718:	080185d8 	.word	0x080185d8
+ 8013718:	080185dc 	.word	0x080185dc
  801371c:	ffff0001 	.word	0xffff0001
 
 08013720 <fiprintf>:
@@ -53983,14 +53983,14 @@ uint8_t *puc;
  8013c08:	f000 fb56 	bl	80142b8 <_printf_i>
  8013c0c:	e7e4      	b.n	8013bd8 <_vfiprintf_r+0x208>
  8013c0e:	bf00      	nop
- 8013c10:	08018598 	.word	0x08018598
- 8013c14:	080185b8 	.word	0x080185b8
- 8013c18:	08018578 	.word	0x08018578
- 8013c1c:	080185dc 	.word	0x080185dc
- 8013c20:	080185e6 	.word	0x080185e6
+ 8013c10:	0801859c 	.word	0x0801859c
+ 8013c14:	080185bc 	.word	0x080185bc
+ 8013c18:	0801857c 	.word	0x0801857c
+ 8013c1c:	080185e0 	.word	0x080185e0
+ 8013c20:	080185ea 	.word	0x080185ea
  8013c24:	08013d71 	.word	0x08013d71
  8013c28:	080139ab 	.word	0x080139ab
- 8013c2c:	080185e2 	.word	0x080185e2
+ 8013c2c:	080185e6 	.word	0x080185e6
 
 08013c30 <__cvt>:
  8013c30:	e92d 47ff 	stmdb	sp!, {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, sl, lr}
@@ -54419,11 +54419,11 @@ uint8_t *puc;
  8014048:	e7ee      	b.n	8014028 <_printf_float+0x2b8>
  801404a:	bf00      	nop
  801404c:	7fefffff 	.word	0x7fefffff
- 8014050:	080185ed 	.word	0x080185ed
- 8014054:	080185f1 	.word	0x080185f1
- 8014058:	080185f9 	.word	0x080185f9
- 801405c:	080185f5 	.word	0x080185f5
- 8014060:	080185fd 	.word	0x080185fd
+ 8014050:	080185f1 	.word	0x080185f1
+ 8014054:	080185f5 	.word	0x080185f5
+ 8014058:	080185fd 	.word	0x080185fd
+ 801405c:	080185f9 	.word	0x080185f9
+ 8014060:	08018601 	.word	0x08018601
  8014064:	9a0a      	ldr	r2, [sp, #40]	; 0x28
  8014066:	6da3      	ldr	r3, [r4, #88]	; 0x58
  8014068:	429a      	cmp	r2, r3
@@ -54914,8 +54914,8 @@ uint8_t *puc;
  80144f4:	f104 0619 	add.w	r6, r4, #25
  80144f8:	e7f5      	b.n	80144e6 <_printf_i+0x22e>
  80144fa:	bf00      	nop
- 80144fc:	080185ff 	.word	0x080185ff
- 8014500:	08018610 	.word	0x08018610
+ 80144fc:	08018603 	.word	0x08018603
+ 8014500:	08018614 	.word	0x08018614
 
 08014504 <iprintf>:
  8014504:	b40f      	push	{r0, r1, r2, r3}
@@ -55035,9 +55035,9 @@ uint8_t *puc;
  80145fe:	6022      	str	r2, [r4, #0]
  8014600:	701d      	strb	r5, [r3, #0]
  8014602:	e7db      	b.n	80145bc <_puts_r+0x88>
- 8014604:	08018598 	.word	0x08018598
- 8014608:	080185b8 	.word	0x080185b8
- 801460c:	08018578 	.word	0x08018578
+ 8014604:	0801859c 	.word	0x0801859c
+ 8014608:	080185bc 	.word	0x080185bc
+ 801460c:	0801857c 	.word	0x0801857c
 
 08014610 <puts>:
  8014610:	4b02      	ldr	r3, [pc, #8]	; (801461c <puts+0xc>)
@@ -55364,8 +55364,8 @@ uint8_t *puc;
  80148e8:	e8bd 4070 	ldmia.w	sp!, {r4, r5, r6, lr}
  80148ec:	f000 b806 	b.w	80148fc <__strtok_r>
  80148f0:	20000058 	.word	0x20000058
- 80148f4:	08018621 	.word	0x08018621
- 80148f8:	08018638 	.word	0x08018638
+ 80148f4:	08018625 	.word	0x08018625
+ 80148f8:	0801863c 	.word	0x0801863c
 
 080148fc <__strtok_r>:
  80148fc:	b5f0      	push	{r4, r5, r6, r7, lr}
@@ -55476,9 +55476,9 @@ uint8_t *puc;
  80149dc:	f04f 37ff 	mov.w	r7, #4294967295
  80149e0:	e7ea      	b.n	80149b8 <__swbuf_r+0x6c>
  80149e2:	bf00      	nop
- 80149e4:	08018598 	.word	0x08018598
- 80149e8:	080185b8 	.word	0x080185b8
- 80149ec:	08018578 	.word	0x08018578
+ 80149e4:	0801859c 	.word	0x0801859c
+ 80149e8:	080185bc 	.word	0x080185bc
+ 80149ec:	0801857c 	.word	0x0801857c
 
 080149f0 <_write_r>:
  80149f0:	b538      	push	{r3, r4, r5, lr}
@@ -55588,9 +55588,9 @@ uint8_t *puc;
  8014adc:	e7f7      	b.n	8014ace <__swsetup_r+0xba>
  8014ade:	bf00      	nop
  8014ae0:	20000058 	.word	0x20000058
- 8014ae4:	08018598 	.word	0x08018598
- 8014ae8:	080185b8 	.word	0x080185b8
- 8014aec:	08018578 	.word	0x08018578
+ 8014ae4:	0801859c 	.word	0x0801859c
+ 8014ae8:	080185bc 	.word	0x080185bc
+ 8014aec:	0801857c 	.word	0x0801857c
 
 08014af0 <abort>:
  8014af0:	b508      	push	{r3, lr}
@@ -56004,15 +56004,15 @@ uint8_t *puc;
  8014efc:	3fc68a28 	.word	0x3fc68a28
  8014f00:	509f79fb 	.word	0x509f79fb
  8014f04:	3fd34413 	.word	0x3fd34413
- 8014f08:	08018621 	.word	0x08018621
- 8014f0c:	080186a2 	.word	0x080186a2
+ 8014f08:	08018625 	.word	0x08018625
+ 8014f0c:	080186a6 	.word	0x080186a6
  8014f10:	7ff00000 	.word	0x7ff00000
- 8014f14:	0801869e 	.word	0x0801869e
- 8014f18:	08018695 	.word	0x08018695
- 8014f1c:	080185fe 	.word	0x080185fe
+ 8014f14:	080186a2 	.word	0x080186a2
+ 8014f18:	08018699 	.word	0x08018699
+ 8014f1c:	08018602 	.word	0x08018602
  8014f20:	3ff80000 	.word	0x3ff80000
  8014f24:	08018798 	.word	0x08018798
- 8014f28:	080186fd 	.word	0x080186fd
+ 8014f28:	08018701 	.word	0x08018701
  8014f2c:	2501      	movs	r5, #1
  8014f2e:	2300      	movs	r3, #0
  8014f30:	9306      	str	r3, [sp, #24]
@@ -56920,9 +56920,9 @@ uint8_t *puc;
  8015800:	2b02      	cmp	r3, #2
  8015802:	f73f aea8 	bgt.w	8015556 <_dtoa_r+0x91e>
  8015806:	e7a9      	b.n	801575c <_dtoa_r+0xb24>
- 8015808:	080186fd 	.word	0x080186fd
- 801580c:	080185fd 	.word	0x080185fd
- 8015810:	08018695 	.word	0x08018695
+ 8015808:	08018701 	.word	0x08018701
+ 801580c:	08018601 	.word	0x08018601
+ 8015810:	08018699 	.word	0x08018699
 
 08015814 <__sflush_r>:
  8015814:	898a      	ldrh	r2, [r1, #12]
@@ -57098,9 +57098,9 @@ uint8_t *puc;
  8015986:	bf08      	it	eq
  8015988:	68ec      	ldreq	r4, [r5, #12]
  801598a:	e7da      	b.n	8015942 <_fflush_r+0x22>
- 801598c:	08018598 	.word	0x08018598
- 8015990:	080185b8 	.word	0x080185b8
- 8015994:	08018578 	.word	0x08018578
+ 801598c:	0801859c 	.word	0x0801859c
+ 8015990:	080185bc 	.word	0x080185bc
+ 8015994:	0801857c 	.word	0x0801857c
 
 08015998 <_localeconv_r>:
  8015998:	4800      	ldr	r0, [pc, #0]	; (801599c <_localeconv_r+0x4>)
@@ -57284,8 +57284,8 @@ uint8_t *puc;
  8015b28:	e9c0 3303 	strd	r3, r3, [r0, #12]
  8015b2c:	e7f7      	b.n	8015b1e <_Balloc+0x66>
  8015b2e:	bf00      	nop
- 8015b30:	08018621 	.word	0x08018621
- 8015b34:	0801870e 	.word	0x0801870e
+ 8015b30:	08018625 	.word	0x08018625
+ 8015b34:	08018712 	.word	0x08018712
 
 08015b38 <_Bfree>:
  8015b38:	b570      	push	{r4, r5, r6, lr}
@@ -57313,8 +57313,8 @@ uint8_t *puc;
  8015b6c:	6021      	str	r1, [r4, #0]
  8015b6e:	f843 4022 	str.w	r4, [r3, r2, lsl #2]
  8015b72:	bd70      	pop	{r4, r5, r6, pc}
- 8015b74:	08018621 	.word	0x08018621
- 8015b78:	0801870e 	.word	0x0801870e
+ 8015b74:	08018625 	.word	0x08018625
+ 8015b78:	08018712 	.word	0x08018712
 
 08015b7c <__multadd>:
  8015b7c:	e92d 41f0 	stmdb	sp!, {r4, r5, r6, r7, r8, lr}
@@ -57368,8 +57368,8 @@ uint8_t *puc;
  8015bf8:	6125      	str	r5, [r4, #16]
  8015bfa:	4620      	mov	r0, r4
  8015bfc:	e8bd 81f0 	ldmia.w	sp!, {r4, r5, r6, r7, r8, pc}
- 8015c00:	080186fd 	.word	0x080186fd
- 8015c04:	0801870e 	.word	0x0801870e
+ 8015c00:	08018701 	.word	0x08018701
+ 8015c04:	08018712 	.word	0x08018712
 
 08015c08 <__hi0bits>:
  8015c08:	0c03      	lsrs	r3, r0, #16
@@ -57464,8 +57464,8 @@ uint8_t *puc;
  8015cc6:	6103      	str	r3, [r0, #16]
  8015cc8:	bd10      	pop	{r4, pc}
  8015cca:	bf00      	nop
- 8015ccc:	080186fd 	.word	0x080186fd
- 8015cd0:	0801870e 	.word	0x0801870e
+ 8015ccc:	08018701 	.word	0x08018701
+ 8015cd0:	08018712 	.word	0x08018712
 
 08015cd4 <__multiply>:
  8015cd4:	e92d 4ff0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
@@ -57585,8 +57585,8 @@ uint8_t *puc;
  8015e1a:	3e01      	subs	r6, #1
  8015e1c:	e79c      	b.n	8015d58 <__multiply+0x84>
  8015e1e:	bf00      	nop
- 8015e20:	080186fd 	.word	0x080186fd
- 8015e24:	0801870e 	.word	0x0801870e
+ 8015e20:	08018701 	.word	0x08018701
+ 8015e24:	08018712 	.word	0x08018712
 
 08015e28 <__pow5mult>:
  8015e28:	e92d 43f8 	stmdb	sp!, {r3, r4, r5, r6, r7, r8, r9, lr}
@@ -57655,8 +57655,8 @@ uint8_t *puc;
  8015eca:	e8bd 83f8 	ldmia.w	sp!, {r3, r4, r5, r6, r7, r8, r9, pc}
  8015ece:	bf00      	nop
  8015ed0:	08018860 	.word	0x08018860
- 8015ed4:	08018621 	.word	0x08018621
- 8015ed8:	0801870e 	.word	0x0801870e
+ 8015ed4:	08018625 	.word	0x08018625
+ 8015ed8:	08018712 	.word	0x08018712
 
 08015edc <__lshift>:
  8015edc:	e92d 47f0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
@@ -57736,8 +57736,8 @@ uint8_t *puc;
  8015fae:	d8f9      	bhi.n	8015fa4 <__lshift+0xc8>
  8015fb0:	e7ea      	b.n	8015f88 <__lshift+0xac>
  8015fb2:	bf00      	nop
- 8015fb4:	080186fd 	.word	0x080186fd
- 8015fb8:	0801870e 	.word	0x0801870e
+ 8015fb4:	08018701 	.word	0x08018701
+ 8015fb8:	08018712 	.word	0x08018712
 
 08015fbc <__mcmp>:
  8015fbc:	b530      	push	{r4, r5, lr}
@@ -57862,8 +57862,8 @@ uint8_t *puc;
  80160fa:	e7e0      	b.n	80160be <__mdiff+0xca>
  80160fc:	3f01      	subs	r7, #1
  80160fe:	e7ea      	b.n	80160d6 <__mdiff+0xe2>
- 8016100:	080186fd 	.word	0x080186fd
- 8016104:	0801870e 	.word	0x0801870e
+ 8016100:	08018701 	.word	0x08018701
+ 8016104:	08018712 	.word	0x08018712
 
 08016108 <__d2b>:
  8016108:	e92d 43f7 	stmdb	sp!, {r0, r1, r2, r4, r5, r6, r7, r8, r9, lr}
@@ -57932,8 +57932,8 @@ uint8_t *puc;
  80161ae:	f7ff fd2b 	bl	8015c08 <__hi0bits>
  80161b2:	ebc0 1042 	rsb	r0, r0, r2, lsl #5
  80161b6:	e7df      	b.n	8016178 <__d2b+0x70>
- 80161b8:	080186fd 	.word	0x080186fd
- 80161bc:	0801870e 	.word	0x0801870e
+ 80161b8:	08018701 	.word	0x08018701
+ 80161bc:	08018712 	.word	0x08018712
 
 080161c0 <_calloc_r>:
  80161c0:	b537      	push	{r0, r1, r2, r4, r5, lr}
@@ -58345,11 +58345,11 @@ uint8_t *puc;
  801657c:	f7fd fe9c 	bl	80142b8 <_printf_i>
  8016580:	e7eb      	b.n	801655a <_svfiprintf_r+0x1c2>
  8016582:	bf00      	nop
- 8016584:	080185dc 	.word	0x080185dc
- 8016588:	080185e6 	.word	0x080185e6
+ 8016584:	080185e0 	.word	0x080185e0
+ 8016588:	080185ea 	.word	0x080185ea
  801658c:	08013d71 	.word	0x08013d71
  8016590:	080162e3 	.word	0x080162e3
- 8016594:	080185e2 	.word	0x080185e2
+ 8016594:	080185e6 	.word	0x080185e6
 
 08016598 <_read_r>:
  8016598:	b538      	push	{r3, r4, r5, lr}
