@@ -23,7 +23,7 @@ typedef struct topicFilterContext
 
 static topicFilterContext_t xTopicFilterContext[ TOPIC_COUNT ] =
 {
-    { pcTempTopic, MQTTSubAckFailure }
+    { accelTopic, MQTTSubAckFailure }
 };
 static uint16_t usSubscribePacketIdentifier;
 /**

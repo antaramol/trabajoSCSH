@@ -1100,12 +1100,12 @@ void prvMQTTProcessIncomingPublish( MQTTPublishInfo_t *pxPublishInfo )
 
   // Actuar localmente sobre los LEDs o alguna otra cosa
 
-	for(i=0;i<strlen(pcTempTopic2);i++){
-		if(buffer2[i] != pcTempTopic2[i]){
+	for(i=0;i<strlen(tempSupTopic);i++){
+		if(buffer2[i] != tempSupTopic[i]){
 			break;
 		}
 	}
-	if (i == strlen(pcTempTopic2)){
+	if (i == strlen(tempSupTopic)){
 		if(buffer1[0]=='1'){
 			modo_continuo = true;
 			HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_SET);
@@ -1631,7 +1631,7 @@ void clientMQTT_func(void *argument)
 	configASSERT( xNetworkStatus == PLAINTEXT_TRANSPORT_SUCCESS );
 	//LOG(("Trying to create an MQTT connection\n"));
 	prvCreateMQTTConnectionWithBroker( &xMQTTContext, &xNetworkContext );
-	prvMQTTSubscribeToTopic(&xMQTTContext,pcTempTopic2);
+	prvMQTTSubscribeToTopic(&xMQTTContext,tempSupTopic);
 	prvMQTTSubscribeToTopic(&xMQTTContext,rtcConfTopic);
 	prvMQTTSubscribeToTopic(&xMQTTContext,accelConfTopic);
 
@@ -1654,7 +1654,7 @@ void clientMQTT_func(void *argument)
 		 {
 		  //printf("Publicamos: %s",(char*)mensaje);
 			 sprintf(payLoad,"%s",mensaje);
-			 prvMQTTPublishToTopic(&xMQTTContext,pcTempTopic,payLoad);
+			 prvMQTTPublishToTopic(&xMQTTContext,accelTopic,payLoad);
 		 }
 		 else if (estado == osErrorTimeout)
 		 {
