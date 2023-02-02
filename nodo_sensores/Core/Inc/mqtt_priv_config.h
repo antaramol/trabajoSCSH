@@ -14,8 +14,8 @@ extern "C" {
 #define MQTT_BROKER_PORT (1883)
 #define MQTTCLIENT_IDENTIFIER "adsfclvlahfdsbbhlkadfniqwef23"
 #define TOPIC_COUNT (1)
-#define humdTopic "SCF/sensores/Humd"
-#define tempTopic "SCF/sensores/Temp"
+#define humdTopic "SCF/trabajoFinal/sensores/Humd"
+#define tempTopic "SCF/trabajoFinal/sensores/Temp"
 #define tempSupTopic "SCF/trabajoFinal/TempSup"
 #define rtcConfTopic "SCF/trabajoFinal/conf/RTC"
 //#define pcTempTopic2 "SistCiberFis_jacinto/SCF/LED"
