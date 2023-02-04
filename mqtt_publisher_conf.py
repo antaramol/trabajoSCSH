@@ -10,7 +10,7 @@ i = 0;
 
 
 # Esta linea para cambiar la hora
-client.publish("SCF/trabajoFinal/conf/RTC", "20:20:20,20/10/20")
+client.publish("SCF/trabajoFinal/conf/RTC", "20:20:20,20/1/20")
 
 # Esta linea para cambiar el acelerometro
 client.publish("SCF/trabajoFinal/conf/Accel", "104,4")
